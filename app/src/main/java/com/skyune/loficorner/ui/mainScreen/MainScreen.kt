@@ -1,44 +1,49 @@
 package com.skyune.loficorner.ui.mainScreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
+import com.skyune.loficorner.exoplayer.MusicService
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.exoplayer.isPlaying
+import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
-import com.skyune.loficorner.viewmodels.MainViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
-
+import kotlinx.serialization.json.JsonNull.content
 
 
 @Composable
 fun MainScreen(
-    navController: NavController,
-    mainViewModel: MainViewModel = hiltViewModel(),
+    navController: NavHostController,
     onToggleTheme: () -> Unit,
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
@@ -46,16 +51,13 @@ fun MainScreen(
 ) {
 
     val navController = rememberNavController()
-
-    val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
-
-    val isLoaded = rememberSaveable { (mutableStateOf(false)) }
-
+    val bottomBarState = remember { derivedStateOf {    (mutableStateOf(true)) }}
+    val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
     var myList: MutableList<Data> = mutableListOf<Data>()
 
     //Scaffold from Accompanist, initialized in build.gradle. (for hide bottom bar support)
     Scaffold(
-        bottomBar = { BottomBar(navController = navController, bottomBarState)  }
+        bottomBar = { BottomBar(navController = navController, bottomBarState.value,musicServiceConnection)  }
     ) {
 
             WeatherNavigation(navController = navController,
@@ -63,8 +65,8 @@ fun MainScreen(
                 onToggleDarkMode,
                 musicServiceConnection,
                 gravitySensorDefaulted,
-                bottomBarState,
-                isLoaded,
+                bottomBarState.value,
+                isLoaded.value,
             myList)
 
     }
@@ -73,55 +75,144 @@ fun MainScreen(
 }
 
 @Composable
-fun BottomBar(navController: NavHostController, bottomBarState: MutableState<Boolean>) {
+fun BottomBar(
+
+    navController: NavHostController,
+    bottomBarState: MutableState<Boolean>,
+    musicServiceConnection: MusicServiceConnection,
+) {
     val screens = listOf(
         BottomNavScreen.Home,
         BottomNavScreen.Profile,
         BottomNavScreen.Settings,
     )
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-
-
-//        Card(
-//            modifier = Modifier
-//                .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
-//                .height(50.dp)
-//                .fillMaxWidth(), backgroundColor = MaterialTheme.colors.background
-//        )
-//        {}
-        AnimatedVisibility(
-            visible = bottomBarState.value,
-            enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(
-                durationMillis = 300,
-                easing = LinearEasing
-            )),
-            exit = slideOutVertically(targetOffsetY = { it }, animationSpec = tween(
-                durationMillis = 300,
-                easing = LinearEasing
-            )),
-            content = {
-        BottomNavigation(
-            modifier = Modifier
-                .zIndex(2f)
-                .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
-            backgroundColor = MaterialTheme.colors.secondary, elevation = 10.dp,
+    Column(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top,
         ) {
-            screens.forEach { screen ->
-                AddItem(
-                    screen = screen,
-                    currentDestination = currentDestination,
-                    navController = navController,
-                    bottomBarState = bottomBarState,
-                )
-            }
-        }})
-    }
-}
+            Row() {
+                val songIcon by remember { derivedStateOf { musicServiceConnection.currentPlayingSong.value?.displayIconUri} }
+                val title by remember {
+                    derivedStateOf {
+                        musicServiceConnection.currentPlayingSong.value?.description?.title.toString()
+                    }
+                }
+                val artist by remember {
+                    derivedStateOf {
+                        musicServiceConnection.currentPlayingSong.value?.description?.subtitle.toString()
+                    }
+                }
 
+                AnimatedVisibility(
+                    visible = bottomBarState.value && currentDestination?.route != "home" && musicServiceConnection.isConnected.value,
+                    enter = slideInVertically(
+                        initialOffsetY = { it }, animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearEasing
+                        )
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it }, animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearEasing
+                        )
+                    ),
+                    content = {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Bottom,
+
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .fillMaxWidth()
+                                .zIndex(1f)
+                                .offset(0.dp, 16.dp)
+                                .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
+                                .background(MaterialTheme.colors.primaryVariant)) {
+
+                            Column(Modifier.padding(0.dp,0.dp,0.dp,16.dp)) {
+                               Row {
+                                   Image(
+                                       rememberAsyncImagePainter(
+                                           ImageRequest.Builder(LocalContext.current)
+                                               .diskCachePolicy(CachePolicy.DISABLED)
+                                               .data(data = songIcon)
+                                               .build()
+                                       ),
+                                       modifier = Modifier.size(50.dp),
+                                       contentScale = ContentScale.FillBounds,
+                                       contentDescription = null
+                                   )
+                                   Text(text = title)
+                               }
+
+
+                                LinearProgressIndicator(
+                                    progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(1.dp)
+                                        .graphicsLayer {
+                                            //   alpha = if (currentFraction > 0.001) 0f else 1f
+                                        }
+                                )
+                            }
+                        }
+                    })
+            }
+        }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .zIndex(20f)
+        ) {
+
+
+            AnimatedVisibility(
+                visible = bottomBarState.value,
+                enter = slideInVertically(
+                    initialOffsetY = { it }, animationSpec = tween(
+                        durationMillis = 300,
+                        easing = LinearEasing
+                    )
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { it }, animationSpec = tween(
+                        durationMillis = 300,
+                        easing = LinearEasing
+                    )
+                ),
+                content = {
+                    BottomNavigation(
+                        modifier = Modifier
+                            .zIndex(21f)
+                            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
+                        backgroundColor = MaterialTheme.colors.secondary, elevation = 10.dp,
+                    ) {
+                        screens.forEach { screen ->
+                            AddItem(
+                                screen = screen,
+                                currentDestination = currentDestination,
+                                navController = navController,
+                                bottomBarState = bottomBarState,
+                            )
+                        }
+                    }
+                })
+        }
+    }
+
+}
 
 @Composable
 fun RowScope.AddItem(

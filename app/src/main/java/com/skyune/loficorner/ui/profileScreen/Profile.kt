@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -27,14 +29,19 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
+import com.skyune.loficorner.ui.homeScreen.WeatherItem
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import retrofit2.Call
@@ -56,7 +63,9 @@ fun ProfileScreen(
             .background(MaterialTheme.colors.primary),
         contentAlignment = Alignment.Center
     ) {
-        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded)
+        val list by profileViewModel.allWords.observeAsState(listOf())
+
+        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,list)
     }
 }
 
@@ -86,22 +95,17 @@ fun ShowData(
     profileViewModel: ProfileViewModel,
     musicServiceConnection: MusicServiceConnection,
     bottomBarState: MutableState<Boolean>,
-    isLoaded: MutableState<Boolean>
+    isLoaded: MutableState<Boolean>,
+    list: List<Data>
 ) {
-
-
-    LocalContext.current
-
-
     val listState = rememberLazyListState()
-    val scrollingUp = listState.isScrollingUp()
-    val scrollContext = rememberScrollContext(listState = listState)
-
-    val isPlayerReady: MutableState<Boolean> = rememberSaveable{
-        mutableStateOf(false)
-    }
-
-    bottomBarState.value =  scrollingUp // If we're scrolling up, show the bottom bar
+    //val scrollContext = rememberScrollContext(listState = listState)
+    val isPlayerReady: MutableState<Boolean> = remember{
+        derivedStateOf {
+            mutableStateOf(false)
+        }
+    }.value
+    bottomBarState.value=listState.isScrollingUp()// If we're scrolling up, show the bottom bar
 
     Box(
         modifier = Modifier
@@ -112,17 +116,23 @@ fun ShowData(
 
         ) {
 
-        val list by profileViewModel.allWords.observeAsState(listOf())
-        if(!isLoaded.value)
+
+
+        if(!isLoaded.value && list.isEmpty())
         {
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
 
         }
+        if(list.size>10)
+        {
 
             LazyColumn(modifier = Modifier
-                .padding(2.dp).simpleVerticalScrollbar(listState), contentPadding = PaddingValues(1.dp), state = listState) {
+                .padding(2.dp)
+                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(1.dp), state = listState) {
                 //item { RoomImagesRow() }
-                items(list) { item ->
+                items(list,key = {
+                    it.id
+                },)  { item ->
                     WeatherItem(
                         item = item,
                         onItemClicked = {
@@ -152,20 +162,24 @@ fun ShowData(
                                     isPlayerReady.value = true
                                 }
                         })})}
-                if (scrollContext.isBottom)
-                {
-                   // profileViewModel.ShowPlaylistsSongs(profileViewModel,context)
-                }
+//                if (scrollContext.isBottom)
+//                {
+//                   // profileViewModel.ShowPlaylistsSongs(profileViewModel,context)
+//                }
             }
         }
- }
+        else
+        {
+            CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+        }
+ }}
 
 fun Modifier.simpleVerticalScrollbar(
     state: LazyListState,
-    width: Dp = 8.dp
+    width: Dp = 4.dp
 ): Modifier = composed {
     val targetAlpha = if (state.isScrollInProgress) 1f else 0f
-    val duration = if (state.isScrollInProgress) 150 else 500
+    val duration = if (state.isScrollInProgress) 300 else 800
 
     val alpha by animateFloatAsState(
         targetValue = targetAlpha,
@@ -231,17 +245,29 @@ fun WeatherItem(item: Data, onItemClicked: () -> Unit) {
         color = Color(0xFFCDBEC8),
         shape = RoundedCornerShape(4.dp)) {
         Row {
-            Column(modifier = Modifier.height(50.dp)) {
+            Row {
+                Image(
+                    rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .diskCachePolicy(CachePolicy.DISABLED)
+                            .data(data = item.artwork?.small)
+                            .build()
+                    ),
+                    modifier = Modifier.size(150.dp),
+                    contentScale = ContentScale.FillBounds,
+                    contentDescription = null
+                )
 
+            Column(modifier = Modifier.height(150.dp)) {
                 item.playlist_name?.let { Text(text = it) }
-                //Text(text = item.user.name.toString())
+                item.user?.name?.let { Text(text = it) }
+
             }
         }
     }
-}
+}}
 
 @Composable
 @Preview
 fun ProfileScreenPreview() {
-    //ProfileScreen(musicServiceConnection = MusicServiceConnection())
 }

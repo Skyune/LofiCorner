@@ -34,14 +34,14 @@ class MusicSource {
     }
 
     private fun MediaMetadataCompat.Builder.from(song: Data): MediaMetadataCompat.Builder {
-        //artist = song.user.name
+        artist = song.user?.name
         id = song.id
         title = song.title
-        //displayIconUri = song.songIconList.songImageURL480px
+        displayIconUri = song.artwork?.small
         mediaUri = setSongUrl(song.id)
         //albumArtUri = song.songIconList.songImageURL480px
         displaySubtitle = song.title
-        displayDescription = song.title
+        displayDescription = song.description
         //isFavorite = song.isFavorite.toString()
         duration = 120
 

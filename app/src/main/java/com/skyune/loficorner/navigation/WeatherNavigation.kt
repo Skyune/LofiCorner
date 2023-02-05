@@ -38,8 +38,7 @@ fun WeatherNavigation(
         composable(WeatherScreens.MainScreen.name){
             val mainViewModel = hiltViewModel<MainViewModel>()
             MainScreen(
-                navController = navController,
-                mainViewModel,
+                navController,
                 onToggleTheme,
                 onToggleDarkMode,
                 musicServiceConnection,

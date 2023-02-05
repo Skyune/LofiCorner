@@ -84,8 +84,8 @@ inline val MediaMetadataCompat.albumArtist: String?
 inline val MediaMetadataCompat.art: Bitmap
     get() = getBitmap(MediaMetadataCompat.METADATA_KEY_ART)
 
-//inline val MediaMetadataCompat.artUri: Uri
-//    get() = this.getString(MediaMetadataCompat.METADATA_KEY_ART_URI).toUri()
+inline val MediaMetadataCompat.artUri: Uri
+    get() = this.getString(MediaMetadataCompat.METADATA_KEY_ART_URI).toUri()
 //
 //inline val MediaMetadataCompat.albumArt: Bitmap?
 //    get() = getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART)
@@ -286,7 +286,7 @@ fun MediaMetadataCompat.toMediaItemMetadata(): MediaMetadata {
 //        setDiscNumber(discNumber.toInt())
        // setWriter(writer)
    //     setGenre(genre)
-        //setArtworkUri(albumArtUri)
+      //  setArtworkUri(displayIconUri)
         val extras = Bundle()
         extras.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
         extras.putString(MediaMetadataCompat.METADATA_KEY_GENRE, genre)

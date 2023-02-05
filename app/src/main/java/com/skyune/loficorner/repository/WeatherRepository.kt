@@ -29,6 +29,10 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi, private
     val allWords: Flow<List<Data>> = noteDatabaseDao.getAll()
 
 
+    suspend fun count(): Int {
+        return noteDatabaseDao.getCount()
+    }
+
     suspend fun insert(id: Data) {
         noteDatabaseDao.insert(id)
     }
@@ -36,7 +40,6 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi, private
     fun getMovieById(id: String): Call<Weather> {
         return api.getMovieById(id)
     }
-    val playlistids = listOf("noPJL","n62mn")
 
      suspend fun getPlaylist(id: String): List<Data> {
         return api.getPlaylist(id)

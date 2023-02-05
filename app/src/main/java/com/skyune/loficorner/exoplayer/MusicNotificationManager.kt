@@ -109,8 +109,8 @@ class MusicNotificationManager(
         val loader = ImageLoader(context)
         val request = ImageRequest.Builder(context)
             .data(uri)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.DISABLED)
+            .diskCachePolicy(CachePolicy.DISABLED)
             .allowHardware(false) // Disable hardware bitmaps.
             .build()
         return try {
