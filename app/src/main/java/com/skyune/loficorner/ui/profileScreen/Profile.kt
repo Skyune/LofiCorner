@@ -5,10 +5,7 @@ package com.skyune.loficorner.ui.profileScreen
 import android.util.Log
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -25,15 +22,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.input.key.Key.Companion.F
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
@@ -42,10 +49,12 @@ import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.ui.homeScreen.WeatherItem
+import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import retrofit2.Call
 import retrofit2.Response
+import kotlin.time.Duration.Companion.hours
 
 
 @Composable
@@ -59,8 +68,7 @@ fun ProfileScreen(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight()
-            .background(MaterialTheme.colors.primary),
+            .fillMaxHeight(),
         contentAlignment = Alignment.Center
     ) {
         val list by profileViewModel.allWords.observeAsState(listOf())
@@ -111,15 +119,20 @@ fun ShowData(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(Color(0xFFC1AEB9)),
+            .background(brush = Brush.linearGradient(
+                0f to Color(0xfff8eef9),
+                1f to Color(0xffd4b2c7),
+                start = Offset(0f, 255f),
+                end = Offset(400f, 1900.5f))),
         contentAlignment = Alignment.Center,
 
         ) {
 
 
 
-        if(!isLoaded.value && list.isEmpty())
+        if(profileViewModel.allWords.value?.isEmpty() == true)
         {
+            Log.d("TAG", "ShowData: list is empty")
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
 
         }
@@ -129,7 +142,7 @@ fun ShowData(
             LazyColumn(modifier = Modifier
                 .padding(2.dp)
                 .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(1.dp), state = listState) {
-                //item { RoomImagesRow() }
+                item { RoomImagesRow() }
                 items(list,key = {
                     it.id
                 },)  { item ->
@@ -211,6 +224,38 @@ fun Modifier.simpleVerticalScrollbar(
 
 
 @Composable
+fun ClippedShadow(elevation: Dp, shape: Shape, modifier: Modifier = Modifier) {
+    Layout(
+        modifier
+            .drawWithCache {
+                // Naive cache setup similar to foundation's Background.
+                val path = Path()
+                var lastSize: Size? = null
+
+                fun updatePathIfNeeded() {
+                    if (size != lastSize) {
+                        path.reset()
+                        path.addOutline(
+                            shape.createOutline(size, layoutDirection, this)
+                        )
+                        lastSize = size
+                    }
+                }
+
+                onDrawWithContent {
+                    updatePathIfNeeded()
+                    clipPath(path, ClipOp.Difference) {
+                        this@onDrawWithContent.drawContent()
+                    }
+                }
+            }
+            .shadow(elevation, shape)
+    ) { _, constraints ->
+        layout(constraints.minWidth, constraints.minHeight) {}
+    }
+}
+
+@Composable
 fun rememberScrollContext(listState: LazyListState): ScrollContext {
     val scrollContext by remember {
         derivedStateOf {
@@ -238,36 +283,116 @@ data class ScrollContext(
 
 @Composable
 fun WeatherItem(item: Data, onItemClicked: () -> Unit) {
-    Surface(modifier = Modifier
-        .padding(2.dp)
-        .fillMaxWidth()
-        .clickable { onItemClicked() },
-        color = Color(0xFFCDBEC8),
-        shape = RoundedCornerShape(4.dp)) {
-        Row {
-            Row {
-                Image(
+
+Box(modifier = Modifier.wrapContentWidth().wrapContentHeight()) {
+    ClippedShadow(
+        elevation = 10.dp,
+        shape = RoundedCornerShape(15.dp),
+        modifier = Modifier.matchParentSize().padding(4.dp)
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .height(height = 100.dp)
+            .clip(shape = RoundedCornerShape(15.dp))
+            .background(
+                brush = Brush.linearGradient(
+                    0f to Color(0xfff0e1ed),
+                    1f to Color(0xffd4b2c6),
+                    start = Offset(0f, 0f),
+                    end = Offset(20f, 500f)
+                )
+            ).border(BorderStroke(1.dp, brush = Brush.linearGradient(
+                0f to Color(0xFFFBD4EB),
+                1f to Color(0xffFFB0DF),
+                start = Offset(0f, 0f),
+                end = Offset(20f, 500f))))
+        , contentAlignment = Alignment.CenterStart) {
+
+
+
+        Row() {
+            Image(
                     rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
                             .diskCachePolicy(CachePolicy.DISABLED)
                             .data(data = item.artwork?.small)
                             .build()
                     ),
-                    modifier = Modifier.size(150.dp),
+                    modifier = Modifier.size(100.dp)
+                        .clip(shape = RoundedCornerShape(15.dp)),
                     contentScale = ContentScale.FillBounds,
                     contentDescription = null
                 )
+          Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
+              item.playlist_name?.let {
+                  Text(
+                      text = it,
+                      color = Color(0xff56434d),
+                      lineHeight = 15.sp,
+                      style = TextStyle(
+                          fontSize = 13.sp,
+                          fontWeight = FontWeight.Bold
+                      ),
+                      modifier = Modifier
+                          .width(width = 209.dp).padding(10.dp)
+                  )
+              }
+              item.user?.name?.let {
+                  Text(
+                      text = it,
+                      color = Color(0xff56434d),
+                      textAlign = TextAlign.Center,
+                      lineHeight = 15.sp,
+                      style = TextStyle(
+                          fontSize = 9.sp
+                      ),
+                      modifier = Modifier
+                          .width(width = 55.dp)
+                          .height(height = 15.dp)
+                  )
+              }
 
-            Column(modifier = Modifier.height(150.dp)) {
-                item.playlist_name?.let { Text(text = it) }
-                item.user?.name?.let { Text(text = it) }
+              Box(modifier = Modifier, contentAlignment = Alignment.BottomStart){
 
-            }
-        }
-    }
-}}
+                  ClippedShadow(
+                      elevation = 12.dp,
+                      shape = RoundedCornerShape(15.dp),
+                      modifier = Modifier.matchParentSize().padding(4.dp)
+                  )
+              Box(
+                  modifier = Modifier
+                      .width(width = 63.dp)
+                      .height(height = 22.dp)
+                      .clip(shape = RoundedCornerShape(15.dp))
+                      .background(
+                          brush = Brush.linearGradient(
+                              0f to Color(0xfffec5f3),
+                              1f to Color(0xffbb70c8),
+                              start = Offset(0f, 0f),
+                              end = Offset(0f, 120f)
+                          )
+                      ), contentAlignment = Alignment.Center
+              ) {
+                  item.user?.track_count?.let {
+                      Text(
+                          text = it.toString(),
+                          color = Color(0xff56434d),
+                          textAlign = TextAlign.Center,
+                          lineHeight = 15.sp,
+                          style = TextStyle(
+                              fontSize = 9.sp
+                          ),
+                          modifier = Modifier
+                              .width(width = 55.dp)
+                              .height(height = 15.dp)
+                      )
+                  }
+              }
+          }
+}}}}}
 
 @Composable
-@Preview
 fun ProfileScreenPreview() {
 }

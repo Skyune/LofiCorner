@@ -7,11 +7,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImagePainter.State.Empty.painter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.skyune.loficorner.R
 
 @Preview
@@ -21,8 +26,17 @@ fun room() {
     //This is dumb but it actually works so...
     Box(modifier = Modifier.zIndex(2f).wrapContentSize()) {
 
-        Image(modifier= Modifier.wrapContentSize().aspectRatio(0.9f),painter = painterResource(R.drawable.jazz), contentDescription = "")
-
+        Image(
+            rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .diskCachePolicy(CachePolicy.DISABLED)
+                    .data(data = R.drawable.jazz)
+                    .build()
+            ),
+            modifier = Modifier.wrapContentSize().aspectRatio(0.9f),
+            contentScale = ContentScale.FillBounds,
+            contentDescription = null
+        )
         Box(
             Modifier
                 .zIndex(1f)

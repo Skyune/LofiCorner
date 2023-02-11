@@ -11,9 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 
 
 @Composable
@@ -32,10 +37,17 @@ fun RoomImage(
 
 
                 Box(modifier = Modifier, Alignment.Center) {
+
                     Image(
-                        painter = painterResource(id = ImageId),
-                        modifier = Modifier,
-                        contentDescription = "clickable room"
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .diskCachePolicy(CachePolicy.DISABLED)
+                                .data(data = ImageId)
+                                .build()
+                        ),
+                        modifier = Modifier.size(150.dp),
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null
                     )
 //                    Column(
 //                        verticalArrangement = Arrangement.Bottom,

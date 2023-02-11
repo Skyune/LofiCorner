@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Placeable
@@ -66,13 +67,17 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 
 
             Column(modifier = Modifier
-                .background(color = MaterialTheme.colors.primary)
+                .background(brush = Brush.linearGradient(
+                    0f to Color(0xfff8eef9),
+                    1f to Color(0xffd4b2c7),
+                    start = Offset(0f, 255f),
+                    end = Offset(400f, 1900.5f)))
                 .fillMaxSize()
                 .padding(30.dp, 0.dp, 30.dp, 4.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
 
-                MarqueeText("Lorem", gradientEdgeColor = Color(0xFFFFC1AEB9))
+                //MarqueeText("Lorem", gradientEdgeColor = Color(0xFFFFC1AEB9))
 
                     val shouldHavePlayBar by remember {
                         derivedStateOf {
@@ -87,7 +92,7 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 
                     if (shouldHavePlayBar) {
                         room()
-
+                            //TODO add room logic & animation
                         //GifImage(Modifier.fillMaxSize())
 
                         Log.d("TAG", "HomeScreen: exted")

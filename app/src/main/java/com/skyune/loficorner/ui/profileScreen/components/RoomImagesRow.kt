@@ -29,29 +29,19 @@ fun RoomImagesRow() {
         contentAlignment = Alignment.Center,
 
         ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            Text(
-                "Your Lofi Corner,",
-                style = MaterialTheme.typography.h4, fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            )
-            Text("What would you like to listen to?", fontSize = 16.sp, color = Color.Black)
-            Card(modifier = Modifier
-                .height(30.dp)
-                .fillMaxWidth()
-                , backgroundColor = MaterialTheme.colors.secondary, ) {
-                Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-
-
-                Icon(imageVector = Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colors.primaryVariant, modifier = Modifier.padding(start = 8.dp))
-                Text("Search for playlists", fontSize = 16.sp, color = Color.Black)
-                }
-            }
+//        Column(modifier = Modifier.padding(14.dp)) {
+//            Text(
+//                "Your Lofi Corner,",
+//                style = MaterialTheme.typography.h4, fontWeight = FontWeight.Bold,
+//                fontSize = 20.sp
+//            )
+//
+//            }
             //SearchBar(modifier = Modifier.height(30.dp))
             Row(modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)) {
-                Text("Rooms", fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.weight(1f))
-                Text("Show All")
+                //Text("Rooms", fontWeight = FontWeight.Bold)
+                //Spacer(modifier = Modifier.weight(1f))
+                //Text("Show All")
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 RoomImage(
@@ -76,4 +66,3 @@ fun RoomImagesRow() {
             }
         }
     }
-}

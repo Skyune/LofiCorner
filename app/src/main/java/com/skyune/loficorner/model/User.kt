@@ -20,5 +20,5 @@ data class User(
 //    val spl_wallet: String,
 //    val supporter_count: Int,
 //    val supporting_count: Int,
-//    val track_count: Int
+  val track_count: Int?
 )

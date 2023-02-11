@@ -9,7 +9,7 @@ import com.skyune.loficorner.data.UserTypeConverter
 import com.skyune.loficorner.model.Data
 
 
-@Database(entities = [Data::class], version = 11, exportSchema = false)
+@Database(entities = [Data::class], version = 13, exportSchema = false)
 @TypeConverters(ArtworkTypeConverter::class, UserTypeConverter::class)
 abstract class NoteDatabase: RoomDatabase() {
     abstract fun noteDao(): NoteDatabaseDao

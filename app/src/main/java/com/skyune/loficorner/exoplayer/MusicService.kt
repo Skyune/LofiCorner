@@ -123,6 +123,7 @@ class MusicService : MediaBrowserServiceCompat() {
         exoPlayer.setMediaItems(songs.map {
             it.toMediaItem()}, currentSongIndex, 0L)
         exoPlayer.prepare()
+        exoPlayer.seekTo(0L)
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -163,14 +164,15 @@ class MusicService : MediaBrowserServiceCompat() {
                                 MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
                             )
                         }
+
                         result.sendResult(item)
                         if (!isPlayerInitialized && musicSource.songs.isNotEmpty()) {
                             preparePlayer(musicSource.songs, musicSource.songs[0], true)
                             isPlayerInitialized = true
                         }
                     } else {
-                        mediaSession.sendSessionEvent(NETWORK_ERROR, null)
-                        result.sendResult(null)
+                                mediaSession.sendSessionEvent(NETWORK_ERROR, null)
+                                result.sendResult(null)
                     }
                 }
                 if (!resultsSent) {
