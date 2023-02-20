@@ -119,11 +119,14 @@ fun ShowData(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(brush = Brush.linearGradient(
-                0f to Color(0xfff8eef9),
-                1f to Color(0xffd4b2c7),
-                start = Offset(0f, 255f),
-                end = Offset(400f, 1900.5f))),
+            .background(
+                brush = Brush.linearGradient(
+                    0f to Color(0xfff8eef9),
+                    1f to Color(0xffd4b2c7),
+                    start = Offset(0f, 255f),
+                    end = Offset(400f, 1900.5f)
+                )
+            ),
         contentAlignment = Alignment.Center,
 
         ) {
@@ -142,7 +145,110 @@ fun ShowData(
             LazyColumn(modifier = Modifier
                 .padding(2.dp)
                 .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(1.dp), state = listState) {
-                item { RoomImagesRow() }
+                item {
+                    Column {
+
+                        Row(
+                                horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+
+                            Box(modifier = Modifier .size(size = 130.dp)
+                                .weight(1f).padding(4.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .clip(shape = RoundedCornerShape(15.dp))
+                                        .background(
+                                            brush = Brush.linearGradient(
+                                                0f to Color(0xfffec5f3),
+                                                1f to Color(0xffbb70c8),
+                                                start = Offset(0f, 0f),
+                                                end = Offset(100f, 400f)
+                                            )
+                                        ).border(
+                                            BorderStroke(
+                                                1.dp, brush = Brush.linearGradient(
+                                                    0f to Color(0xFFFBD4EB),
+                                                    1f to Color(0xffFFB0DF),
+                                                    start = Offset(0f, 0f),
+                                                    end = Offset(20f, 550f)
+                                                )
+                                            )
+                                        )
+                                )
+                                ClippedShadow(
+                                    elevation = 5.dp,
+                                    shape = RoundedCornerShape(15.dp),
+                                    modifier = Modifier
+                                        .matchParentSize())
+                            }
+
+                            Box(modifier = Modifier .size(size = 130.dp)
+                                .weight(1f).padding(4.dp)) {
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .clip(shape = RoundedCornerShape(15.dp))
+                                        .background(
+                                            brush = Brush.linearGradient(
+                                                0f to Color(0xfff0e1ed),
+                                                1f to Color(0xffd4b2c6),
+                                                start = Offset(0f, 0f),
+                                                end = Offset(100f, 300f)
+                                            )
+                                        )
+                                )
+                                ClippedShadow(
+                                    elevation = 10.dp,
+                                    shape = RoundedCornerShape(15.dp),
+                                    modifier = Modifier
+                                        .matchParentSize())
+                            }
+
+
+                            Box(modifier = Modifier .size(size = 130.dp)
+                                .weight(1f).padding(4.dp)) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(shape= RoundedCornerShape(15.dp))
+                                    .matchParentSize()
+                                    .background(brush = Brush.linearGradient(
+                                        0f to Color(0xfff0e1ed),
+                                        1f to Color(0xffd4b2c6),
+                                        start = Offset(0f, 0f),
+                                        end = Offset(100f, 300f))))
+                                ClippedShadow(
+                                    elevation = 10.dp,
+                                    shape = RoundedCornerShape(15.dp),
+                                    modifier = Modifier
+                                        .matchParentSize())
+                        }
+                        }
+                        RoomImagesRow()
+                        Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Rooms",
+                                color = Color(0xff7d3389),
+                                textAlign = TextAlign.Center,
+                                lineHeight = 15.sp,
+                                style = TextStyle(
+                                    fontSize = 20.sp),
+                                modifier = Modifier.weight(0.2f))
+
+                            Spacer(Modifier.weight(0.5f)) //top vertical spacer
+
+
+                            Text(
+                                text = "Show All",
+                                color = Color(0xff725866),
+                                textAlign = TextAlign.Center,
+                                lineHeight = 15.sp,
+                                style = TextStyle(
+                                    fontSize = 20.sp),
+                                modifier = Modifier.weight(0.2f)
+                                    )
+                        }
+                    }
+                }
                 items(list,key = {
                     it.id
                 },)  { item ->
@@ -284,16 +390,21 @@ data class ScrollContext(
 @Composable
 fun WeatherItem(item: Data, onItemClicked: () -> Unit) {
 
-Box(modifier = Modifier.wrapContentWidth().wrapContentHeight()) {
+Box(modifier = Modifier
+    .wrapContentWidth()
+    .wrapContentHeight()) {
     ClippedShadow(
         elevation = 10.dp,
         shape = RoundedCornerShape(15.dp),
-        modifier = Modifier.matchParentSize().padding(4.dp)
+        modifier = Modifier
+            .matchParentSize()
+            .padding(4.dp)
     )
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp)
+            .clickable { onItemClicked() }
             .height(height = 100.dp)
             .clip(shape = RoundedCornerShape(15.dp))
             .background(
@@ -303,11 +414,17 @@ Box(modifier = Modifier.wrapContentWidth().wrapContentHeight()) {
                     start = Offset(0f, 0f),
                     end = Offset(20f, 500f)
                 )
-            ).border(BorderStroke(1.dp, brush = Brush.linearGradient(
-                0f to Color(0xFFFBD4EB),
-                1f to Color(0xffFFB0DF),
-                start = Offset(0f, 0f),
-                end = Offset(20f, 500f))))
+            )
+            .border(
+                BorderStroke(
+                    1.dp, brush = Brush.linearGradient(
+                        0f to Color(0xFFFBD4EB),
+                        1f to Color(0xffFFB0DF),
+                        start = Offset(0f, 0f),
+                        end = Offset(20f, 500f)
+                    )
+                )
+            )
         , contentAlignment = Alignment.CenterStart) {
 
 
@@ -320,7 +437,8 @@ Box(modifier = Modifier.wrapContentWidth().wrapContentHeight()) {
                             .data(data = item.artwork?.small)
                             .build()
                     ),
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier
+                        .size(100.dp)
                         .clip(shape = RoundedCornerShape(15.dp)),
                     contentScale = ContentScale.FillBounds,
                     contentDescription = null
@@ -336,7 +454,8 @@ Box(modifier = Modifier.wrapContentWidth().wrapContentHeight()) {
                           fontWeight = FontWeight.Bold
                       ),
                       modifier = Modifier
-                          .width(width = 209.dp).padding(10.dp)
+                          .width(width = 209.dp)
+                          .padding(10.dp)
                   )
               }
               item.user?.name?.let {
@@ -359,7 +478,9 @@ Box(modifier = Modifier.wrapContentWidth().wrapContentHeight()) {
                   ClippedShadow(
                       elevation = 12.dp,
                       shape = RoundedCornerShape(15.dp),
-                      modifier = Modifier.matchParentSize().padding(4.dp)
+                      modifier = Modifier
+                          .matchParentSize()
+                          .padding(4.dp)
                   )
               Box(
                   modifier = Modifier

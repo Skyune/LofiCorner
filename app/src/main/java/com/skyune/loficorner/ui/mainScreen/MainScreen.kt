@@ -71,7 +71,6 @@ fun MainScreen(
         }
     }
 
-    //Scaffold from Accompanist, initialized in build.gradle. (for hide bottom bar support)
     Scaffold(
         bottomBar = { BottomBar(navController = navController, bottomBarState,musicServiceConnection, songIcon,title,artist)  }
     ) {
@@ -193,15 +192,16 @@ fun BottomBar(
                                    } else {
                                        OutlinedButton(
                                            shape = CircleShape,
-                                           border = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
+                                           border = BorderStroke(1.dp, Color.Transparent),
                                            contentPadding = PaddingValues(0.dp),
-                                           colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.onSurface),
+                                           colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
                                            modifier = Modifier
                                                .size(40.dp)
                                                .weight(0.2f),
                                            onClick = { musicServiceConnection.transportControls.pause() }) {
                                            Icon(
                                                painter = painterResource(id = R.drawable.exo_icon_pause),
+                                               tint = Color.White,
                                                contentDescription = null
                                            )
                                        }
@@ -213,7 +213,7 @@ fun BottomBar(
                                     progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
                                     Modifier
                                         .fillMaxWidth()
-                                        .height(1.dp)
+                                        .height(2.dp)
                                         .graphicsLayer {
                                             //   alpha = if (currentFraction > 0.001) 0f else 1f
                                         }
@@ -270,8 +270,6 @@ fun BottomBar(
 }
 
 
-//TODO needs better implementation?
-//stutter on animation when scrolling up and down on lazycolumn screen.
 @Composable
 fun RowScope.AddItem(
     screen: BottomNavScreen,
