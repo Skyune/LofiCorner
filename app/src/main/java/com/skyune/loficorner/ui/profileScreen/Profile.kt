@@ -139,7 +139,7 @@ fun ShowData(
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
 
         }
-        if(list.size>10)
+        if(list.size>5)
         {
 
             LazyColumn(modifier = Modifier

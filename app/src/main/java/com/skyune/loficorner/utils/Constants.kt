@@ -1,7 +1,7 @@
 package com.skyune.loficorner.utils
 
 object Constants {
-    const val BASE_URL = "https://audius-discovery-2.altego.net/"
+    const val BASE_URL = "https://discoveryprovider.audius.co"
     const val appName = "Lofi-Corner"
 
     const val MEDIA_ROOT_ID = "root_id"

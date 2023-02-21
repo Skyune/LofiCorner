@@ -133,18 +133,9 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
             }
     }
 
-
     val playlistids = listOf("noPJL", "n62mn","ebd1O", "eAlov", "nQR49", "nqbzB", "ezWJp", "lzdql", "XB7R7", "5QaVY", "qE1q2","3AbWv", "AxRP0", "aAw5Q", "Q4wGW", "KK8v2", "RKjdZ","epYaM",
         "LKpEw", "Dv65v", "ebOpP", "ePMJ5", "Ax7ww")
-
-
-        // noteList.addAll(NotesDataSource().loadNotes())
-
-
-    //fun addNote(song: CurrentSong) = viewModelScope.launch { repository.addNote(song) }
-    //fun getNotes() = viewModelScope.launch {  repository.getLatestNote() }
-
-}
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.skyune.loficorner.ui.mainScreen
 
+import android.content.Context
 import android.media.session.PlaybackState
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
@@ -17,6 +18,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -33,7 +35,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.skyune.loficorner.R
@@ -57,6 +59,7 @@ fun MainScreen(
 
     val navController = rememberNavController()
     val bottomBarState = remember { derivedStateOf {    (mutableStateOf(true)) }}
+
     val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
     var myList: MutableList<Data> = mutableListOf<Data>()
     val songIcon by remember { derivedStateOf { musicServiceConnection.currentPlayingSong.value?.displayIconUri} }
@@ -91,7 +94,6 @@ fun MainScreen(
 
 @Composable
 fun BottomBar(
-
     navController: NavHostController,
     bottomBarState: State<MutableState<Boolean>>,
     musicServiceConnection: MusicServiceConnection,
@@ -106,6 +108,8 @@ fun BottomBar(
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .wrapContentHeight()
@@ -118,109 +122,23 @@ fun BottomBar(
             verticalArrangement = Arrangement.Top,
         ) {
             Row() {
-
-
                 AnimatedVisibility(
-                    visible = bottomBarState.value.value && currentDestination?.route != "home" && musicServiceConnection.isConnected.value,
+                    visible = bottomBarState.value.value,
                     enter = slideInVertically(
                         initialOffsetY = { it }, animationSpec = tween(
-                            durationMillis = 150,
+                            durationMillis = 200,
                             easing = LinearEasing
                         )
                     ),
                     exit = slideOutVertically(
                         targetOffsetY = { it }, animationSpec = tween(
-                            durationMillis = 150,
+                            durationMillis = 200,
                             easing = LinearEasing
                         )
-                    ),
-                    content = {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Bottom,
-
-                            modifier = Modifier
-                                .wrapContentHeight()
-                                .fillMaxWidth()
-                                .zIndex(1f)
-                                .offset(0.dp, 16.dp)
-                                .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        0f to Color(0xffFEC5F3),
-                                        1f to Color(0xffBB70C8),
-                                        start = Offset(0f, 0f),
-                                        end = Offset(0f, 202f)
-                                    )
-                                )) {
-
-                            Column(Modifier.padding(0.dp,0.dp,0.dp,16.dp)) {
-                               Row(modifier = Modifier, horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                                   Image(
-                                       rememberAsyncImagePainter(
-                                           ImageRequest.Builder(LocalContext.current)
-                                               .diskCachePolicy(CachePolicy.DISABLED)
-                                               .data(data = songIcon)
-                                               .build()
-                                       ),
-                                       modifier = Modifier.size(50.dp),
-                                       contentScale = ContentScale.FillBounds,
-                                       contentDescription = null
-                                   )
-                                   Column {
-                                       Text(text = title)
-                                       Text(artist)
-                                   }
-                                   if (musicServiceConnection.playbackState.value?.state != PlaybackState.STATE_PLAYING &&
-                                       musicServiceConnection.playbackState.value?.state != PlaybackState.STATE_BUFFERING
-                                   ) {
-                                       OutlinedButton(
-                                           shape = CircleShape,
-                                           border = BorderStroke(1.dp, Color.Transparent),
-                                           contentPadding = PaddingValues(0.dp),
-                                           colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                                           modifier = Modifier
-                                               .size(40.dp)
-                                               .weight(0.2f),
-                                           onClick = { musicServiceConnection.transportControls.play() }) {
-                                           Icon(
-                                               painter = painterResource(id = R.drawable.exo_icon_play),
-                                               tint = Color.White,
-                                               contentDescription = null
-                                           )
-                                       }
-                                   } else {
-                                       OutlinedButton(
-                                           shape = CircleShape,
-                                           border = BorderStroke(1.dp, Color.Transparent),
-                                           contentPadding = PaddingValues(0.dp),
-                                           colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                                           modifier = Modifier
-                                               .size(40.dp)
-                                               .weight(0.2f),
-                                           onClick = { musicServiceConnection.transportControls.pause() }) {
-                                           Icon(
-                                               painter = painterResource(id = R.drawable.exo_icon_pause),
-                                               tint = Color.White,
-                                               contentDescription = null
-                                           )
-                                       }
-                                   }
-                               }
-
-
-                                LinearProgressIndicator(
-                                    progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(2.dp)
-                                        .graphicsLayer {
-                                            //   alpha = if (currentFraction > 0.001) 0f else 1f
-                                        }
-                                )
-                            }
-                        }
-                    })
+                    )
+                ) {
+                    SongColumn(songIcon, title, artist, musicServiceConnection, context)
+                }
             }
         }
         Column(
@@ -229,44 +147,141 @@ fun BottomBar(
             modifier = Modifier
                 .zIndex(20f)
         ) {
-
-
-            //why tf value.value
-            //TODO fix later
             AnimatedVisibility(
                 visible = bottomBarState.value.value,
                 enter = slideInVertically(
                     initialOffsetY = { it }, animationSpec = tween(
-                        durationMillis = 150,
+                        durationMillis = 200,
                         easing = LinearEasing
                     )
                 ),
                 exit = slideOutVertically(
                     targetOffsetY = { it }, animationSpec = tween(
-                        durationMillis = 150,
+                        durationMillis = 200,
                         easing = LinearEasing
                     )
-                ),
-                content = {
-                    BottomNavigation(
-                        modifier = Modifier
-                            .zIndex(21f)
-                            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
-                        backgroundColor = MaterialTheme.colors.secondary, elevation = 10.dp,
-                    ) {
-                        screens.forEach { screen ->
-                            AddItem(
-                                screen = screen,
-                                currentDestination = currentDestination,
-                                navController = navController,
-                                bottomBarState = bottomBarState.value,
-                            )
-                        }
+                )
+            ) {
+                BottomNavigation(
+                    modifier = Modifier
+                        .zIndex(21f)
+                        .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
+                    backgroundColor = MaterialTheme.colors.secondary, elevation = 10.dp,
+                ) {
+                    screens.forEach { screen ->
+                        AddItem(
+                            screen = screen,
+                            currentDestination = currentDestination,
+                            navController = navController,
+                            bottomBarState = bottomBarState.value,
+                        )
                     }
-                })
+                }
+            }
         }
     }
+}
 
+
+@Composable
+private fun SongColumn(
+    songIcon: Uri?,
+    title: String,
+    artist: String,
+    musicServiceConnection: MusicServiceConnection,
+    context: Context
+) {
+    val imageRequest = remember(songIcon) {
+        ImageRequest.Builder(context)
+            .diskCachePolicy(CachePolicy.DISABLED)
+            .data(data = songIcon)
+            .build()
+    }
+
+    val isPlaying = musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PLAYING ||
+            musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_BUFFERING
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .zIndex(1f)
+            .offset(0.dp, 16.dp)
+            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
+            .background(
+                brush = Brush.linearGradient(
+                    0f to Color(0xffFEC5F3),
+                    1f to Color(0xffBB70C8),
+                    start = Offset(0f, 0f),
+                    end = Offset(0f, 202f)
+                )
+            )
+    ) {
+
+        Column(Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp)) {
+            Row(
+                modifier = Modifier
+                ,
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val painter = rememberImagePainter(
+                    imageRequest,
+                    builder = {
+                        crossfade(true)
+                            .data(songIcon)
+                    }
+                )
+                Image(
+                    painter = painter,
+                    modifier = Modifier.size(50.dp)
+                    ,
+                    contentScale = ContentScale.FillBounds,
+                    contentDescription = null
+                )
+                Column {
+                    Text(text = title)
+                    Text(artist)
+                }
+                OutlinedButton(
+                    shape = CircleShape,
+                    border = BorderStroke(1.dp, Color.Transparent),
+                    contentPadding = PaddingValues(0.dp),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .weight(0.2f)
+                    ,
+                    onClick = {
+                        if (isPlaying) musicServiceConnection.transportControls.pause()
+                        else musicServiceConnection.transportControls.play()
+                    }
+                ) {
+                    Icon(
+
+                        painter = painterResource(id = if (isPlaying) R.drawable.exo_icon_pause else R.drawable.exo_icon_play),
+                        tint = Color.White,
+                        modifier = Modifier
+                        ,
+                        contentDescription = null
+                    )
+                }
+            }
+
+
+            LinearProgressIndicator(
+                progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .graphicsLayer {
+                        //   alpha = if (currentFraction > 0.001) 0f else 1f
+                    }
+            )
+        }
+    }
 }
 
 
