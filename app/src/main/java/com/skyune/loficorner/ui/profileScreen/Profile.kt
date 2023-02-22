@@ -13,12 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -30,14 +27,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.input.key.Key.Companion.F
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,13 +43,13 @@ import coil.request.ImageRequest
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
-import com.skyune.loficorner.ui.homeScreen.WeatherItem
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
+import dagger.hilt.internal.aggregatedroot.codegen._com_skyune_loficorner_WeatherApplication
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
-import kotlin.time.Duration.Companion.hours
 
 
 @Composable
@@ -107,7 +102,6 @@ fun ShowData(
     list: List<Data>
 ) {
     val listState = rememberLazyListState()
-    //val scrollContext = rememberScrollContext(listState = listState)
     val isPlayerReady: MutableState<Boolean> = remember{
         derivedStateOf {
             mutableStateOf(false)
@@ -135,12 +129,13 @@ fun ShowData(
 
         if(profileViewModel.allWords.value?.isEmpty() == true)
         {
-            Log.d("TAG", "ShowData: list is empty")
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
-
         }
+
+
         if(list.size>5)
         {
+            val selectedItemId = remember { mutableStateOf(profileViewModel.selectedItemId.value) }
 
             LazyColumn(modifier = Modifier
                 .padding(2.dp)
@@ -235,8 +230,6 @@ fun ShowData(
                                 modifier = Modifier.weight(0.2f))
 
                             Spacer(Modifier.weight(0.5f)) //top vertical spacer
-
-
                             Text(
                                 text = "Show All",
                                 color = Color(0xff725866),
@@ -249,42 +242,24 @@ fun ShowData(
                         }
                     }
                 }
+
+
                 items(list,key = {
                     it.id
                 },)  { item ->
                     WeatherItem(
                         item = item,
+                        isSelected = item.id == selectedItemId.value,
                         onItemClicked = {
+                            selectedItemId.value = item.id
+                            profileViewModel.selectItem(item.id)
 
-                            //TODO("Refactor this abomination")
-
-                            val response: Call<Weather> =
-                                profileViewModel.getMovieById(item.id)
-                            response.enqueue(object : retrofit2.Callback<Weather> {
-                                override fun onFailure(call: Call<Weather>, t: Throwable) {
-                                    Log.d("onFailure", t.message.toString())
-                                }
-
-                                override fun onResponse(
-                                    call: Call<Weather>,
-                                    response: Response<Weather>
-                                ) {
-                                    if (isPlayerReady.value) {
-                                        isPlayerReady.value = false
-                                    }
-                                    playMusicFromId(
-                                        musicServiceConnection,
-                                        response.body()!!.data,
-                                        item.id,
-                                        isPlayerReady.value
-                                    )
-                                    isPlayerReady.value = true
-                                }
-                        })})}
-//                if (scrollContext.isBottom)
-//                {
-//                   // profileViewModel.ShowPlaylistsSongs(profileViewModel,context)
-//                }
+                            profileViewModel.PlayPlaylist(
+                                item,
+                                isPlayerReady,
+                                musicServiceConnection
+                                )
+                        })}
             }
         }
         else
@@ -292,6 +267,38 @@ fun ShowData(
             CircularProgressIndicator(modifier = Modifier.fillMaxSize())
         }
  }}
+
+@Composable
+private fun PlayPlaylist(
+    profileViewModel: ProfileViewModel,
+    item: Data,
+    isPlayerReady: MutableState<Boolean>,
+    musicServiceConnection: MusicServiceConnection
+) {
+    val response: Call<Weather> =
+        profileViewModel.getMovieById(item.id)
+    response.enqueue(object : Callback<Weather> {
+        override fun onFailure(call: Call<Weather>, t: Throwable) {
+            Log.d("onFailure", t.message.toString())
+        }
+
+        override fun onResponse(
+            call: Call<Weather>,
+            response: Response<Weather>
+        ) {
+            if (isPlayerReady.value) {
+                isPlayerReady.value = false
+            }
+            playMusicFromId(
+                musicServiceConnection,
+                response.body()!!.data,
+                item.id,
+                isPlayerReady.value
+            )
+            isPlayerReady.value = true
+        }
+    })
+}
 
 fun Modifier.simpleVerticalScrollbar(
     state: LazyListState,
@@ -362,33 +369,8 @@ fun ClippedShadow(elevation: Dp, shape: Shape, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun rememberScrollContext(listState: LazyListState): ScrollContext {
-    val scrollContext by remember {
-        derivedStateOf {
-            ScrollContext(
-                isTop = listState.isFirstItemVisible,
-                isBottom = listState.isLastItemVisible
-            )
-        }
-    }
-    return scrollContext
-}
+fun WeatherItem(item: Data, onItemClicked: () -> Unit, isSelected: Boolean) {
 
-val LazyListState.isLastItemVisible: Boolean
-    get() = layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-
-val LazyListState.isFirstItemVisible: Boolean
-    get() = firstVisibleItemIndex == 0
-
-
-data class ScrollContext(
-    val isTop: Boolean,
-    val isBottom: Boolean,
-)
-
-
-@Composable
-fun WeatherItem(item: Data, onItemClicked: () -> Unit) {
 
 Box(modifier = Modifier
     .wrapContentWidth()
@@ -408,12 +390,21 @@ Box(modifier = Modifier
             .height(height = 100.dp)
             .clip(shape = RoundedCornerShape(15.dp))
             .background(
-                brush = Brush.linearGradient(
-                    0f to Color(0xfff0e1ed),
-                    1f to Color(0xffd4b2c6),
-                    start = Offset(0f, 0f),
-                    end = Offset(20f, 500f)
-                )
+                if (isSelected) {
+                    Brush.linearGradient(
+                        0f to Color(0xfff0e1ed),
+                        1f to Color(0xffd4b2c6),
+                        start = Offset(0f, 0f),
+                        end = Offset(20f, 500f)
+                    )
+                } else {
+                    Brush.linearGradient(
+                        0f to Color(0xFFA920CF),
+                        1f to Color(0xffbbbbbb),
+                        start = Offset(0f, 0f),
+                        end = Offset(20f, 500f)
+                    )
+                }
             )
             .border(
                 BorderStroke(
@@ -426,9 +417,6 @@ Box(modifier = Modifier
                 )
             )
         , contentAlignment = Alignment.CenterStart) {
-
-
-
         Row() {
             Image(
                     rememberAsyncImagePainter(

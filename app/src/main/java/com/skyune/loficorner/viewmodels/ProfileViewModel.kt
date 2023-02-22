@@ -2,10 +2,10 @@ package com.skyune.loficorner.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.*
+import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
@@ -24,7 +24,8 @@ import javax.inject.Inject
 
 @OptIn(InternalCoroutinesApi::class)
 @HiltViewModel
-class ProfileViewModel @Inject constructor(private val repository: WeatherRepository)
+class ProfileViewModel @Inject constructor(private val repository: WeatherRepository,
+                                           private val preferences: AppPreferences)
     : ViewModel() {
     suspend fun getWeatherData()
             : DataOrException<Weather, Boolean, Exception> {
@@ -53,6 +54,8 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
         return repository.getMovieById(id)
 
     }
+
+
 
     val allWords : LiveData<List<Data>> = repository.allWords.asLiveData()
     var playlist: MutableList<Data> = mutableListOf<Data>()
@@ -90,20 +93,50 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
             }
 
 
-
-
-//
-//    fun insert(id: MutableList<Data>) = viewModelScope.launch {
-//        repository.insert(id)
-//    }
-
-
     fun insert(id: Data) = viewModelScope.launch {
         repository.insert(id)
     }
 
+    private val _selectedItemId = mutableStateOf("")
+
+    val selectedItemId: State<String> = preferences.selectedItemId?.let { mutableStateOf(it) }
+        ?: _selectedItemId
+
+    fun selectItem(itemId: String) {
+        preferences.selectedItemId = itemId // save to SharedPreferences
+        _selectedItemId.value = itemId
+    }
 
 
+    fun PlayPlaylist(
+        item: Data,
+        isPlayerReady: MutableState<Boolean>,
+        musicServiceConnection: MusicServiceConnection,
+    ) {
+        val response: Call<Weather> =
+            getMovieById(item.id)
+        response.enqueue(object : Callback<Weather> {
+            override fun onFailure(call: Call<Weather>, t: Throwable) {
+                Log.d("onFailure", t.message.toString())
+            }
+
+            override fun onResponse(
+                call: Call<Weather>,
+                response: Response<Weather>
+            ) {
+                if (isPlayerReady.value) {
+                    isPlayerReady.value = false
+                }
+                playMusicFromId(
+                    musicServiceConnection,
+                    response.body()!!.data,
+                    item.id,
+                    isPlayerReady.value
+                )
+                isPlayerReady.value = true
+            }
+        })
+    }
 
     fun ShowPlaylistsSongs(
         isLoaded: MutableState<Boolean>

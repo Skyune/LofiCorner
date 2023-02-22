@@ -23,4 +23,5 @@ interface NoteDatabaseDao {
 
     @Query("SELECT COUNT(*) FROM data")
     fun getCount(): Int
+
 }

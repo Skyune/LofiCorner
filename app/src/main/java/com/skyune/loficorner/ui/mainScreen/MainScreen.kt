@@ -277,7 +277,6 @@ private fun SongColumn(
                     .fillMaxWidth()
                     .height(2.dp)
                     .graphicsLayer {
-                        //   alpha = if (currentFraction > 0.001) 0f else 1f
                     }
             )
         }

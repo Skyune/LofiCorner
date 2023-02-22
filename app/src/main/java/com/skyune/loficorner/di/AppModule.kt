@@ -1,8 +1,11 @@
 package com.skyune.loficorner.di
 
+import android.app.Application
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.cleannote.data.NoteDatabase
+import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.NoteDatabaseDao
 import com.skyune.loficorner.WeatherApplication
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
@@ -22,6 +25,17 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class AppModule {
 
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(application: Application): SharedPreferences {
+        return application.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppPreferences(sharedPreferences: SharedPreferences): AppPreferences {
+        return AppPreferences(sharedPreferences)
+    }
 
     @Singleton
     @Provides
