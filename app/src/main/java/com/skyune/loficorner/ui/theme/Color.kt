@@ -1,13 +1,8 @@
 package com.skyune.loficorner.ui.theme
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
 
-val Blue300 = Color(0xFF64B5F6)
-val Blue400 = Color(0xFF42A5F5)
-val Blue500 = Color(0xFF2196F3)
-val Blue600 = Color(0xFF1E88E5)
-val Blue700 = Color(0xFF1976D2)
-val Blue800 = Color(0xFF1565C0)
 
 val Teal300 = Color(0xFF1AC6FF)
 
@@ -22,3 +17,25 @@ val RedErrorLight = Color(0xFFEF5350)
 val JazzMainScreenPrimaryVariant = Color(0xFF7d3389)
 val JazzMainScreenSecondary = Color(0xFFcebfc9)
 val JazzMainScreenPrimary = Color(0xFFc2aeba)
+
+//JazzRoom colors
+
+//on top of playlist brush
+val PrimaryJazzColor = Color(0xfff0e1ed)
+val PrimaryVariantJazzColor = Color(0xffd4b2c6)
+
+//border stroke colors
+val BorderStrokeColor1 = Color(0xFFFBD4EB)
+val BorderStrokeColor2 =  Color(0xffFFB0DF)
+
+
+
+//pinker hue for components
+val ComponentColor1 =  Color(0xfffec5f3)
+val ComponentColor2 = Color(0xffbb70c8)
+
+val BackgroundBrush1 = Color(0xfff8eef9)
+val BackgroundBrush2 = Color(0xffd4b2c7)
+
+//text
+val SurfaceText = Color(0xff7d3389)

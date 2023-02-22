@@ -23,17 +23,17 @@ private val LightThemeColors = lightColors(
 )
 
 public val JazzRoomTheme = lightColors(
-    primary = JazzMainScreenPrimary,
-    primaryVariant = JazzMainScreenPrimaryVariant,
-    onPrimary = Color.White,
-    secondary = JazzMainScreenSecondary,
-    secondaryVariant = Teal300,
-    onSecondary = Black1,
+    primary = PrimaryJazzColor,
+    primaryVariant = PrimaryVariantJazzColor,
+    onPrimary = ComponentColor1,
+    secondary = BorderStrokeColor1,
+    secondaryVariant = BorderStrokeColor2,
+    onSecondary = ComponentColor2,
     error = RedErrorDark,
     onError = RedErrorLight,
-    background = Grey1,
-    onBackground = Color.Black,
-    surface = Color.White,
+    background = BackgroundBrush1,
+    onBackground = BackgroundBrush2,
+    surface = SurfaceText,
     onSurface = Black1,
 )
 
@@ -63,9 +63,10 @@ public val RainbowTheme = darkColors(
 )
 
 enum class Theme {
-    Light,
-    Dark,
-    Auto
+    Jazz,
+    Piano,
+    Witch,
+    Queen,
 }
 
 @Composable
@@ -76,9 +77,10 @@ fun AppTheme(theme: Theme,
         color = Color(0xFFBA98AC)
     )
     val colors = when (theme) {
-        Theme.Light -> JazzRoomTheme
-        Theme.Dark -> RainbowTheme
-        else -> LightThemeColors
+        Theme.Jazz -> JazzRoomTheme
+        Theme.Witch -> RainbowTheme
+        Theme.Queen -> RainbowTheme
+        else -> JazzRoomTheme
     }
     MaterialTheme(
 

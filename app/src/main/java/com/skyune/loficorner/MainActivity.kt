@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme(theme = application.currentTheme.value) {
                 WeatherApp(onToggleTheme = { theme -> application.changeTheme(theme)},
-                    onToggleDarkMode = { application.changeTheme(Theme.Dark) },
+                    onToggleDarkMode = { application.changeTheme(Theme.Jazz) },
                     musicServiceConnection = musicServiceConnection,
                     gravitySensorDefaulted = gravitySensorDefaulted,
                 )
@@ -75,7 +75,7 @@ fun WeatherApp(
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    AppTheme(theme = Theme.Dark) {
+    AppTheme(theme = Theme.Jazz) {
 
     }
 }

@@ -17,7 +17,7 @@ class WeatherApplication: Application() {
 
     lateinit var gravitySensorDefaulted: GravitySensorDefaulted
 
-    private val _currentTheme = mutableStateOf(Theme.Light)
+    private val _currentTheme = mutableStateOf(Theme.Jazz)
     val currentTheme: State<Theme> = _currentTheme
 
     fun changeTheme(theme: Theme) {

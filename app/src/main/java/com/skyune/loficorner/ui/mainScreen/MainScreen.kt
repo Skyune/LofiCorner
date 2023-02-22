@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -166,8 +167,12 @@ fun BottomBar(
                 BottomNavigation(
                     modifier = Modifier
                         .zIndex(21f)
-                        .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
-                    backgroundColor = MaterialTheme.colors.secondary, elevation = 10.dp,
+                        .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)).background( brush = Brush.linearGradient(
+                            0f to MaterialTheme.colors.primary,
+                            1f to MaterialTheme.colors.primaryVariant,
+                            start = Offset(0f, 255f),
+                            end = Offset(400f, 1900.5f))),
+                     elevation = 10.dp,
                 ) {
                     screens.forEach { screen ->
                         AddItem(
@@ -213,10 +218,10 @@ private fun SongColumn(
             .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
             .background(
                 brush = Brush.linearGradient(
-                    0f to Color(0xffFEC5F3),
-                    1f to Color(0xffBB70C8),
+                    0f to Color(MaterialTheme.colors.onPrimary.value),
+                    1f to Color(MaterialTheme.colors.onSecondary.value),
                     start = Offset(0f, 0f),
-                    end = Offset(0f, 202f)
+                    end = Offset(0f, 200f)
                 )
             )
     ) {
@@ -243,8 +248,8 @@ private fun SongColumn(
                     contentDescription = null
                 )
                 Column {
-                    Text(text = title)
-                    Text(artist)
+                    Text(text = title,color = MaterialTheme.colors.onSurface)
+                    Text(artist,color = MaterialTheme.colors.onSurface)
                 }
                 OutlinedButton(
                     shape = CircleShape,
@@ -272,15 +277,18 @@ private fun SongColumn(
             }
 
 
-            LinearProgressIndicator(
-                progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
-                Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-                    .graphicsLayer {
-                    }
-            )
-        }
+
+                LinearProgressIndicator(
+                    progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .fillMaxWidth(0.9f)
+                        .height(3f.dp)
+                        .graphicsLayer {
+                        }
+                )
+            }
+
     }
 }
 
@@ -294,13 +302,13 @@ fun RowScope.AddItem(
 ) {
     BottomNavigationItem(
         label = {
-            Text(text = screen.title)
+            Text(text = screen.title, color = MaterialTheme.colors.onSurface)
         },
         icon = {
             Icon(
                 imageVector = screen.icon,
                 contentDescription = "Navigation Icon",
-                tint = MaterialTheme.colors.primaryVariant
+                tint = MaterialTheme.colors.surface
             )
         },
         selected = currentDestination?.hierarchy?.any {

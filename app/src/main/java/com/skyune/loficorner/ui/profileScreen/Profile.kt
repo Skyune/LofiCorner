@@ -41,11 +41,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
-import com.skyune.loficorner.ui.theme.JazzRoomTheme
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
@@ -119,8 +119,8 @@ fun ShowData(
             .fillMaxHeight()
             .background(
                 brush = Brush.linearGradient(
-                    0f to Color(0xfff8eef9),
-                    1f to Color(0xffd4b2c7),
+                    0f to Color(MaterialTheme.colors.background.value),
+                    1f to Color(MaterialTheme.colors.onBackground.value),
                     start = Offset(0f, 255f),
                     end = Offset(400f, 1900.5f)
                 )
@@ -129,30 +129,52 @@ fun ShowData(
 
         ) {
 
-
-
         if(profileViewModel.allWords.value?.isEmpty() == true)
         {
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
         }
-
-
         if(list.size>5)
         {
             val selectedItemId = remember { mutableStateOf(profileViewModel.selectedItemId.value) }
 
             LazyColumn(modifier = Modifier
                 .padding(2.dp)
-                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(1.dp), state = listState) {
+                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(3.dp), state = listState) {
+                item {
+
+                        Text(
+                            text = "Your Lofi Corner,",
+                            color = Color(MaterialTheme.colors.surface.value),
+                            textAlign = TextAlign.Center,
+                            lineHeight = 15.sp,
+                            style = TextStyle(
+                                fontSize = 20.sp
+                            ),
+                            modifier = Modifier
+                                .width(width = 163.dp)
+                                .height(height = 28.dp)
+                        )
+
+                    }
+
+                item {
+                    Text(
+                    text = "What music would you like to listen to?",
+                    color = Color(0xff56434d),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 15.sp,
+                    style = TextStyle(
+                        fontSize = 14.sp
+                    ),
+                    modifier = Modifier
+                        .width(width = 265.dp)
+                        .height(height = 28.dp)
+
+                )}
                 item {
                     Column {
-
                         Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-
-
-
-
                                 Box(
                                     modifier = Modifier
                                         .size(size = 130.dp)
@@ -163,27 +185,37 @@ fun ShowData(
                                         modifier = Modifier
                                             .matchParentSize()
                                             .clip(shape = RoundedCornerShape(15.dp))
-                                            .clickable { onToggleTheme(Theme.Dark) }
-
                                             .background(
                                                 brush = Brush.linearGradient(
-                                                    0f to Color(MaterialTheme.colors.onPrimary.value),
+                                                    0f to Color(0xfffec5f3),
                                                     1f to Color(0xffbb70c8),
                                                     start = Offset(0f, 0f),
-                                                    end = Offset(100f, 400f)
+                                                    end = Offset(100f, 450f)
                                                 )
                                             )
                                             .border(
                                                 BorderStroke(
                                                     1.dp, brush = Brush.linearGradient(
-                                                        0f to Color(0xFFFBD4EB),
-                                                        1f to Color(0xffFFB0DF),
+                                                        0f to Color(0xfff0e1ed),
+                                                        1f to Color(0xffd4b2c6),
                                                         start = Offset(0f, 0f),
-                                                        end = Offset(20f, 550f)
+                                                        end = Offset(20f, 500f)
                                                     )
                                                 )
-                                            )
-                                    )
+                                            ), contentAlignment = Alignment.Center
+                                    ) {
+                                        Image(
+                                            rememberAsyncImagePainter(
+                                                ImageRequest.Builder(LocalContext.current)
+                                                    .diskCachePolicy(CachePolicy.DISABLED)
+                                                    .data(data = R.drawable.fluent_sleep_20_filled__1_)
+                                                    .build()
+                                            ),
+                                            modifier = Modifier.size(100.dp),
+                                            contentScale = ContentScale.FillBounds,
+                                            contentDescription = null
+                                        )
+                                    }
                                     ClippedShadow(
                                         elevation = 5.dp,
                                         shape = RoundedCornerShape(15.dp),
@@ -205,7 +237,7 @@ fun ShowData(
                                                 0f to Color(0xfff0e1ed),
                                                 1f to Color(0xffd4b2c6),
                                                 start = Offset(0f, 0f),
-                                                end = Offset(100f, 300f)
+                                                end = Offset(20f, 500f)
                                             )
                                         )
                                 )
@@ -215,7 +247,6 @@ fun ShowData(
                                     modifier = Modifier
                                         .matchParentSize())
                             }
-
 
                             Box(modifier = Modifier
                                 .size(size = 130.dp)
@@ -230,7 +261,7 @@ fun ShowData(
                                             0f to Color(0xfff0e1ed),
                                             1f to Color(0xffd4b2c6),
                                             start = Offset(0f, 0f),
-                                            end = Offset(100f, 300f)
+                                            end = Offset(20f, 500f)
                                         )
                                     ))
                                 ClippedShadow(
@@ -240,11 +271,10 @@ fun ShowData(
                                         .matchParentSize())
                         }
                         }
-                        RoomImagesRow()
                         Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "Rooms",
-                                color = Color(0xff7d3389),
+                                color = Color(MaterialTheme.colors.surface.value),
                                 textAlign = TextAlign.Center,
                                 lineHeight = 15.sp,
                                 style = TextStyle(
@@ -254,16 +284,29 @@ fun ShowData(
                             Spacer(Modifier.weight(0.5f)) //top vertical spacer
                             Text(
                                 text = "Show All",
-                                color = Color(0xff725866),
+                                color = Color(MaterialTheme.colors.onSurface.value),
                                 textAlign = TextAlign.Center,
                                 lineHeight = 15.sp,
                                 style = TextStyle(
                                     fontSize = 20.sp),
                                 modifier = Modifier.weight(0.2f)
-                                    )
+                            )
                         }
+                        RoomImagesRow(onToggleTheme)
                     }
                 }
+
+
+                item {  Text(
+                    text = "Featured playlists",
+                    color = Color(0xff7d3389),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 15.sp,
+                    style = TextStyle(
+                        fontSize = 20.sp),
+                    modifier = Modifier
+                        .width(width = 172.dp)
+                        .height(height = 28.dp)) }
 
 
                 items(list,key = {
@@ -412,17 +455,17 @@ Box(modifier = Modifier
             .height(height = 100.dp)
             .clip(shape = RoundedCornerShape(15.dp))
             .background(
-                if (isSelected) {
+                if (!isSelected) {
                     Brush.linearGradient(
-                        0f to Color(MaterialTheme.colors.onPrimary.value),
-                        1f to Color(0xffd4b2c6),
+                        0f to Color(MaterialTheme.colors.primary.value),
+                        1f to Color(MaterialTheme.colors.primaryVariant.value),
                         start = Offset(0f, 0f),
                         end = Offset(20f, 500f)
                     )
                 } else {
                     Brush.linearGradient(
                         0f to Color(0xFFA920CF),
-                        1f to Color(0xffbbbbbb),
+                        1f to Color(MaterialTheme.colors.primaryVariant.value),
                         start = Offset(0f, 0f),
                         end = Offset(20f, 500f)
                     )
@@ -431,8 +474,8 @@ Box(modifier = Modifier
             .border(
                 BorderStroke(
                     1.dp, brush = Brush.linearGradient(
-                        0f to Color(0xFFFBD4EB),
-                        1f to Color(0xffFFB0DF),
+                        0f to Color(MaterialTheme.colors.secondary.value),
+                        1f to Color(MaterialTheme.colors.secondaryVariant.value),
                         start = Offset(0f, 0f),
                         end = Offset(20f, 500f)
                     )
@@ -499,17 +542,17 @@ Box(modifier = Modifier
                       .clip(shape = RoundedCornerShape(15.dp))
                       .background(
                           brush = Brush.linearGradient(
-                              0f to Color(0xfffec5f3),
-                              1f to Color(0xffbb70c8),
+                              0f to Color(MaterialTheme.colors.onPrimary.value),
+                              1f to Color(MaterialTheme.colors.onSecondary.value),
                               start = Offset(0f, 0f),
-                              end = Offset(0f, 120f)
+                              end = Offset(0f, 80f)
                           )
                       ), contentAlignment = Alignment.Center
               ) {
                   item.user?.track_count?.let {
                       Text(
                           text = it.toString(),
-                          color = Color(0xff56434d),
+                          color = Color(MaterialTheme.colors.onSurface.value),
                           textAlign = TextAlign.Center,
                           lineHeight = 15.sp,
                           style = TextStyle(
