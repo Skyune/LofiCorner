@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -44,9 +46,10 @@ import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
+import com.skyune.loficorner.ui.theme.JazzRoomTheme
+import com.skyune.loficorner.ui.theme.RainbowTheme
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
-import dagger.hilt.internal.aggregatedroot.codegen._com_skyune_loficorner_WeatherApplication
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -146,39 +149,67 @@ fun ShowData(
                         Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
 
-                            Box(modifier = Modifier .size(size = 130.dp)
-                                .weight(1f).padding(4.dp)) {
+                            var isJazzRoomTheme by remember { mutableStateOf(false) }
+
+                            val colors = if (isJazzRoomTheme) {
+                                JazzRoomTheme
+                            } else {
+                                MaterialTheme.colors.copy()
+                            }
+                            val colorPalette = remember { mutableStateOf(colors) }
+
+                            MaterialTheme(
+                                colors = colorPalette.value,
+                            ) {
                                 Box(
                                     modifier = Modifier
-                                        .matchParentSize()
-                                        .clip(shape = RoundedCornerShape(15.dp))
-                                        .background(
-                                            brush = Brush.linearGradient(
-                                                0f to Color(0xfffec5f3),
-                                                1f to Color(0xffbb70c8),
-                                                start = Offset(0f, 0f),
-                                                end = Offset(100f, 400f)
-                                            )
-                                        ).border(
-                                            BorderStroke(
-                                                1.dp, brush = Brush.linearGradient(
-                                                    0f to Color(0xFFFBD4EB),
-                                                    1f to Color(0xffFFB0DF),
+                                        .size(size = 130.dp)
+                                        .weight(1f)
+                                        .padding(4.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                            .clip(shape = RoundedCornerShape(15.dp))
+                                            .clickable {
+                                                isJazzRoomTheme = !isJazzRoomTheme
+                                                colorPalette.value = if (isJazzRoomTheme) {
+                                                    RainbowTheme
+                                                } else {
+                                                    JazzRoomTheme
+                                                }
+                                            }
+                                            .background(
+                                                brush = Brush.linearGradient(
+                                                    0f to Color(MaterialTheme.colors.onPrimary.value),
+                                                    1f to Color(0xffbb70c8),
                                                     start = Offset(0f, 0f),
-                                                    end = Offset(20f, 550f)
+                                                    end = Offset(100f, 400f)
                                                 )
                                             )
-                                        )
-                                )
-                                ClippedShadow(
-                                    elevation = 5.dp,
-                                    shape = RoundedCornerShape(15.dp),
-                                    modifier = Modifier
-                                        .matchParentSize())
+                                            .border(
+                                                BorderStroke(
+                                                    1.dp, brush = Brush.linearGradient(
+                                                        0f to Color(0xFFFBD4EB),
+                                                        1f to Color(0xffFFB0DF),
+                                                        start = Offset(0f, 0f),
+                                                        end = Offset(20f, 550f)
+                                                    )
+                                                )
+                                            )
+                                    )
+                                    ClippedShadow(
+                                        elevation = 5.dp,
+                                        shape = RoundedCornerShape(15.dp),
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                    )
+                                }
                             }
-
-                            Box(modifier = Modifier .size(size = 130.dp)
-                                .weight(1f).padding(4.dp)) {
+                            Box(modifier = Modifier
+                                .size(size = 130.dp)
+                                .weight(1f)
+                                .padding(4.dp)) {
                                 Box(
                                     modifier = Modifier
                                         .matchParentSize()
@@ -200,17 +231,22 @@ fun ShowData(
                             }
 
 
-                            Box(modifier = Modifier .size(size = 130.dp)
-                                .weight(1f).padding(4.dp)) {
+                            Box(modifier = Modifier
+                                .size(size = 130.dp)
+                                .weight(1f)
+                                .padding(4.dp)) {
                             Box(
                                 modifier = Modifier
-                                    .clip(shape= RoundedCornerShape(15.dp))
+                                    .clip(shape = RoundedCornerShape(15.dp))
                                     .matchParentSize()
-                                    .background(brush = Brush.linearGradient(
-                                        0f to Color(0xfff0e1ed),
-                                        1f to Color(0xffd4b2c6),
-                                        start = Offset(0f, 0f),
-                                        end = Offset(100f, 300f))))
+                                    .background(
+                                        brush = Brush.linearGradient(
+                                            0f to Color(0xfff0e1ed),
+                                            1f to Color(0xffd4b2c6),
+                                            start = Offset(0f, 0f),
+                                            end = Offset(100f, 300f)
+                                        )
+                                    ))
                                 ClippedShadow(
                                     elevation = 10.dp,
                                     shape = RoundedCornerShape(15.dp),

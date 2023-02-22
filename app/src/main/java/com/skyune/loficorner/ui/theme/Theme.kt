@@ -22,7 +22,7 @@ private val LightThemeColors = lightColors(
     onSurface = Black1,
 )
 
-private val JazzRoomTheme = lightColors(
+public val JazzRoomTheme = lightColors(
     primary = JazzMainScreenPrimary,
     primaryVariant = JazzMainScreenPrimaryVariant,
     onPrimary = Color.White,
@@ -37,7 +37,7 @@ private val JazzRoomTheme = lightColors(
     onSurface = Black1,
 )
 
-private val DarkThemeColors = darkColors(
+public val DarkThemeColors = darkColors(
     primary = JazzMainScreenPrimary,
     primaryVariant = JazzMainScreenPrimaryVariant,
     onPrimary = Color.White,
@@ -49,10 +49,10 @@ private val DarkThemeColors = darkColors(
     surface = Black1,
     onSurface = Color.White,
 )
-private val RainbowTheme = darkColors(
+public val RainbowTheme = darkColors(
     primary = JazzMainScreenPrimary,
     primaryVariant = JazzMainScreenPrimaryVariant,
-    onPrimary = Color.White,
+    onPrimary = Color.Black,
     secondary = JazzMainScreenSecondary,
     onSecondary = Color.White,
     error = RedErrorLight,
