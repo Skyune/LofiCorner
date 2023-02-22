@@ -15,12 +15,13 @@ import com.skyune.loficorner.viewmodels.MainViewModel
 import com.skyune.loficorner.ui.profileScreen.ProfileScreen
 import com.skyune.loficorner.ui.settingsScreen.SettingsScreen
 import com.skyune.loficorner.ui.splash.WeatherSplashScreen
+import com.skyune.loficorner.ui.theme.Theme
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
 @Composable
 fun WeatherNavigation(
     navController: NavHostController,
-    onToggleTheme: () -> Unit,
+    onToggleTheme: (Theme) -> Unit,
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
     gravitySensorDefaulted: GravitySensorDefaulted,
@@ -54,7 +55,8 @@ fun WeatherNavigation(
                 profileViewModel = hiltViewModel(),
                 musicServiceConnection,
                 bottomBarState,
-                isLoaded
+                isLoaded,
+                onToggleTheme
             )
         }
         composable(route = BottomNavScreen.Settings.route) {

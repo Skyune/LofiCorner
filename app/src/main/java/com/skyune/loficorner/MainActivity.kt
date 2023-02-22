@@ -36,10 +36,9 @@ class MainActivity : ComponentActivity() {
 
         val musicServiceConnection = (application as WeatherApplication).musicServiceConnection
 
-
         setContent {
             AppTheme(theme = application.currentTheme.value) {
-                WeatherApp(onToggleTheme = { application.changeTheme(Theme.Light) },
+                WeatherApp(onToggleTheme = { theme -> application.changeTheme(theme)},
                     onToggleDarkMode = { application.changeTheme(Theme.Dark) },
                     musicServiceConnection = musicServiceConnection,
                     gravitySensorDefaulted = gravitySensorDefaulted,
@@ -50,11 +49,12 @@ class MainActivity : ComponentActivity() {
 }
 
 
+
+
 //this is probably a bad way to implement the theming, going to improve on this later.
 @Composable
 fun WeatherApp(
-
-    onToggleTheme: () -> Unit,
+    onToggleTheme: (Theme)  -> Unit,
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
     gravitySensorDefaulted: GravitySensorDefaulted
@@ -65,7 +65,9 @@ fun WeatherApp(
                      horizontalAlignment = Alignment.CenterHorizontally) {
                    val navController = rememberNavController()
 
-                   MainScreen(navController = navController, onToggleTheme = onToggleTheme, onToggleDarkMode = onToggleDarkMode, musicServiceConnection = musicServiceConnection,gravitySensorDefaulted = gravitySensorDefaulted)
+                   MainScreen(
+                       navController = navController, onToggleTheme = onToggleTheme, onToggleDarkMode = onToggleDarkMode, musicServiceConnection = musicServiceConnection,
+                       gravitySensorDefaulted = gravitySensorDefaulted)
                }
 }
 

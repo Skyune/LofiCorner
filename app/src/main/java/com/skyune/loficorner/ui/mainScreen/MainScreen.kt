@@ -18,7 +18,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -45,13 +44,14 @@ import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
+import com.skyune.loficorner.ui.theme.Theme
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
 
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    onToggleTheme: () -> Unit,
+    onToggleTheme: (Theme) -> Unit,
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
     gravitySensorDefaulted: GravitySensorDefaulted
@@ -78,7 +78,8 @@ fun MainScreen(
         bottomBar = { BottomBar(navController = navController, bottomBarState,musicServiceConnection, songIcon,title,artist)  }
     ) {
 
-            WeatherNavigation(navController = navController,
+            WeatherNavigation(
+                navController = navController,
                 onToggleTheme,
                 onToggleDarkMode,
                 musicServiceConnection,

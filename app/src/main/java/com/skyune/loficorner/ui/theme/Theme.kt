@@ -62,18 +62,6 @@ public val RainbowTheme = darkColors(
     onSurface = Color.White,
 )
 
-//@Composable
-//fun AppTheme(darkTheme: Boolean = false,
-//             content: @Composable() () -> Unit) {
-//    val colors = if (darkTheme) DarkThemeColors else LightThemeColors
-//    MaterialTheme(
-//        colors = colors,
-//        typography = MaterialTheme.typography,
-//        shapes = MaterialTheme.shapes,
-//    ) {
-//        content()
-//    }
-//}
 enum class Theme {
     Light,
     Dark,
@@ -89,7 +77,7 @@ fun AppTheme(theme: Theme,
     )
     val colors = when (theme) {
         Theme.Light -> JazzRoomTheme
-        Theme.Dark -> LightThemeColors
+        Theme.Dark -> RainbowTheme
         else -> LightThemeColors
     }
     MaterialTheme(

@@ -13,10 +13,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.yeocak.parallaximage.ParallaxImage
+import com.skyune.loficorner.ui.theme.Theme
 
 @Composable
-fun SettingsScreen(onToggleTheme: () -> Unit, onToggleDarkMode: () -> Unit) {
+fun SettingsScreen(onToggleTheme: (Theme) -> Unit, onToggleDarkMode: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -26,13 +26,13 @@ fun SettingsScreen(onToggleTheme: () -> Unit, onToggleDarkMode: () -> Unit) {
 
         Row() {
             IconButton(
-                onClick = {onToggleTheme()  },
+                onClick = { },
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Toggle Theme")
             }
             IconButton(
-                onClick = {onToggleTheme()},
+                onClick = {},
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Toggle Theme")
@@ -53,5 +53,5 @@ fun SettingsScreen(onToggleTheme: () -> Unit, onToggleDarkMode: () -> Unit) {
 @Composable
 @Preview
 fun SettingsScreenPreview() {
-    SettingsScreen(onToggleTheme = {}, onToggleDarkMode = {})
+    SettingsScreen(onToggleTheme = {}) {}
 }

@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -47,7 +46,7 @@ import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.ui.theme.JazzRoomTheme
-import com.skyune.loficorner.ui.theme.RainbowTheme
+import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import retrofit2.Call
@@ -60,7 +59,8 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel(),
     musicServiceConnection: MusicServiceConnection,
     bottomBarState: MutableState<Boolean>,
-    isLoaded: MutableState<Boolean>
+    isLoaded: MutableState<Boolean>,
+    onToggleTheme: (Theme) -> Unit
 ) {
 
     Box(
@@ -71,7 +71,7 @@ fun ProfileScreen(
     ) {
         val list by profileViewModel.allWords.observeAsState(listOf())
 
-        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,list)
+        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,list,onToggleTheme)
     }
 }
 
@@ -102,7 +102,8 @@ fun ShowData(
     musicServiceConnection: MusicServiceConnection,
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
-    list: List<Data>
+    list: List<Data>,
+    onToggleTheme: (Theme) -> Unit
 ) {
     val listState = rememberLazyListState()
     val isPlayerReady: MutableState<Boolean> = remember{
@@ -149,18 +150,9 @@ fun ShowData(
                         Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
 
-                            var isJazzRoomTheme by remember { mutableStateOf(false) }
 
-                            val colors = if (isJazzRoomTheme) {
-                                JazzRoomTheme
-                            } else {
-                                MaterialTheme.colors.copy()
-                            }
-                            val colorPalette = remember { mutableStateOf(colors) }
 
-                            MaterialTheme(
-                                colors = colorPalette.value,
-                            ) {
+
                                 Box(
                                     modifier = Modifier
                                         .size(size = 130.dp)
@@ -171,14 +163,8 @@ fun ShowData(
                                         modifier = Modifier
                                             .matchParentSize()
                                             .clip(shape = RoundedCornerShape(15.dp))
-                                            .clickable {
-                                                isJazzRoomTheme = !isJazzRoomTheme
-                                                colorPalette.value = if (isJazzRoomTheme) {
-                                                    RainbowTheme
-                                                } else {
-                                                    JazzRoomTheme
-                                                }
-                                            }
+                                            .clickable { onToggleTheme(Theme.Dark) }
+
                                             .background(
                                                 brush = Brush.linearGradient(
                                                     0f to Color(MaterialTheme.colors.onPrimary.value),
@@ -205,7 +191,7 @@ fun ShowData(
                                             .matchParentSize()
                                     )
                                 }
-                            }
+
                             Box(modifier = Modifier
                                 .size(size = 130.dp)
                                 .weight(1f)
@@ -428,7 +414,7 @@ Box(modifier = Modifier
             .background(
                 if (isSelected) {
                     Brush.linearGradient(
-                        0f to Color(0xfff0e1ed),
+                        0f to Color(MaterialTheme.colors.onPrimary.value),
                         1f to Color(0xffd4b2c6),
                         start = Offset(0f, 0f),
                         end = Offset(20f, 500f)
