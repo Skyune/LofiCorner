@@ -45,6 +45,7 @@ import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
+import com.skyune.loficorner.ui.homeScreen.GifImage
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusicFromId
@@ -129,6 +130,7 @@ fun ShowData(
 
         ) {
 
+        val showAll = remember { mutableStateOf(false) }
         if(profileViewModel.allWords.value?.isEmpty() == true)
         {
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
@@ -171,105 +173,13 @@ fun ShowData(
                         .height(height = 28.dp)
 
                 )}
+
                 item {
                     Column {
+
                         Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(size = 130.dp)
-                                        .weight(1f)
-                                        .padding(4.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .matchParentSize()
-                                            .clip(shape = RoundedCornerShape(15.dp))
-                                            .background(
-                                                brush = Brush.linearGradient(
-                                                    0f to Color(0xfffec5f3),
-                                                    1f to Color(0xffbb70c8),
-                                                    start = Offset(0f, 0f),
-                                                    end = Offset(100f, 450f)
-                                                )
-                                            )
-                                            .border(
-                                                BorderStroke(
-                                                    1.dp, brush = Brush.linearGradient(
-                                                        0f to Color(0xfff0e1ed),
-                                                        1f to Color(0xffd4b2c6),
-                                                        start = Offset(0f, 0f),
-                                                        end = Offset(20f, 500f)
-                                                    )
-                                                )
-                                            ), contentAlignment = Alignment.Center
-                                    ) {
-                                        Image(
-                                            rememberAsyncImagePainter(
-                                                ImageRequest.Builder(LocalContext.current)
-                                                    .diskCachePolicy(CachePolicy.DISABLED)
-                                                    .data(data = R.drawable.fluent_sleep_20_filled__1_)
-                                                    .build()
-                                            ),
-                                            modifier = Modifier.size(100.dp),
-                                            contentScale = ContentScale.FillBounds,
-                                            contentDescription = null
-                                        )
-                                    }
-                                    ClippedShadow(
-                                        elevation = 5.dp,
-                                        shape = RoundedCornerShape(15.dp),
-                                        modifier = Modifier
-                                            .matchParentSize()
-                                    )
-                                }
-
-                            Box(modifier = Modifier
-                                .size(size = 130.dp)
-                                .weight(1f)
-                                .padding(4.dp)) {
-                                Box(
-                                    modifier = Modifier
-                                        .matchParentSize()
-                                        .clip(shape = RoundedCornerShape(15.dp))
-                                        .background(
-                                            brush = Brush.linearGradient(
-                                                0f to Color(0xfff0e1ed),
-                                                1f to Color(0xffd4b2c6),
-                                                start = Offset(0f, 0f),
-                                                end = Offset(20f, 500f)
-                                            )
-                                        )
-                                )
-                                ClippedShadow(
-                                    elevation = 10.dp,
-                                    shape = RoundedCornerShape(15.dp),
-                                    modifier = Modifier
-                                        .matchParentSize())
-                            }
-
-                            Box(modifier = Modifier
-                                .size(size = 130.dp)
-                                .weight(1f)
-                                .padding(4.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(shape = RoundedCornerShape(15.dp))
-                                    .matchParentSize()
-                                    .background(
-                                        brush = Brush.linearGradient(
-                                            0f to Color(0xfff0e1ed),
-                                            1f to Color(0xffd4b2c6),
-                                            start = Offset(0f, 0f),
-                                            end = Offset(20f, 500f)
-                                        )
-                                    ))
-                                ClippedShadow(
-                                    elevation = 10.dp,
-                                    shape = RoundedCornerShape(15.dp),
-                                    modifier = Modifier
-                                        .matchParentSize())
-                        }
+                            MusicSelectionButtons(profileViewModel)
                         }
                         Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -282,6 +192,7 @@ fun ShowData(
                                 modifier = Modifier.weight(0.2f))
 
                             Spacer(Modifier.weight(0.5f)) //top vertical spacer
+
                             Text(
                                 text = "Show All",
                                 color = Color(MaterialTheme.colors.onSurface.value),
@@ -289,10 +200,14 @@ fun ShowData(
                                 lineHeight = 15.sp,
                                 style = TextStyle(
                                     fontSize = 20.sp),
-                                modifier = Modifier.weight(0.2f)
+                                modifier = Modifier
+                                    .weight(0.2f)
+                                    .clickable {
+                                        showAll.value =! showAll.value
+                                    }
                             )
                         }
-                        RoomImagesRow(onToggleTheme)
+                        RoomImagesRow(showAll = showAll.value, onToggleTheme)
                     }
                 }
 
@@ -332,6 +247,88 @@ fun ShowData(
             CircularProgressIndicator(modifier = Modifier.fillMaxSize())
         }
  }}
+
+@Composable
+fun MusicSelectionButtons(profileViewModel: ProfileViewModel) {
+    val selectedButtonIndex = remember { mutableStateOf(profileViewModel.selectedButtonIndexId.value) }
+
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        MusicSelectionButton(selectedButtonIndex.value == 0) { profileViewModel.selectButtonIndex(0)
+            selectedButtonIndex.value = 0
+        }
+        MusicSelectionButton(selectedButtonIndex.value == 1) { profileViewModel.selectButtonIndex(1)
+            selectedButtonIndex.value = 1
+        }
+        MusicSelectionButton(selectedButtonIndex.value == 2) { profileViewModel.selectButtonIndex(2)
+            selectedButtonIndex.value = 2
+        }
+    }
+}
+
+
+@Composable
+private fun MusicSelectionButton(isSelected: Boolean, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(size = 130.dp)
+
+            .padding(4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clip(shape = RoundedCornerShape(15.dp))
+                .clickable(onClick = onClick)
+                .background(
+                    if (!isSelected) {
+                        Brush.linearGradient(
+                            0f to Color(MaterialTheme.colors.primary.value),
+                            1f to Color(MaterialTheme.colors.primaryVariant.value),
+                            start = Offset(0f, 0f),
+                            end = Offset(20f, 500f)
+                        )
+                    } else {
+                        Brush.linearGradient(
+                            0f to MaterialTheme.colors.onPrimary,
+                            1f to MaterialTheme.colors.onSecondary,
+                            start = Offset(0f, 0f),
+                            end = Offset(100f, 450f)
+                        )
+                    }
+
+                )
+                .border(
+                    BorderStroke(
+                        1.dp, brush = Brush.linearGradient(
+                            0f to Color(0xfff0e1ed),
+                            1f to Color(0xffd4b2c6),
+                            start = Offset(0f, 0f),
+                            end = Offset(20f, 500f)
+                        )
+                    )
+                ), contentAlignment = Alignment.Center
+        ) {
+            //GifImage(modifier = Modifier.size(100.dp))
+            Image(
+                rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .diskCachePolicy(CachePolicy.DISABLED)
+                        .data(data = R.drawable.fluent_sleep_20_filled__1_)
+                        .build()
+                ),
+                modifier = Modifier.size(100.dp),
+                contentScale = ContentScale.FillBounds,
+                contentDescription = null
+            )
+            }
+        ClippedShadow(
+            elevation = 5.dp,
+            shape = RoundedCornerShape(15.dp),
+            modifier = Modifier
+                .matchParentSize()
+        )
+    }
+}
 
 @Composable
 private fun PlayPlaylist(

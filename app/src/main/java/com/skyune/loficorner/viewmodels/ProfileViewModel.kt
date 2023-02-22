@@ -1,9 +1,7 @@
 package com.skyune.loficorner.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
@@ -107,6 +105,13 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
         _selectedItemId.value = itemId
     }
 
+    var _selectedButtonIndex = mutableStateOf(0)
+    val selectedButtonIndexId: State<Int> = preferences.selectedButtonIndexId.let { mutableStateOf(it) }
+
+    fun selectButtonIndex(itemId: Int) {
+        preferences.selectedButtonIndexId = itemId // save to SharedPreferences
+        _selectedButtonIndex.value = itemId
+    }
 
     fun PlayPlaylist(
         item: Data,
@@ -142,14 +147,14 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
         isLoaded: MutableState<Boolean>
 
         ) {
-                isLoaded.value = false;
-                for (i in playlistids.indices) {
+                isLoaded.value = false
+        for (i in playlistids.indices) {
                     val response: Call<Weather> =
                         getPlaylistData(playlistids[i])
                     response.enqueue(object : Callback<Weather> {
                         override fun onFailure(call: Call<Weather>, t: Throwable) {
                             Log.d("onFailure", t.message.toString())
-                            isLoaded.value = false;
+                            isLoaded.value = false
                         }
 
                         override fun onResponse(call: Call<Weather>, response: Response<Weather>) {
@@ -162,8 +167,8 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
                             }
                         }
                     })
-                    isLoaded.value = true;
-            }
+                    isLoaded.value = true
+                }
     }
 
     val playlistids = listOf("noPJL", "n62mn","ebd1O", "eAlov", "nQR49", "nqbzB", "ezWJp", "lzdql", "XB7R7", "5QaVY", "qE1q2","3AbWv", "AxRP0", "aAw5Q", "Q4wGW", "KK8v2", "RKjdZ","epYaM",

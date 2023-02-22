@@ -149,12 +149,12 @@ fun GifImage(
         .build()
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.red).apply(block = {
+            ImageRequest.Builder(context).data(data = R.drawable.night).apply(block = {
                 size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),
         contentDescription = null,
-        modifier = modifier,
+        modifier = modifier
     )
 }
 
