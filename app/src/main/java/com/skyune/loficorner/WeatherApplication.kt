@@ -1,6 +1,7 @@
 package com.skyune.loficorner
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
@@ -10,17 +11,24 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class WeatherApplication: Application() {
+class WeatherApplication : Application() {
 
     @Inject
     lateinit var musicServiceConnection: MusicServiceConnection
 
-    lateinit var gravitySensorDefaulted: GravitySensorDefaulted
+    @Inject lateinit var preferences: AppPreferences
 
-    private val _currentTheme = mutableStateOf(Theme.Jazz)
-    val currentTheme: State<Theme> = _currentTheme
+
+    public val _currentTheme = mutableStateOf(Theme.Jazz)
+    val currentTheme: State<Theme> by lazy {
+        preferences.selectedTheme.let{ mutableStateOf(it) }
+    }
+
 
     fun changeTheme(theme: Theme) {
+        Log.d("TAG", "changeTheme: ${currentTheme.value}")
+        preferences.selectedTheme = theme // save to SharedPreferences
+        currentTheme.value
         _currentTheme.value = theme
     }
 

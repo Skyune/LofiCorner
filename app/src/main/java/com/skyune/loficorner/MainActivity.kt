@@ -35,10 +35,12 @@ class MainActivity : ComponentActivity() {
         gravitySensorDefaulted = GravitySensorDefaulted(this)
 
         val musicServiceConnection = (application as WeatherApplication).musicServiceConnection
-
         setContent {
-            AppTheme(theme = application.currentTheme.value) {
-                WeatherApp(onToggleTheme = { theme -> application.changeTheme(theme)},
+            val selectedTheme = remember { mutableStateOf(application.currentTheme.value) }
+            AppTheme(theme = selectedTheme.value) {
+                WeatherApp(onToggleTheme = { theme -> application.changeTheme(theme)
+                                           selectedTheme.value = theme
+                                           },
                     onToggleDarkMode = { application.changeTheme(Theme.Jazz) },
                     musicServiceConnection = musicServiceConnection,
                     gravitySensorDefaulted = gravitySensorDefaulted,

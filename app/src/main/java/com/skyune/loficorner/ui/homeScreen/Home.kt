@@ -70,7 +70,7 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                 .background(brush = Brush.linearGradient(
                     0f to MaterialTheme.colors.background,
                     1f to MaterialTheme.colors.onBackground,
-                    start = Offset(0f, 255f),
+                    start = Offset(250f, 300f),
                     end = Offset(900f, 1900.5f)))
                 .fillMaxSize()
                 .padding(30.dp, 0.dp, 30.dp, 4.dp),

@@ -115,7 +115,7 @@ fun ShowData(
                 brush = Brush.linearGradient(
                     0f to Color(MaterialTheme.colors.background.value),
                     1f to Color(MaterialTheme.colors.onBackground.value),
-                    start = Offset(0f, 255f),
+                    start = Offset(250f, 300f),
                     end = Offset(900f, 1900.5f)
                 )
             ),
@@ -206,7 +206,7 @@ fun ShowData(
                                     }
                             )
                         }
-                        RoomImagesRow(showAll = showAll.value, onToggleTheme)
+                        RoomImagesRow(showAll = showAll.value, onToggleTheme,profileViewModel)
                     }
                 }
 
@@ -322,8 +322,8 @@ private fun MusicSelectionButton(
                 .background(
                     if (!isSelected) {
                         Brush.linearGradient(
-                            0f to Color(MaterialTheme.colors.primary.value),
-                            1f to Color(MaterialTheme.colors.primaryVariant.value),
+                            0f to Color(MaterialTheme.colors.secondary.value),
+                            1f to Color(MaterialTheme.colors.secondaryVariant.value),
                             start = Offset(0f, 0f),
                             end = Offset(20f, 500f)
                         )
@@ -335,17 +335,8 @@ private fun MusicSelectionButton(
                             end = Offset(100f, 450f)
                         )
                     }
-                )
-                .border(
-                    BorderStroke(
-                        1.dp, brush = Brush.linearGradient(
-                            0f to MaterialTheme.colors.secondary,
-                            1f to MaterialTheme.colors.secondaryVariant,
-                            start = Offset(0f, 0f),
-                            end = Offset(20f, 500f)
-                        )
-                    )
-                ), contentAlignment = Alignment.Center
+                ),
+                contentAlignment = Alignment.Center
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Card(
@@ -365,19 +356,15 @@ private fun MusicSelectionButton(
                             .data(data = ImageId)
                             .build()
                     ),
-                    modifier = Modifier.size(60.dp),
+                    modifier = Modifier.size(60.dp).composed {
+                        alpha(if (isSelected) 1f else 0.7f)
+                    },
                     contentScale = ContentScale.FillBounds,
                     contentDescription = null
                 )
                 Text(text = Title, Modifier.padding(4.dp), color = MaterialTheme.colors.error)
             }
         }
-        ClippedShadow(
-            elevation = 10.dp,
-            shape = RoundedCornerShape(15.dp),
-            modifier = Modifier
-                .matchParentSize()
-        )
     }
 }
 
@@ -576,7 +563,7 @@ Box(modifier = Modifier
               Box(modifier = Modifier, contentAlignment = Alignment.BottomStart){
 
                   ClippedShadow(
-                      elevation = 12.dp,
+                      elevation = 7.dp,
                       shape = RoundedCornerShape(15.dp),
                       modifier = Modifier
                           .matchParentSize()

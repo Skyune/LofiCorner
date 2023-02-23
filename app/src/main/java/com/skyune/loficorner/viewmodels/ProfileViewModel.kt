@@ -108,9 +108,19 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
     var _selectedButtonIndex = mutableStateOf(0)
     val selectedButtonIndexId: State<Int> = preferences.selectedButtonIndexId.let { mutableStateOf(it) }
 
+
     fun selectButtonIndex(itemId: Int) {
         preferences.selectedButtonIndexId = itemId // save to SharedPreferences
         _selectedButtonIndex.value = itemId
+    }
+
+
+    var _selectedRoomIndex = mutableStateOf(0)
+    val selectedRoomIndexId: State<Int> = preferences.selectedRoomId.let { mutableStateOf(it) }
+
+    fun selectRoomIndex(itemId: Int) {
+        preferences.selectedRoomId = itemId // save to SharedPreferences
+        _selectedRoomIndex.value = itemId
     }
 
     fun PlayPlaylist(

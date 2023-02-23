@@ -41,15 +41,15 @@ public val WitchRoomTheme = darkColors(
 
 @SuppressLint("ConflictingOnColor")
 public val BotanistRoomTheme = lightColors(
-    primary = Color(0xFFFFFFFF),
+    primary = Color(0xFFACDFA8),
     primaryVariant = Color(0xFF93FF89),
-    onPrimary = Color(0xFF7DDD74), //Component1
-    secondary = Color(0xFF74CA6C), //BorderStroke1
-    secondaryVariant = Color(0xFF61864D), //BorderStroke2
-    onSecondary = Color(0xFF3AAF53), //Component2
+    onPrimary = Color(0xFF63BD77), //Component1
+    secondary = Color(0xFF8EE486), //BorderStroke1
+    secondaryVariant = Color(0xFF75D86A), //BorderStroke2
+    onSecondary = Color(0xFF3A834A), //Component2
     error = Color.Black,
-    background = Color(0xFFEDF8ED),
-    onBackground = Color(0xFFAEFFA7),
+    background = Color(0xFFD7EFD5),
+    onBackground = Color(0xFF7ACC72),
     surface = Color(0xFF24300B), //surfaceText
     onSurface = Color.Black,
 )
@@ -61,7 +61,7 @@ public val JazzRoomTheme = lightColors(
     onPrimary = Color(0xFFE97774), //Component1
     secondary = Color(0xFFF6DBE2), //BorderStroke1
     secondaryVariant = Color(0xFFF6BCBE), //BorderStroke2
-    onSecondary = Color(0xFFFCB0AE), //Component2
+    onSecondary = Color(0xFFF58683), //Component2
     error = Color.Black,
     background = Color(0xFFFEFBFB),
     onBackground = Color(0xFFFDB5B3),
@@ -73,10 +73,10 @@ public val JazzRoomTheme = lightColors(
 public val RockstarRoomTheme = lightColors(
     primary = Color(0xFF95C8FA),
     primaryVariant = Color(0xFF44A4FE),
-    onPrimary = Color(0xFF8BC4FB), //Component1
+    onPrimary = Color(0xFF2A7FD1), //Component1
     secondary = Color(0xFFA4CFFB), //BorderStroke1
     secondaryVariant = Color(0xFF80BFFB), //BorderStroke2
-    onSecondary = Color(0xFF339DFE), //Component2
+    onSecondary = Color(0xFF1A71C0), //Component2
     error = Color.Black,
     background = Color(0xFFEDF0F7),
     onBackground = Color(0xFF339CFE),
@@ -111,10 +111,7 @@ enum class Theme {
 @Composable
 fun AppTheme(theme: Theme,
              content: @Composable() () -> Unit) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = Color(0xFFBA98AC)
-    )
+
     val colors = when (theme) {
         Theme.Queen -> BeautyQueenTheme
         Theme.Witch -> WitchRoomTheme
@@ -123,8 +120,20 @@ fun AppTheme(theme: Theme,
         Theme.Rockstar -> RockstarRoomTheme
         else -> JazzRoomTheme
     }
-    MaterialTheme(
 
+    val statusBarColor = when (theme) {
+        Theme.Queen -> Color(0xfff8eef9)
+        Theme.Witch -> Color(0xff483c73)
+        Theme.Jazz -> Color(0xFFFEFBFB)
+        Theme.Botanist -> Color(0xFFD7EFD5)
+        Theme.Rockstar ->Color(0xFFEDF0F7)
+        else -> Color(0xFFBA98AC)
+    }
+
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(statusBarColor)
+
+    MaterialTheme(
         colors = colors,
         typography = MaterialTheme.typography,
         shapes = MaterialTheme.shapes,
