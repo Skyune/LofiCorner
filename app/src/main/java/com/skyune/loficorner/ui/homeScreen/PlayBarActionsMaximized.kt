@@ -28,7 +28,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
 @Composable
-fun PlayBarActionsMaximized(
+public fun PlayBarActionsMaximized(
     bottomPadding: Dp,
     currentFraction: Float,
     musicServiceConnection: MusicServiceConnection,

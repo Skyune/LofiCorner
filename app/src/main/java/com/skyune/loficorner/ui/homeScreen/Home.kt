@@ -1,8 +1,11 @@
 package com.skyune.loficorner.ui.homeScreen
 
+import android.app.Activity
 import android.media.session.PlaybackState
 import android.os.Build.VERSION.SDK_INT
+import android.support.v4.media.session.MediaControllerCompat
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Image
@@ -23,6 +26,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -50,14 +54,20 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
+import com.rld.justlisten.android.ui.bottombars.sheets.BottomSheetScreen
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.utils.playMusic
+import com.skyune.loficorner.utils.playMusicFromId
 
 import com.skyune.loficorner.widgets.RoundIconButton
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class,
-    ExperimentalAnimationGraphicsApi::class
+    ExperimentalAnimationGraphicsApi::class, InternalCoroutinesApi::class
 )
 
 @Composable
@@ -67,17 +77,20 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 
 
             Column(modifier = Modifier
-                .background(brush = Brush.linearGradient(
-                    0f to MaterialTheme.colors.background,
-                    1f to MaterialTheme.colors.onBackground,
-                    start = Offset(250f, 300f),
-                    end = Offset(900f, 1900.5f)))
+                .background(
+                    brush = Brush.linearGradient(
+                        0f to MaterialTheme.colors.background,
+                        1f to MaterialTheme.colors.onBackground,
+                        start = Offset(250f, 300f),
+                        end = Offset(900f, 1900.5f)
+                    )
+                )
                 .fillMaxSize()
                 .padding(30.dp, 0.dp, 30.dp, 4.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
 
-                //MarqueeText("Lorem", gradientEdgeColor = Color(0xFFFFC1AEB9))
+
 
                     val shouldHavePlayBar by remember {
                         derivedStateOf {
@@ -92,46 +105,27 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 
                     if (shouldHavePlayBar) {
                         room()
-                            //TODO add room logic & animation
-                        //GifImage(Modifier.fillMaxSize())
+                        val title by remember { derivedStateOf {
+                            musicServiceConnection.currentPlayingSong.value?.description?.title.toString()  } }
+                        val artist by remember { derivedStateOf {
+                            musicServiceConnection.currentPlayingSong.value?.description?.subtitle.toString() } }
 
-                        Log.d("TAG", "HomeScreen: exted")
-                        PlayerBarSheetContent(
-                            onSkipNextPressed = { musicServiceConnection.transportControls.skipToNext() },
-                            musicServiceConnection = musicServiceConnection,
-                            isExtended = true, currentFraction = 1f
-                        )
-
+                        BoxWithConstraints() {
+                            val constraints = this@BoxWithConstraints
+                            PlayBarActionsMaximized(
+                                bottomPadding = 0.dp,
+                                currentFraction = 1f,
+                                musicServiceConnection = musicServiceConnection,
+                                title = title,
+                                artist = artist,
+                                onSkipNextPressed = { musicServiceConnection.transportControls.skipToNext() },
+                                maxWidth = constraints.maxWidth.value
+                            )
+                        }
                     }
             }
-
     }
 
-@ExperimentalComposeUiApi
-@Composable
-fun SearchBar(
-    modifier: Modifier = Modifier,
-    onSearch: (String) -> Unit = {}) {
-    val searchQueryState = rememberSaveable { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val valid = remember(searchQueryState.value){
-        searchQueryState.value.trim().isNotEmpty()
-    }
-
-    Column {
-        CommonTextField(
-            valueState = searchQueryState,
-            placeholder = "Search for playlists",
-            onAction = KeyboardActions {
-                if (!valid) return@KeyboardActions
-                onSearch(searchQueryState.value.trim())
-                searchQueryState.value = ""
-                keyboardController?.hide()
-            })
-
-    }
-
-}
 
 @Composable
 fun GifImage(
@@ -156,33 +150,6 @@ fun GifImage(
         contentDescription = null,
         modifier = modifier
     )
-}
-
-@Composable
-fun CommonTextField(
-    valueState: MutableState<String>,
-                    placeholder: String,
-                    keyboardType: KeyboardType = KeyboardType.Text,
-                    imeAction: ImeAction = ImeAction.Next,
-                    onAction: KeyboardActions = KeyboardActions.Default) {
-    TextField(
-        value = valueState.value,
-        onValueChange = { valueState.value = it},
-        label = { Text(text = placeholder)},
-        maxLines = 1,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
-        keyboardActions = onAction,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Blue,
-            cursorColor = Color.Blue,),
-        shape = RoundedCornerShape(15.dp),
-        modifier = Modifier
-            .height(60.dp)
-            .fillMaxWidth(),
-            )
-
-
 }
 
 @Composable
@@ -232,7 +199,6 @@ fun MarqueeText(
         if (textLayoutInfo.textWidth <= textLayoutInfo.containerWidth) return@LaunchedEffect
         val duration = 7500 * textLayoutInfo.textWidth / textLayoutInfo.containerWidth
         val delay = 1000L
-
         do {
             val animation = TargetBasedAnimation(
                 animationSpec = infiniteRepeatable(
@@ -303,30 +269,6 @@ fun MarqueeText(
                 it.first.place(it.second, 0)
             }
             gradient?.place(0, 0)
-        }
-    }
-}
-
-
-@Composable
-fun WeatherItem() {
-    Surface(modifier = Modifier
-        .padding(2.dp)
-        .fillMaxWidth()
-        .height(60.dp),
-
-
-        color = Color(0xFFCDBEC8),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Row(modifier = Modifier,Arrangement.Center, Alignment.CenterVertically) {
-            Column(modifier = Modifier.padding(4.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                Text(text = "String", fontFamily = FontFamily.Default, fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight.Bold)
-                Text(text = "Author", fontFamily = FontFamily.Default, fontSize = 12.sp, color = Color.Gray)
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            RoundIconButton(modifier = Modifier, imageVector = Icons.Default.PlayArrow, onClick = { /*TODO*/ })
-
         }
     }
 }

@@ -90,7 +90,7 @@ private class MinimumTouchTargetModifier(val size: DpSize) : LayoutModifier {
         return layout(width, height) {
             val centerX = ((width - placeable.width) / 2f).roundToInt()
             val centerY = ((height - placeable.height) / 2f).roundToInt()
-            placeable.place(centerX, centerY)
+            placeable.placeRelative(centerX, centerY)
         }
     }
 

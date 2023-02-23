@@ -33,10 +33,6 @@ fun PlayerBottomBar(
     onBackgroundClicked: () -> Unit,
     painterLoaded: (Painter) -> Unit
 ) {
-    val color = MaterialTheme.colors.background.toArgb()
-    var gradientColor by remember {
-        mutableStateOf(color)
-    }
 
     BoxWithConstraints(
         modifier = if (isExtended) Modifier
@@ -45,18 +41,6 @@ fun PlayerBottomBar(
         val constraints = this@BoxWithConstraints
         Column(Modifier.fillMaxSize(), ) {
 
-
-            //PlayBarTopSection(currentFraction, onCollapsedClicked, onMoreClicked)
-
-//            PlayBarSwipeActions(
-//                songIcon, currentFraction, constraints,
-//                title, musicServiceConnection, onSkipNextPressed, painterLoaded, onFavoritePressed,
-//                newDominantColor = { color ->
-//                    gradientColor = color
-//                    newDominantColor(color)
-//                },
-//                playBarMinimizedClicked = playBarMinimizedClicked
-//            )
             LinearProgressIndicator(
                 progress = musicServiceConnection.songDuration.value / curSongDuration.toFloat(),
                 Modifier

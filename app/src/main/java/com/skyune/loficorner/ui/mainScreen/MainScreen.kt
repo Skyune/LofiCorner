@@ -125,7 +125,7 @@ fun BottomBar(
         ) {
             Row() {
                 AnimatedVisibility(
-                    visible = bottomBarState.value.value,
+                    visible = bottomBarState.value.value && currentDestination?.route != "home" && musicServiceConnection.isConnected.value,
                     enter = slideInVertically(
                         initialOffsetY = { it }, animationSpec = tween(
                             durationMillis = 200,
