@@ -14,7 +14,7 @@ fun playMusicFromId(
     isPlayerReady: Boolean
 ) {
     if (isPlayerReady) {
-        musicServiceConnection.transportControls.playFromMediaId(songId, null)
+        musicServiceConnection.transportControls?.playFromMediaId(songId, null)
     } else {
         playMusic(musicServiceConnection, playlist, isPlayerReady, songId)
     }
@@ -33,6 +33,6 @@ fun playMusic(
             object : MediaBrowserCompat.SubscriptionCallback() {})
     }
     if (playFromId != "") {
-        musicServiceConnection.transportControls.playFromMediaId(playFromId, null)
+        musicServiceConnection.transportControls?.playFromMediaId(playFromId, null)
     }
 }

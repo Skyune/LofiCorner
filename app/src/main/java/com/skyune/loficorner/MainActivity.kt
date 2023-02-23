@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.navigation.compose.rememberNavController
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.repository.WeatherRepository
 import com.skyune.loficorner.ui.mainScreen.MainScreen
 import com.skyune.loficorner.ui.theme.AppTheme
 import com.skyune.loficorner.ui.theme.Theme
@@ -28,9 +32,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var application: WeatherApplication
 
+    @Inject
+    lateinit var repository: WeatherRepository
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val allWords : LiveData<List<Data>> = repository.allWords.asLiveData()
 
         gravitySensorDefaulted = GravitySensorDefaulted(this)
 
@@ -44,6 +53,7 @@ class MainActivity : ComponentActivity() {
                     onToggleDarkMode = { application.changeTheme(Theme.Jazz) },
                     musicServiceConnection = musicServiceConnection,
                     gravitySensorDefaulted = gravitySensorDefaulted,
+                    allWords
                 )
             }
         }
@@ -56,10 +66,11 @@ class MainActivity : ComponentActivity() {
 //this is probably a bad way to implement the theming, going to improve on this later.
 @Composable
 fun WeatherApp(
-    onToggleTheme: (Theme)  -> Unit,
+    onToggleTheme: (Theme) -> Unit,
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
-    gravitySensorDefaulted: GravitySensorDefaulted
+    gravitySensorDefaulted: GravitySensorDefaulted,
+    allWords: LiveData<List<Data>>
 ) {
 
 
@@ -69,7 +80,7 @@ fun WeatherApp(
 
                    MainScreen(
                        navController = navController, onToggleTheme = onToggleTheme, onToggleDarkMode = onToggleDarkMode, musicServiceConnection = musicServiceConnection,
-                       gravitySensorDefaulted = gravitySensorDefaulted)
+                       gravitySensorDefaulted = gravitySensorDefaulted, allWords)
                }
 }
 

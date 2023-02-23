@@ -118,7 +118,7 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                                 musicServiceConnection = musicServiceConnection,
                                 title = title,
                                 artist = artist,
-                                onSkipNextPressed = { musicServiceConnection.transportControls.skipToNext() },
+                                onSkipNextPressed = { musicServiceConnection.transportControls?.skipToNext() },
                                 maxWidth = constraints.maxWidth.value
                             )
                         }

@@ -47,7 +47,7 @@ public fun PlayBarActionsMaximized(
                     musicServiceConnection.sliderClicked.value = true
                 }
                 is PressInteraction.Release -> {
-                    musicServiceConnection.transportControls.seekTo(musicServiceConnection.songDuration.value)
+                    musicServiceConnection.transportControls?.seekTo(musicServiceConnection.songDuration.value)
                     musicServiceConnection.sliderClicked.value = false
                     musicServiceConnection.updateSong()
                 }
@@ -56,7 +56,7 @@ public fun PlayBarActionsMaximized(
                     musicServiceConnection.sliderClicked.value = true
                 }
                 is DragInteraction.Stop -> {
-                    musicServiceConnection.transportControls.seekTo(musicServiceConnection.songDuration.value)
+                    musicServiceConnection.transportControls?.seekTo(musicServiceConnection.songDuration.value)
                     musicServiceConnection.sliderClicked.value = false
                     musicServiceConnection.updateSong()
                 }
@@ -125,7 +125,7 @@ public fun PlayBarActionsMaximized(
                             .size(40.dp)
                             .weight(0.2f)
                             .clickable {
-                                musicServiceConnection.transportControls.setShuffleMode(
+                                musicServiceConnection.transportControls?.setShuffleMode(
                                     SHUFFLE_MODE_ALL
                                 )
                             },
@@ -138,7 +138,7 @@ public fun PlayBarActionsMaximized(
                             .size(40.dp)
                             .weight(0.2f)
                             .clickable {
-                                musicServiceConnection.transportControls.setShuffleMode(
+                                musicServiceConnection.transportControls?.setShuffleMode(
                                     SHUFFLE_MODE_NONE
                                 )
                             },
@@ -151,7 +151,7 @@ public fun PlayBarActionsMaximized(
                         .size(40.dp)
                         .weight(0.2f)
                         .clickable {
-                            musicServiceConnection.transportControls.skipToPrevious()
+                            musicServiceConnection.transportControls?.skipToPrevious()
                         },
                     painter = painterResource(id = R.drawable.exo_ic_skip_previous),
                     contentDescription = null,
@@ -167,7 +167,7 @@ public fun PlayBarActionsMaximized(
                         modifier = Modifier
                             .size(40.dp)
                             .weight(0.2f),
-                        onClick = { musicServiceConnection.transportControls.play() }) {
+                        onClick = { musicServiceConnection.transportControls?.play() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.exo_icon_play),
                             contentDescription = null
@@ -182,7 +182,7 @@ public fun PlayBarActionsMaximized(
                         modifier = Modifier
                             .size(40.dp)
                             .weight(0.2f),
-                        onClick = { musicServiceConnection.transportControls.pause() }) {
+                        onClick = { musicServiceConnection.transportControls?.pause() }) {
                         Icon(
                             painter = painterResource(id = R.drawable.exo_icon_pause),
                             contentDescription = null
@@ -204,7 +204,7 @@ public fun PlayBarActionsMaximized(
                             .size(40.dp)
                             .weight(0.2f)
                             .clickable {
-                                musicServiceConnection.transportControls.setRepeatMode(
+                                musicServiceConnection.transportControls?.setRepeatMode(
                                     REPEAT_MODE_ONE
                                 )
                             },
@@ -216,7 +216,7 @@ public fun PlayBarActionsMaximized(
                             .size(40.dp)
                             .weight(0.2f)
                             .clickable {
-                                musicServiceConnection.transportControls.setRepeatMode(
+                                musicServiceConnection.transportControls?.setRepeatMode(
                                     REPEAT_MODE_ALL
                                 )
                             },
@@ -228,7 +228,7 @@ public fun PlayBarActionsMaximized(
                             .size(40.dp)
                             .weight(0.2f)
                             .clickable {
-                                musicServiceConnection.transportControls.setRepeatMode(
+                                musicServiceConnection.transportControls?.setRepeatMode(
                                     REPEAT_MODE_NONE
                                 )
                             },

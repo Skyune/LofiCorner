@@ -16,8 +16,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -46,6 +47,8 @@ import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
 import com.skyune.loficorner.ui.theme.Theme
+import com.skyune.loficorner.utils.playMusic
+import com.skyune.loficorner.utils.playMusicFromId
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
 
@@ -55,12 +58,23 @@ fun MainScreen(
     onToggleTheme: (Theme) -> Unit,
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
-    gravitySensorDefaulted: GravitySensorDefaulted
+    gravitySensorDefaulted: GravitySensorDefaulted,
+    allWords: LiveData<List<Data>>
 ) {
 
+    val list by allWords.observeAsState(listOf())
     val navController = rememberNavController()
     val bottomBarState = remember { derivedStateOf {    (mutableStateOf(true)) }}
 
+    if(list.size>5)
+    playMusicFromId(
+        musicServiceConnection,
+        list,
+        list[0].id,
+        false
+
+    )
+        //PlayPlaylist()
     val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
     var myList: MutableList<Data> = mutableListOf<Data>()
     val songIcon by remember { derivedStateOf { musicServiceConnection.currentPlayingSong.value?.displayIconUri} }
@@ -75,6 +89,8 @@ fun MainScreen(
         }
     }
 
+
+
     Scaffold(
         bottomBar = { BottomBar(navController = navController, bottomBarState,musicServiceConnection, songIcon,title,artist)  }
     ) {
@@ -87,12 +103,14 @@ fun MainScreen(
                 gravitySensorDefaulted,
                 bottomBarState.value,
                 isLoaded.value,
-            myList)
+            myList,
+                allWords)
 
     }
 
 
 }
+
 
 @Composable
 fun BottomBar(
@@ -165,9 +183,10 @@ fun BottomBar(
                 )
             ) {
                 Box(
-                    modifier = Modifier                .zIndex(22f)
+                    modifier = Modifier
+                        .zIndex(22f)
                         .clip(shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
-                    .background(
+                        .background(
                             Brush.linearGradient(
                                 0f to MaterialTheme.colors.primary,
                                 1f to MaterialTheme.colors.primaryVariant,
@@ -270,8 +289,8 @@ private fun SongColumn(
                         .weight(0.2f)
                     ,
                     onClick = {
-                        if (isPlaying) musicServiceConnection.transportControls.pause()
-                        else musicServiceConnection.transportControls.play()
+                        if (isPlaying) musicServiceConnection.transportControls?.pause()
+                        else musicServiceConnection.transportControls?.play()
                     }
                 ) {
                     Icon(

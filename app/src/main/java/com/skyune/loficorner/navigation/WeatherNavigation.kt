@@ -3,6 +3,7 @@ package com.skyune.loficorner.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,7 +28,8 @@ fun WeatherNavigation(
     gravitySensorDefaulted: GravitySensorDefaulted,
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
-    myList: MutableList<Data>
+    myList: MutableList<Data>,
+    allWords: LiveData<List<Data>>
 ) {
     //val navController = rememberNavController()
     NavHost(navController = navController,
@@ -44,6 +46,7 @@ fun WeatherNavigation(
                 onToggleDarkMode,
                 musicServiceConnection,
                 gravitySensorDefaulted,
+                allWords,
 
             )
         }

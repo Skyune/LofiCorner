@@ -39,7 +39,7 @@ class MusicServiceConnection @Inject constructor(
     val currentPlayingSong: MutableState<MediaMetadataCompat?> =
         mutableStateOf(MediaMetadataCompat.fromMediaMetadata(null))
 
-    lateinit var mediaController: MediaControllerCompat
+    private var mediaController: MediaControllerCompat? = null
 
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(context = context)
 
@@ -56,14 +56,14 @@ class MusicServiceConnection @Inject constructor(
         updateSong()
     }
 
-    val transportControls: MediaControllerCompat.TransportControls
-        get() = mediaController.transportControls
+    val transportControls: MediaControllerCompat.TransportControls?
+        get() = mediaController?.transportControls
 
-    val shuffleMode: Int
-        get() = mediaController.shuffleMode
+    val shuffleMode: Int?
+        get() = mediaController?.shuffleMode
 
-    val repeatMode: Int
-        get() = mediaController.repeatMode
+    val repeatMode: Int?
+        get() = mediaController?.repeatMode
 
     fun updatePlaylist(list: List<Data>) {
         musicSource.playlist = list
