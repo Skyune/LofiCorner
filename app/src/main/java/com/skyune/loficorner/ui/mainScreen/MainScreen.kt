@@ -164,23 +164,32 @@ fun BottomBar(
                     )
                 )
             ) {
-                BottomNavigation(
-                    modifier = Modifier
-                        .zIndex(21f)
-                        .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)).background( brush = Brush.linearGradient(
-                            0f to MaterialTheme.colors.primary,
-                            1f to MaterialTheme.colors.primaryVariant,
-                            start = Offset(0f, 255f),
-                            end = Offset(400f, 1900.5f))),
-                     elevation = 10.dp,
-                ) {
-                    screens.forEach { screen ->
-                        AddItem(
-                            screen = screen,
-                            currentDestination = currentDestination,
-                            navController = navController,
-                            bottomBarState = bottomBarState.value,
+                Box(
+                    modifier = Modifier                .zIndex(22f)
+                        .clip(shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp))
+                    .background(
+                            Brush.linearGradient(
+                                0f to MaterialTheme.colors.primary,
+                                1f to MaterialTheme.colors.primaryVariant,
+                                start = Offset(0f, -20f),
+                                end = Offset(0f, 100f)
+                            )
                         )
+                ) {
+                    BottomNavigation(
+                        modifier = Modifier
+                            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
+                        backgroundColor = Color.Transparent,
+                        elevation = 0.dp
+                    ) {
+                        screens.forEach { screen ->
+                            AddItem(
+                                screen = screen,
+                                currentDestination = currentDestination,
+                                navController = navController,
+                                bottomBarState = bottomBarState.value,
+                            )
+                        }
                     }
                 }
             }
@@ -215,7 +224,7 @@ private fun SongColumn(
             .fillMaxWidth()
             .zIndex(1f)
             .offset(0.dp, 16.dp)
-            .clip(shape = RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
+            .clip(shape = RoundedCornerShape(10.dp, 10.dp, 0.dp, 0.dp))
             .background(
                 brush = Brush.linearGradient(
                     0f to Color(MaterialTheme.colors.onPrimary.value),

@@ -1,5 +1,6 @@
 package com.skyune.loficorner.ui.profileScreen.components
 
+import android.graphics.Bitmap
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.skyune.loficorner.R
 import com.skyune.loficorner.ui.theme.Theme
@@ -30,7 +30,7 @@ fun RoomImagesRow(showAll: Boolean, onToggleTheme: (Theme) -> Unit) {
                     )
                 )
         ) {
-            Row(modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)) {
+            Row(modifier = Modifier.padding(top = 0.dp, bottom = 10.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
@@ -38,20 +38,20 @@ fun RoomImagesRow(showAll: Boolean, onToggleTheme: (Theme) -> Unit) {
                     RoomImage(
                         modifier = Modifier.weight(1f),
                         ImageId = R.drawable.rockstar,
-                        onClick = { onToggleTheme(Theme.Jazz) },
+                        onClick = { onToggleTheme(Theme.Botanist) },
                         roomTitle = "The Rockstar",
                     )
                     RoomImage(
                         modifier = Modifier.weight(1f),
 
                         ImageId = R.drawable.jazz,
-                        onClick = { onToggleTheme(Theme.Jazz) },
+                        onClick = { onToggleTheme(Theme.Queen) },
                         roomTitle = "Jazz Enthusiast"
                     )
                     RoomImage(
                         modifier = Modifier.weight(1f),
-                        ImageId = R.drawable.untitled,
-                        onClick = { onToggleTheme(Theme.Witch) },
+                        ImageId = R.drawable.witch,
+                        onClick = { onToggleTheme(Theme.Rockstar) },
                         roomTitle = "The Delinquent"
                     )
                 }
@@ -64,9 +64,9 @@ fun RoomImagesRow(showAll: Boolean, onToggleTheme: (Theme) -> Unit) {
                     ) {
                         RoomImage(
                             modifier = Modifier.weight(1f),
-                            ImageId = R.drawable.rockstar,
-                            onClick = { onToggleTheme(Theme.Jazz) },
-                            roomTitle = "The Rockstar",
+                            ImageId = R.drawable.witch,
+                            onClick = { onToggleTheme(Theme.Witch) },
+                            roomTitle = "The Witch's Bedroom",
                         )
                         RoomImage(
                             modifier = Modifier.weight(1f),
@@ -82,7 +82,6 @@ fun RoomImagesRow(showAll: Boolean, onToggleTheme: (Theme) -> Unit) {
                             roomTitle = "The Delinquent"
                         )
                     }
-
             }
         }
     }

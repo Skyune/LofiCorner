@@ -68,10 +68,10 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 
             Column(modifier = Modifier
                 .background(brush = Brush.linearGradient(
-                    0f to Color(0xfff8eef9),
-                    1f to Color(0xffd4b2c7),
+                    0f to MaterialTheme.colors.background,
+                    1f to MaterialTheme.colors.onBackground,
                     start = Offset(0f, 255f),
-                    end = Offset(400f, 1900.5f)))
+                    end = Offset(900f, 1900.5f)))
                 .fillMaxSize()
                 .padding(30.dp, 0.dp, 30.dp, 4.dp),
             verticalArrangement = Arrangement.Top,

@@ -3,15 +3,16 @@
 package com.skyune.loficorner.ui.profileScreen
 
 import android.util.Log
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -20,10 +21,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
@@ -45,11 +43,11 @@ import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
-import com.skyune.loficorner.ui.homeScreen.GifImage
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -63,7 +61,6 @@ fun ProfileScreen(
     isLoaded: MutableState<Boolean>,
     onToggleTheme: (Theme) -> Unit
 ) {
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -71,7 +68,6 @@ fun ProfileScreen(
         contentAlignment = Alignment.Center
     ) {
         val list by profileViewModel.allWords.observeAsState(listOf())
-
         ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,list,onToggleTheme)
     }
 }
@@ -93,9 +89,6 @@ private fun LazyListState.isScrollingUp(): Boolean {
         }
     }.value
 }
-
-
-
 
 @Composable
 fun ShowData(
@@ -123,11 +116,10 @@ fun ShowData(
                     0f to Color(MaterialTheme.colors.background.value),
                     1f to Color(MaterialTheme.colors.onBackground.value),
                     start = Offset(0f, 255f),
-                    end = Offset(400f, 1900.5f)
+                    end = Offset(900f, 1900.5f)
                 )
             ),
         contentAlignment = Alignment.Center,
-
         ) {
 
         val showAll = remember { mutableStateOf(false) }
@@ -140,70 +132,77 @@ fun ShowData(
             val selectedItemId = remember { mutableStateOf(profileViewModel.selectedItemId.value) }
 
             LazyColumn(modifier = Modifier
-                .padding(2.dp)
-                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(3.dp), state = listState) {
+                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(12.dp), state = listState) {
                 item {
-
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
                         Text(
                             text = "Your Lofi Corner,",
                             color = Color(MaterialTheme.colors.surface.value),
-                            textAlign = TextAlign.Center,
-                            lineHeight = 15.sp,
+                            textAlign = TextAlign.Start,
+                            lineHeight = 26.sp,
                             style = TextStyle(
-                                fontSize = 20.sp
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier
-                                .width(width = 163.dp)
-                                .height(height = 28.dp)
+                                .padding(10.dp,4.dp,0.dp,4.dp)
+                                .wrapContentSize()
                         )
-
                     }
-
+                }
                 item {
                     Text(
                     text = "What music would you like to listen to?",
-                    color = Color(0xff56434d),
-                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onSurface,
+                    textAlign = TextAlign.Start,
                     lineHeight = 15.sp,
                     style = TextStyle(
-                        fontSize = 14.sp
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
                     ),
                     modifier = Modifier
-                        .width(width = 265.dp)
-                        .height(height = 28.dp)
+                        .wrapContentSize()
+                        .padding(10.dp,0.dp,0.dp,6.dp)
 
-                )}
+                    )}
 
                 item {
                     Column {
-
                         Row(
                                 horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                             MusicSelectionButtons(profileViewModel)
                         }
-                        Row(horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+
+                        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(0.dp,10.dp,0.dp,0.dp)) {
                             Text(
                                 text = "Rooms",
                                 color = Color(MaterialTheme.colors.surface.value),
-                                textAlign = TextAlign.Center,
-                                lineHeight = 15.sp,
+                                textAlign = TextAlign.End,
+                                lineHeight = 26.sp,
                                 style = TextStyle(
-                                    fontSize = 20.sp),
-                                modifier = Modifier.weight(0.2f))
 
-                            Spacer(Modifier.weight(0.5f)) //top vertical spacer
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold
+                                    ),
+                                modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp).height(42.dp)
+
+                            )
 
                             Text(
                                 text = "Show All",
                                 color = Color(MaterialTheme.colors.onSurface.value),
-                                textAlign = TextAlign.Center,
-                                lineHeight = 15.sp,
+                                textAlign = TextAlign.End,
+                                lineHeight = 20.sp,
                                 style = TextStyle(
                                     fontSize = 20.sp),
-                                modifier = Modifier
+                                modifier = Modifier.padding(0.dp,0.dp,10.dp,0.dp)
                                     .weight(0.2f)
+                                    .height(42.dp)
                                     .clickable {
-                                        showAll.value =! showAll.value
+                                        showAll.value = !showAll.value
                                     }
                             )
                         }
@@ -211,18 +210,19 @@ fun ShowData(
                     }
                 }
 
-
                 item {  Text(
                     text = "Featured playlists",
-                    color = Color(0xff7d3389),
+                    color = MaterialTheme.colors.surface,
                     textAlign = TextAlign.Center,
-                    lineHeight = 15.sp,
+                    lineHeight = 26.sp,
                     style = TextStyle(
-                        fontSize = 20.sp),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    ),
                     modifier = Modifier
-                        .width(width = 172.dp)
-                        .height(height = 28.dp)) }
-
+                    .padding(10.dp,0.dp,10.dp,5.dp)
+                    .wrapContentSize())
+                }
 
                 items(list,key = {
                     it.id
@@ -253,26 +253,66 @@ fun MusicSelectionButtons(profileViewModel: ProfileViewModel) {
     val selectedButtonIndex = remember { mutableStateOf(profileViewModel.selectedButtonIndexId.value) }
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        MusicSelectionButton(selectedButtonIndex.value == 0) { profileViewModel.selectButtonIndex(0)
+        BouncingMusicSelectionButton(R.drawable.iconoir_coffee_cup__4_, "Chill", selectedButtonIndex.value == 0) { profileViewModel.selectButtonIndex(0)
             selectedButtonIndex.value = 0
         }
-        MusicSelectionButton(selectedButtonIndex.value == 1) { profileViewModel.selectButtonIndex(1)
+        BouncingMusicSelectionButton(
+            R.drawable.fluent_sleep_20_filled__1_,
+            "Sleepy",
+            selectedButtonIndex.value == 1
+        ) { profileViewModel.selectButtonIndex(1)
             selectedButtonIndex.value = 1
         }
-        MusicSelectionButton(selectedButtonIndex.value == 2) { profileViewModel.selectButtonIndex(2)
+        BouncingMusicSelectionButton(
+            R.drawable.fluent_emoji_high_contrast_saxophone__1_,
+            "Jazzy",
+            selectedButtonIndex.value == 2
+        ) { profileViewModel.selectButtonIndex(2)
             selectedButtonIndex.value = 2
         }
     }
 }
 
-
 @Composable
-private fun MusicSelectionButton(isSelected: Boolean, onClick: () -> Unit) {
+fun BouncingMusicSelectionButton(
+    ImageId: Int,
+    Title: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+
+    val animationSpec = spring<Float>(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessLow
+    )
+
+
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.1f else 1f,
+        animationSpec = animationSpec
+    )
+
+    Box(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(0.dp,0.dp,0.dp,10.dp)
+            .size(size = 130.dp)
+            .scale(scale)
+    ) {
+        MusicSelectionButton(ImageId,Title, isSelected, onClick)
+    }
+}
+@Composable
+private fun MusicSelectionButton(
+    ImageId: Int,
+    Title: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .size(size = 130.dp)
-
-            .padding(4.dp)
+            .padding(6.dp)
     ) {
         Box(
             modifier = Modifier
@@ -295,34 +335,45 @@ private fun MusicSelectionButton(isSelected: Boolean, onClick: () -> Unit) {
                             end = Offset(100f, 450f)
                         )
                     }
-
                 )
                 .border(
                     BorderStroke(
                         1.dp, brush = Brush.linearGradient(
-                            0f to Color(0xfff0e1ed),
-                            1f to Color(0xffd4b2c6),
+                            0f to MaterialTheme.colors.secondary,
+                            1f to MaterialTheme.colors.secondaryVariant,
                             start = Offset(0f, 0f),
                             end = Offset(20f, 500f)
                         )
                     )
                 ), contentAlignment = Alignment.Center
         ) {
-            //GifImage(modifier = Modifier.size(100.dp))
-            Image(
-                rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .diskCachePolicy(CachePolicy.DISABLED)
-                        .data(data = R.drawable.fluent_sleep_20_filled__1_)
-                        .build()
-                ),
-                modifier = Modifier.size(100.dp),
-                contentScale = ContentScale.FillBounds,
-                contentDescription = null
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize(1f)
+                        .aspectRatio(0.9f),
+                    shape = CircleShape,
+                    backgroundColor = Color.Transparent,
+                    elevation = 0.dp
+                ) {}
             }
+            Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .diskCachePolicy(CachePolicy.DISABLED)
+                            .data(data = ImageId)
+                            .build()
+                    ),
+                    modifier = Modifier.size(60.dp),
+                    contentScale = ContentScale.FillBounds,
+                    contentDescription = null
+                )
+                Text(text = Title, Modifier.padding(4.dp), color = MaterialTheme.colors.error)
+            }
+        }
         ClippedShadow(
-            elevation = 5.dp,
+            elevation = 10.dp,
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier
                 .matchParentSize()
@@ -433,7 +484,6 @@ fun ClippedShadow(elevation: Dp, shape: Shape, modifier: Modifier = Modifier) {
 @Composable
 fun WeatherItem(item: Data, onItemClicked: () -> Unit, isSelected: Boolean) {
 
-
 Box(modifier = Modifier
     .wrapContentWidth()
     .wrapContentHeight()) {
@@ -497,7 +547,7 @@ Box(modifier = Modifier
               item.playlist_name?.let {
                   Text(
                       text = it,
-                      color = Color(0xff56434d),
+                      color = MaterialTheme.colors.surface,
                       lineHeight = 15.sp,
                       style = TextStyle(
                           fontSize = 13.sp,
@@ -511,7 +561,7 @@ Box(modifier = Modifier
               item.user?.name?.let {
                   Text(
                       text = it,
-                      color = Color(0xff56434d),
+                      color = MaterialTheme.colors.surface,
                       textAlign = TextAlign.Center,
                       lineHeight = 15.sp,
                       style = TextStyle(

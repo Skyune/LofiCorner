@@ -27,6 +27,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -75,6 +79,7 @@ fun RoomImage(
                                 .scale(1.02f),
                             contentDescription = null,
                             contentScale = ContentScale.FillBounds,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.secondaryVariant)
 
                             )
 
@@ -90,7 +95,8 @@ fun RoomImage(
                                 .aspectRatio(0.9f)
                                 .zIndex(2f),
                             contentDescription = null,
-                            contentScale = ContentScale.FillBounds
+                            contentScale = ContentScale.FillBounds,
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onSecondary)
                         )
 
                         Image(
@@ -110,7 +116,21 @@ fun RoomImage(
                     }
 
                 }
-                Text(text = roomTitle, modifier = Modifier.padding(vertical = 10.dp), fontSize = 12.sp, color = Color(MaterialTheme.colors.onSurface.value))
+                Box(
+                    modifier = Modifier
+                        .heightIn( MaterialTheme.typography.body1.lineHeight.value.dp)
+                        .fillMaxWidth().padding(4.dp),
+                    Alignment.Center,
+                ) {
+                    Text(
+                        text = roomTitle,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colors.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }

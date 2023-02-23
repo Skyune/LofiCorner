@@ -11,7 +11,7 @@ val Grey1 = Color(0xFFF2F2F2)
 val Black1 = Color(0xFF222222)
 val Black2 = Color(0xFF000000)
 
-val RedErrorDark = Color(0xFFB00020)
+val RedErrorDark = Color(0xFFFFFFFF)
 val RedErrorLight = Color(0xFFEF5350)
 
 val JazzMainScreenPrimaryVariant = Color(0xFF7d3389)
@@ -28,8 +28,6 @@ val PrimaryVariantJazzColor = Color(0xffd4b2c6)
 val BorderStrokeColor1 = Color(0xFFFBD4EB)
 val BorderStrokeColor2 =  Color(0xffFFB0DF)
 
-
-
 //pinker hue for components
 val ComponentColor1 =  Color(0xfffec5f3)
 val ComponentColor2 = Color(0xffbb70c8)
@@ -39,3 +37,15 @@ val BackgroundBrush2 = Color(0xffd4b2c7)
 
 //text
 val SurfaceText = Color(0xff7d3389)
+
+//WitchRoom colors
+val BackgroundWitchBrush1 = Color(0xff483c73)
+val BackgroundWitchBrush2 =  Color(0xFF350247)
+
+val SurfaceWitchText = Color(0xFFFFFFFF)
+
+val PrimaryWitchColor =  Color(0xff483c73)
+val PrimaryVariantWitchColor = Color(0xff350247)
+
+val ComponentWitchColor1 =   Color(0xFF5D4C91)
+val ComponentWitchColor2 = Color(0xFF351742)
