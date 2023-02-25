@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 import retrofit2.Call
 import javax.inject.Inject
 
-class WeatherRepository @Inject constructor(private val api: WeatherApi, private val noteDatabaseDao: NoteDatabaseDao) {
+class WeatherRepository @Inject constructor(private val api: WeatherApi?, private val noteDatabaseDao: NoteDatabaseDao) {
 
     suspend fun getWeather()
     :DataOrException<Weather, Boolean, Exception>  {
         val response = try {
-            api.getWeather()
+            api?.getWeather()
 
         }catch (e: Exception){
             Log.d("REX", "getWeather: $e")
@@ -37,17 +37,17 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi, private
         noteDatabaseDao.insert(id)
     }
 
-    fun getMovieById(id: String): Call<Weather> {
-        return api.getMovieById(id)
+    fun getMovieById(id: String): Call<Weather>? {
+        return api?.getMovieById(id)
     }
 
-     suspend fun getPlaylist(id: String): List<Data> {
-        return api.getPlaylist(id)
+     suspend fun getPlaylist(id: String): List<Data>? {
+        return api?.getPlaylist(id)
     }
 
 
-     fun getPlaylistData(id: String): Call<Weather> {
-        return api.getPlaylistData(id)
+     fun getPlaylistData(id: String): Call<Weather>? {
+        return api?.getPlaylistData(id)
     }
 
 

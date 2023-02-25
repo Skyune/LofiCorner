@@ -72,10 +72,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
-
-
-
-
             Column(modifier = Modifier
                 .background(
                     brush = Brush.linearGradient(
@@ -89,10 +85,7 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                 .padding(30.dp, 0.dp, 30.dp, 4.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
-
-
-
-                    val shouldHavePlayBar by remember {
+                     val shouldHavePlayBar by remember {
                         derivedStateOf {
                             musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PLAYING
                                     || musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PAUSED
@@ -101,7 +94,6 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                                     || musicServiceConnection.currentPlayingSong.value != null
                         }
                     }
-
 
                     if (shouldHavePlayBar) {
                         room()

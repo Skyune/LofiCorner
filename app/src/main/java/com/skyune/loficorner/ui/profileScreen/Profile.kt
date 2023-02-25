@@ -51,6 +51,7 @@ import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.log
 
 
 @Composable
@@ -148,7 +149,7 @@ fun ShowData(
                                 fontWeight = FontWeight.Bold
                             ),
                             modifier = Modifier
-                                .padding(10.dp,4.dp,0.dp,4.dp)
+                                .padding(10.dp, 4.dp, 0.dp, 4.dp)
                                 .wrapContentSize()
                         )
                     }
@@ -165,7 +166,7 @@ fun ShowData(
                     ),
                     modifier = Modifier
                         .wrapContentSize()
-                        .padding(10.dp,0.dp,0.dp,6.dp)
+                        .padding(10.dp, 0.dp, 0.dp, 6.dp)
 
                     )}
 
@@ -187,7 +188,9 @@ fun ShowData(
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold
                                     ),
-                                modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp).height(42.dp)
+                                modifier = Modifier
+                                    .padding(10.dp, 0.dp, 0.dp, 0.dp)
+                                    .height(42.dp)
 
                             )
 
@@ -198,7 +201,8 @@ fun ShowData(
                                 lineHeight = 20.sp,
                                 style = TextStyle(
                                     fontSize = 20.sp),
-                                modifier = Modifier.padding(0.dp,0.dp,10.dp,0.dp)
+                                modifier = Modifier
+                                    .padding(0.dp, 0.dp, 10.dp, 0.dp)
                                     .weight(0.2f)
                                     .height(42.dp)
                                     .clickable {
@@ -220,8 +224,8 @@ fun ShowData(
                         fontWeight = FontWeight.Bold
                     ),
                     modifier = Modifier
-                    .padding(10.dp,0.dp,10.dp,5.dp)
-                    .wrapContentSize())
+                        .padding(10.dp, 0.dp, 10.dp, 5.dp)
+                        .wrapContentSize())
                 }
 
                 items(list,key = {
@@ -234,6 +238,7 @@ fun ShowData(
                             selectedItemId.value = item.id
                             profileViewModel.selectItem(item.id)
 
+                            Log.d("TAG", "ShowData: ${item}")
                             profileViewModel.PlayPlaylist(
                                 item,
                                 isPlayerReady,
@@ -295,7 +300,7 @@ fun BouncingMusicSelectionButton(
     Box(
         modifier = Modifier
             .clickable(onClick = onClick)
-            .padding(0.dp,0.dp,0.dp,10.dp)
+            .padding(0.dp, 0.dp, 0.dp, 10.dp)
             .size(size = 130.dp)
             .scale(scale)
     ) {
@@ -356,9 +361,11 @@ private fun MusicSelectionButton(
                             .data(data = ImageId)
                             .build()
                     ),
-                    modifier = Modifier.size(60.dp).composed {
-                        alpha(if (isSelected) 1f else 0.7f)
-                    },
+                    modifier = Modifier
+                        .size(60.dp)
+                        .composed {
+                            alpha(if (isSelected) 1f else 0.7f)
+                        },
                     contentScale = ContentScale.FillBounds,
                     contentDescription = null
                 )
@@ -375,9 +382,9 @@ private fun PlayPlaylist(
     isPlayerReady: MutableState<Boolean>,
     musicServiceConnection: MusicServiceConnection
 ) {
-    val response: Call<Weather> =
+    val response: Call<Weather>? =
         profileViewModel.getMovieById(item.id)
-    response.enqueue(object : Callback<Weather> {
+    response!!.enqueue(object : Callback<Weather> {
         override fun onFailure(call: Call<Weather>, t: Throwable) {
             Log.d("onFailure", t.message.toString())
         }
@@ -389,12 +396,16 @@ private fun PlayPlaylist(
             if (isPlayerReady.value) {
                 isPlayerReady.value = false
             }
+
             playMusicFromId(
                 musicServiceConnection,
                 response.body()!!.data,
                 item.id,
                 isPlayerReady.value
+
             )
+            Log.d("TAG", "onResponse: ${                response.body()!!.data
+            }")
             isPlayerReady.value = true
         }
     })

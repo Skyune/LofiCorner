@@ -15,13 +15,19 @@ import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import com.skyune.loficorner.network.WeatherApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import javax.inject.Singleton
 
 
 @Module
@@ -49,6 +55,8 @@ object ServiceModule {
         .setUsage(C.USAGE_MEDIA)
         .build()
 
+
+
     @Provides
     @ServiceScoped
     fun provideRenderFactory(@ApplicationContext context: Context) =
@@ -59,6 +67,8 @@ object ServiceModule {
                 )
             )
         }
+
+
 
     @Provides
     @ServiceScoped
@@ -75,4 +85,7 @@ object ServiceModule {
         return CacheDataSource.Factory().setCache(simpleCache)
             .setUpstreamDataSourceFactory(httpDataSourceFactory)
     }
+
+
+
 }

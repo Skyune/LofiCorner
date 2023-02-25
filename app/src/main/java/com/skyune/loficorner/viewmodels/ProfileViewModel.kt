@@ -36,20 +36,20 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
 
     }
 
-    suspend fun getPlaylist(id: String) : List<Data> {
+    suspend fun getPlaylist(id: String) : List<Data>? {
         return repository.getPlaylist(id)
 
     }
 
 
 
-    fun getPlaylistData(id: String) : Call<Weather> {
+    fun getPlaylistData(id: String) : Call<Weather>? {
         return repository.getPlaylistData(id)
 
     }
 
-    fun getMovieById(id: String) : Call<Weather> {
-        return repository.getMovieById(id)
+    fun getMovieById(id: String) : Call<Weather>? {
+        return repository?.getMovieById(id)
 
     }
 
@@ -78,12 +78,14 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
              if (isPlayerReady.value) {
                  isPlayerReady.value = false
              }
-             playMusicFromId(
-                 musicServiceConnection,
-                 data,
-                 item,
-                 isPlayerReady.value
-             )
+             if (data != null) {
+                 playMusicFromId(
+                     musicServiceConnection,
+                     data,
+                     item,
+                     isPlayerReady.value
+                 )
+             }
              isPlayerReady.value = true
          }
 
@@ -128,9 +130,9 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
         isPlayerReady: MutableState<Boolean>,
         musicServiceConnection: MusicServiceConnection,
     ) {
-        val response: Call<Weather> =
+        val response: Call<Weather>? =
             getMovieById(item.id)
-        response.enqueue(object : Callback<Weather> {
+        response?.enqueue(object : Callback<Weather> {
             override fun onFailure(call: Call<Weather>, t: Throwable) {
                 Log.d("onFailure", t.message.toString())
             }
@@ -159,24 +161,24 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
         ) {
                 isLoaded.value = false
         for (i in playlistids.indices) {
-                    val response: Call<Weather> =
+                    val response: Call<Weather>? =
                         getPlaylistData(playlistids[i])
-                    response.enqueue(object : Callback<Weather> {
-                        override fun onFailure(call: Call<Weather>, t: Throwable) {
-                            Log.d("onFailure", t.message.toString())
-                            isLoaded.value = false
-                        }
+            response?.enqueue(object : Callback<Weather> {
+                override fun onFailure(call: Call<Weather>, t: Throwable) {
+                    Log.d("onFailure", t.message.toString())
+                    isLoaded.value = false
+                }
 
-                        override fun onResponse(call: Call<Weather>, response: Response<Weather>) {
-                            Log.d("onResponse", response.body().toString())
-                            if (response.isSuccessful) {
-                                playlist.add(response.body()!!.data[0])
-                                Log.d("TAG", "onResponse: ${playlist}")
-                                    insert(response.body()!!.data[0])
+                override fun onResponse(call: Call<Weather>, response: Response<Weather>) {
+                    Log.d("onResponse", response.body().toString())
+                    if (response.isSuccessful) {
+                        playlist.add(response.body()!!.data[0])
+                        Log.d("TAG", "onResponse: ${playlist}")
+                        insert(response.body()!!.data[0])
 
-                            }
-                        }
-                    })
+                    }
+                }
+            })
                     isLoaded.value = true
                 }
     }

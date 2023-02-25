@@ -54,11 +54,38 @@ class AppModule {
     @Provides
     @Singleton
     fun provideOpenWeatherApi(): WeatherApi {
-        return Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(WeatherApi::class.java)
+        // Define a list of base URLs
+        val baseUrls = listOf(
+            "test",
+            "https://blockchange-audius-discovery-02.bdnodes.net",
+            "https://discovery-us-01.audius.openplayer.org",
+            "https://blockdaemon-audius-discovery-03.bdnodes.net",
+            "https://blockchange-audius-discovery-03.bdnodes.net",
+            "https://discoveryprovider3.audius.co",
+            "https://audius-discovery-1.cultur3stake.com",
+            "https://dn-jpn.audius.metadata.fyi",
+            "https://blockdaemon-audius-discovery-04.bdnodes.net",
+            "https://dn2.monophonic.digital",
+            "https://audius-discovery-7.cultur3stake.com",
+        )
+
+        // Try each base URL until you find one that works
+        var error: Throwable? = null
+        for (baseUrl in baseUrls) {
+            try {
+                return Retrofit.Builder()
+                    .baseUrl(baseUrl)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                    .create(WeatherApi::class.java)
+            } catch (e: Throwable) {
+                // If an error occurs, remember it and try the next base URL
+                error = e
+            }
+        }
+
+        // If all base URLs failed, throw the last error
+        throw error ?: RuntimeException("All base URLs failed")
     }
 
     @Singleton

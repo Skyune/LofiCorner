@@ -10,4 +10,7 @@ object Constants {
 
     const val NETWORK_ERROR = "Network Error"
    // const val API_KEY = "ADD_YOUR_OWN_APPID_HERE
+
+    val usedBasedUrl = mutableMapOf<String, String>()
+    val bestResponseTime = mutableMapOf<String, Long>()
 }

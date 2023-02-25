@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -42,6 +43,7 @@ import coil.request.ImageRequest
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicService
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.exoplayer.isPlaying
 import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
@@ -49,7 +51,10 @@ import com.skyune.loficorner.ui.BottomNavScreen
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusic
 import com.skyune.loficorner.utils.playMusicFromId
+import com.skyune.loficorner.viewmodels.MainViewModel
+import com.skyune.loficorner.viewmodels.ProfileViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -59,21 +64,43 @@ fun MainScreen(
     onToggleDarkMode: () -> Unit,
     musicServiceConnection: MusicServiceConnection,
     gravitySensorDefaulted: GravitySensorDefaulted,
-    allWords: LiveData<List<Data>>
+    allWords: LiveData<List<Data>>,
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
 
     val list by allWords.observeAsState(listOf())
     val navController = rememberNavController()
     val bottomBarState = remember { derivedStateOf {    (mutableStateOf(true)) }}
 
-    if(list.size>5)
-    playMusicFromId(
-        musicServiceConnection,
-        list,
-        list[0].id,
-        false
+    val shouldHavePlayBar by remember {
+        derivedStateOf {
+            musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PLAYING
+                    || musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PAUSED
+                    || musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_SKIPPING_TO_NEXT
+                    || musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_BUFFERING
+                    || musicServiceConnection.currentPlayingSong.value != null
+        }
+    }
 
-    )
+
+    //TODO needs rework on startup
+    //for now ill work on something else.
+    val isPlayerReady: MutableState<Boolean> = remember{
+        derivedStateOf {
+            mutableStateOf(false)
+        }
+    }.value
+
+    if(list.size>5 && !isPlayerReady.value) {
+        playMusicFromId(
+            musicServiceConnection,
+            list,
+            list[0].id,
+            isPlayerReady.value
+
+        )
+        isPlayerReady.value = true
+    }
         //PlayPlaylist()
     val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
     var myList: MutableList<Data> = mutableListOf<Data>()
@@ -90,9 +117,19 @@ fun MainScreen(
     }
 
 
-
     Scaffold(
-        bottomBar = { BottomBar(navController = navController, bottomBarState,musicServiceConnection, songIcon,title,artist)  }
+        bottomBar = {
+            if(shouldHavePlayBar) {
+                BottomBar(
+                    navController = navController,
+                    bottomBarState,
+                    musicServiceConnection,
+                    songIcon,
+                    title,
+                    artist
+                )
+            }
+        }
     ) {
 
             WeatherNavigation(
