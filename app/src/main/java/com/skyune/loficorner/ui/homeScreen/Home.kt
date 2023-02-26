@@ -1,11 +1,20 @@
 package com.skyune.loficorner.ui.homeScreen
 
 import android.app.Activity
+import android.content.Context
+import android.gesture.GestureLibraries.fromRawResource
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.media.session.PlaybackState
+import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
+
 import android.support.v4.media.session.MediaControllerCompat
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Image
@@ -20,13 +29,14 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -44,9 +54,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.room.Room
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -54,6 +66,11 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import coil.size.Size
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.rld.justlisten.android.ui.bottombars.sheets.BottomSheetScreen
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
@@ -62,9 +79,16 @@ import com.skyune.loficorner.utils.playMusic
 import com.skyune.loficorner.utils.playMusicFromId
 
 import com.skyune.loficorner.widgets.RoundIconButton
+import com.yeocak.parallaximage.*
+import com.yeocak.parallaximage.ParallaxImage
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class,
     ExperimentalAnimationGraphicsApi::class, InternalCoroutinesApi::class
@@ -96,7 +120,188 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                     }
 
                     if (shouldHavePlayBar) {
-                        room()
+                        //ParallaxImage(image = R.drawable.witch, sensor = GravitySensorDefaulted(context = LocalContext.current))
+
+                        val context = LocalContext.current
+                        val scope = rememberCoroutineScope()
+
+                        var data by remember { mutableStateOf<SensorData?>(null) }
+
+                        DisposableEffect(Unit) {
+                            val dataManager = SensorDataManager(context)
+                            dataManager.init()
+
+                            scope.launch {
+                                dataManager.data
+                                    .receiveAsFlow()
+                                    .onEach { data = it }
+                                    .collect()
+                            }
+
+                            onDispose {
+                                dataManager.cancel()
+                            }
+                        }
+
+                        if (data != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .offset(y = 40.dp)
+                            ) {
+                                // Blurred image as glow shadow for the card
+                                // Will move in opposite direction of Image Card to reveal itself when inclined
+                                Image(
+                                    painter = painterResource(id = R.drawable.witchopaque),
+                                    modifier = Modifier
+                                        .offset(
+                                            x = (-data!!.roll * 0.14).dp,
+                                            y = (data!!.pitch * 0.14).dp
+                                        )
+                                        .wrapContentSize()
+                                        .aspectRatio(0.9f)
+                                        .scale(1.08f)
+
+                                        .blur(
+                                            radius = 10.dp,
+                                            edgeTreatment = BlurredEdgeTreatment.Unbounded
+
+                                        ),
+                                contentDescription = null,
+                                contentScale = ContentScale.FillHeight,
+                                )
+
+                                // White edge shadow (should move slightly slower than the card)
+//                                Box(
+//                                    modifier = Modifier
+//                                        .offset(
+//                                            x = (data!!.roll * 0.35).dp,
+//                                            y = (-data!!.pitch * 0.35).dp
+//                                        )
+//                                        .width(300.dp)
+//                                        .height(400.dp)
+//                                        .background(
+//                                            color = Color.White.copy(alpha = 0.0f),
+//                                            shape = RoundedCornerShape(16.dp)
+//                                        ),
+//                                )
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.stars),
+                                    modifier = Modifier
+                                        .offset(
+                                            x = (data!!.roll * 0.25).dp,
+                                            y = (-data!!.pitch * 0.25).dp
+                                        )
+                                        .wrapContentSize().aspectRatio(0.9f).scale(0.9f),
+
+                                    contentDescription = null,
+                                    contentScale = ContentScale.FillHeight,
+                                    alignment = BiasAlignment(
+                                        horizontalBias = -(data!!.roll * 0.001).toFloat(),
+                                        verticalBias = 0f,
+                                    )
+                                )
+
+
+//                                Box (modifier = Modifier.offset(75.dp, -50.dp)) {
+//                                    VideoView(
+//                                        videoResourceId = R.raw.bluestars, modifier = Modifier
+//                                            .offset(
+//                                                x = (data!!.roll * 0.25).dp,
+//                                                y = (-data!!.pitch * 0.25).dp
+//                                            )
+//                                            .wrapContentSize().aspectRatio(0.9f).scale(0.4f)
+//                                    )
+//                                }
+
+                                // Image Card (with slight parallax for the image itself)
+                                Image(
+                                    painter = painterResource(id = R.drawable.witchopaque),
+                                    modifier = Modifier
+                                        .offset(
+                                            x = (data!!.roll * 0.1).dp,
+                                            y = (-data!!.pitch * 0.1).dp
+                                        )
+                                        .wrapContentSize()
+                                        .aspectRatio(0.9f)
+                                        .scale(1.08f),
+
+                                    contentDescription = null,
+                                    contentScale = ContentScale.FillHeight,
+                                    alignment = BiasAlignment(
+                                        horizontalBias = -(data!!.roll * 0.001).toFloat(),
+                                        verticalBias = 0f,
+                                    )
+                                )
+                                
+//                                VideoView(videoResourceId = R.raw.cat, modifier = Modifier.offset(
+//                                            x = (data!!.roll * 0.3).dp,
+//                                            y = (-data!!.pitch * 0.3).dp
+//                                        ))
+                            }
+                        }
+                        class SensorDataManager (context: Context): SensorEventListener {
+
+                            private val sensorManager by lazy {
+                                context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+                            }
+
+                            fun init() {
+                                Log.d("SensorDataManager", "init")
+                                val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+                                val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+                                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
+                                sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI)
+                            }
+
+                            private var gravity: FloatArray? = null
+                            private var geomagnetic: FloatArray? = null
+
+                            val data1: Channel<SensorData> = Channel(Channel.UNLIMITED)
+
+
+                            override fun onSensorChanged(event: SensorEvent?) {
+                                if (event?.sensor?.type == Sensor.TYPE_GRAVITY)
+                                    gravity = event.values
+
+                                if (event?.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD)
+                                    geomagnetic = event.values
+
+                                if (gravity != null && geomagnetic != null) {
+                                    var r = FloatArray(9)
+                                    var i = FloatArray(9)
+
+                                    if (SensorManager.getRotationMatrix(r, i, gravity, geomagnetic)) {
+                                        var orientation = FloatArray(3)
+                                        SensorManager.getOrientation(r, orientation)
+
+                                        data1.trySend (
+                                            SensorData(
+                                                roll = orientation[2].toDouble(),
+                                                pitch = orientation[1].toDouble()
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+
+                            fun cancel() {
+                                Log.d("SensorDataManager", "cancel")
+                                sensorManager.unregisterListener(this)
+                            }
+
+                            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+                        }
+
+                        data class SensorData(
+                            val roll: Double,
+                            val pitch: Double
+                        )
+
+                       // VideoView(R.raw.cat)
+                        //room()
                         val title by remember { derivedStateOf {
                             musicServiceConnection.currentPlayingSong.value?.description?.title.toString()  } }
                         val artist by remember { derivedStateOf {
@@ -116,7 +321,100 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                         }
                     }
             }
+
+
     }
+
+class SensorDataManager (context: Context): SensorEventListener {
+
+    private val sensorManager by lazy {
+        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+
+    fun init() {
+        Log.d("SensorDataManager", "init")
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI)
+    }
+
+    private var gravity: FloatArray? = null
+    private var geomagnetic: FloatArray? = null
+
+    val data: Channel<SensorData> = Channel(Channel.UNLIMITED)
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_GRAVITY)
+            gravity = event.values
+
+        if (event?.sensor?.type == Sensor.TYPE_MAGNETIC_FIELD)
+            geomagnetic = event.values
+
+        if (gravity != null && geomagnetic != null) {
+            var r = FloatArray(9)
+            var i = FloatArray(9)
+
+            if (SensorManager.getRotationMatrix(r, i, gravity, geomagnetic)) {
+                var orientation = FloatArray(3)
+                SensorManager.getOrientation(r, orientation)
+
+                data.trySend(
+                    SensorData(
+                        roll = orientation[2] * 180 / Math.PI,
+                        pitch = orientation[1] * 180 / Math.PI
+                    )
+                )
+            }
+        }
+    }
+
+    fun cancel() {
+        Log.d("SensorDataManager", "cancel")
+        sensorManager.unregisterListener(this)
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+}
+
+data class SensorData(
+    val roll: Double,
+    val pitch: Double
+)
+
+
+@Composable
+fun VideoView(videoResourceId: Int, modifier: Modifier) {
+    val context = LocalContext.current
+
+    val rawPath = "android.resource://${context.packageName}/$videoResourceId"
+    val videoUri = Uri.parse(rawPath)
+
+    val exoPlayer = ExoPlayer.Builder(context)
+        .build()
+        .also { exoPlayer ->
+            val mediaItem = MediaItem.fromUri(videoUri)
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+            exoPlayer.prepare()
+            exoPlayer.play()
+        }
+
+    DisposableEffect(
+        AndroidView(factory = {
+            StyledPlayerView(context).apply {
+                player = exoPlayer
+                useController = false
+            }
+
+        },   modifier = modifier
+
+        )
+    ) {
+        onDispose { exoPlayer.release() }
+    }
+}
 
 
 @Composable

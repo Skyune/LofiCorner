@@ -108,7 +108,7 @@ fun RoomImagesRow(
                         )
                         RoomImage(
                             modifier = Modifier.weight(1f),
-                            ImageId = R.drawable.untitled,
+                            ImageId = R.drawable.witch,
                             onClick = { onToggleTheme(Theme.Witch)
                                 profileViewModel.selectRoomIndex(5)
                                 selectedButtonIndex.value = 5
