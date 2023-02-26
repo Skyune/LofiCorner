@@ -82,6 +82,8 @@ fun MainScreen(
         }
     }
 
+    //for testing
+    var showBottomBar = false
 
     //TODO needs rework on startup
     //for now ill work on something else.
@@ -97,9 +99,14 @@ fun MainScreen(
             list,
             list[0].id,
             isPlayerReady.value
-
         )
         isPlayerReady.value = true
+    }else
+    {
+        if(allWords.value?.isEmpty() == true)
+        {
+            showBottomBar = true
+        }
     }
         //PlayPlaylist()
     val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
@@ -119,7 +126,7 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            if(shouldHavePlayBar) {
+            if(shouldHavePlayBar || showBottomBar) {
                 BottomBar(
                     navController = navController,
                     bottomBarState,
