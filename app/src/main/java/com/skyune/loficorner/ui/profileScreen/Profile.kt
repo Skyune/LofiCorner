@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.*
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
@@ -421,10 +422,13 @@ fun Modifier.simpleVerticalScrollbar(
     val alpha by animateFloatAsState(
         targetValue = targetAlpha,
         animationSpec = tween(durationMillis = duration)
+
     )
 
+    val currentColor = MaterialTheme.colors.onSecondary
+    val cornerRadius = 8.dp
 
-    drawWithContent {
+        drawWithContent {
         drawContent()
 
         val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
@@ -436,11 +440,15 @@ fun Modifier.simpleVerticalScrollbar(
             val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
             val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
 
-            drawRect(
-                color = Color.Red,
-                topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
+            val padding = 4.dp.toPx()
+            val topLeft = Offset(this.size.width - width.toPx() - padding, scrollbarOffsetY)
+
+            drawRoundRect(
+                color = currentColor,
+                topLeft = topLeft,
                 size = Size(width.toPx(), scrollbarHeight),
-                alpha = alpha
+                cornerRadius = CornerRadius(cornerRadius.toPx()), // add corner radius
+                alpha = alpha,
             )
         }
     }
