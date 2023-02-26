@@ -13,6 +13,10 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -76,18 +80,21 @@ public fun PlayBarActionsMaximized(
 
         Column(
             Modifier
-                .fillMaxSize().background(Color.Transparent)
-                .padding(bottom = bottomPadding + 5.dp,top = 5.dp),
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .padding(bottom = bottomPadding + 5.dp, top = 5.dp),
             verticalArrangement = Arrangement.Bottom
         ) {
             MarqueeText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = title,
+                color = MaterialTheme.colors.surface,
                 style = MaterialTheme.typography.body1,
                 textAlign = TextAlign.Center, gradientEdgeColor = MaterialTheme.colors.primary)
             MarqueeText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = artist,
+                color = MaterialTheme.colors.onSurface,
                 textAlign = TextAlign.Center, gradientEdgeColor = MaterialTheme.colors.primary)
 
 
@@ -106,15 +113,25 @@ public fun PlayBarActionsMaximized(
                 }
             }
 
+            val customSliderColors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colors.onSurface,
+                activeTrackColor = MaterialTheme.colors.onSurface,
+                inactiveTrackColor = MaterialTheme.colors.secondary
+
+            )
             ModifiedSlider(
                 interactionSource = interactionSource,
                 modifier = Modifier
                     .offset(x = offsetX(currentFraction, maxWidth).dp)
-                    .width(widthSize(currentFraction, maxWidth).dp),
+                    .width(widthSize(currentFraction, maxWidth).dp)
+                    .padding(bottom = 40.dp),
+                colors = customSliderColors,
                 value = sliderValue, onValueChange = {
                     sliderValueRaw = it
                 }, onValueChangeFinished = {musicServiceConnection.songDuration.value =
                     (sliderValue * MusicService.curSongDuration).toLong()}
+
+
             )
             Row(
                 Modifier.height(200.dp)
@@ -123,14 +140,17 @@ public fun PlayBarActionsMaximized(
                     Icon(
                         modifier = Modifier
                             .size(40.dp)
+                            .alpha(0.6f)
                             .weight(0.2f)
                             .clickable {
                                 musicServiceConnection.transportControls?.setShuffleMode(
                                     SHUFFLE_MODE_ALL
                                 )
                             },
-                        painter = painterResource(id = R.drawable.exo_icon_shuffle_off),
+                        //off
+                        painter = painterResource(id = R.drawable.exo_icon_shuffle_on),
                         contentDescription = null,
+                        tint = MaterialTheme.colors.surface
                     )
                 } else {
                     Icon(
@@ -144,6 +164,8 @@ public fun PlayBarActionsMaximized(
                             },
                         painter = painterResource(id = R.drawable.exo_icon_shuffle_on),
                         contentDescription = null,
+                        tint = MaterialTheme.colors.onSurface
+
                     )
                 }
                 Icon(
@@ -155,38 +177,90 @@ public fun PlayBarActionsMaximized(
                         },
                     painter = painterResource(id = R.drawable.exo_ic_skip_previous),
                     contentDescription = null,
+                    tint = MaterialTheme.colors.surface
                 )
                 if (musicServiceConnection.playbackState.value?.state != PlaybackState.STATE_PLAYING &&
                     musicServiceConnection.playbackState.value?.state != PlaybackState.STATE_BUFFERING
                 ) {
-                    OutlinedButton(
-                        shape = CircleShape,
-                        border = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.onSurface),
+                    Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .weight(0.2f),
-                        onClick = { musicServiceConnection.transportControls?.play() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.exo_icon_play),
-                            contentDescription = null
-                        )
+                            .scale(1.2f)
+                            .weight(0.105f)
+                    ) {
+                        // Circle wrapper with brush background
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colors.surface,
+                                            MaterialTheme.colors.secondary
+                                        ),
+                                        start = Offset(0f, 0f),
+                                        end = Offset(40f, 140f)
+                                    ),
+                                    shape = CircleShape
+                                )
+                        ) {
+                            OutlinedButton(
+                                shape = CircleShape,
+                                border = BorderStroke(0.dp, MaterialTheme.colors.onSurface),
+                                contentPadding = PaddingValues(0.dp),
+                                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .scale(1f),
+
+                                onClick = { musicServiceConnection.transportControls?.play() }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.exo_icon_play),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colors.onSurface
+                                )
+                            }
+                        }
                     }
                 } else {
-                    OutlinedButton(
-                        shape = CircleShape,
-                        border = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
-                        contentPadding = PaddingValues(0.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colors.onSurface),
+                    Box(
                         modifier = Modifier
                             .size(40.dp)
-                            .weight(0.2f),
-                        onClick = { musicServiceConnection.transportControls?.pause() }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.exo_icon_pause),
-                            contentDescription = null
-                        )
+                            .scale(1.2f)
+                            .weight(0.105f)
+                    ) {
+                        // Circle wrapper with brush background
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colors.surface,
+                                            MaterialTheme.colors.secondary
+                                        ),
+                                        start = Offset(0f, 0f),
+                                        end = Offset(40f, 140f)
+                                    ),
+                                    shape = CircleShape
+                                )
+                        ) {
+                            OutlinedButton(
+                                shape = CircleShape,
+                                border = BorderStroke(0.dp, MaterialTheme.colors.onSurface),
+                                contentPadding = PaddingValues(0.dp),
+                                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .scale(1f),
+                                onClick = { musicServiceConnection.transportControls?.pause() }) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.exo_icon_pause),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colors.onSurface
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -197,20 +271,26 @@ public fun PlayBarActionsMaximized(
                         .clickable(onClick = onSkipNextPressed)
                         .weight(0.2f),
                     contentDescription = null,
+                    tint = MaterialTheme.colors.surface
                 )
                 when (musicServiceConnection.repeatMode) {
+                    //off
                     REPEAT_MODE_NONE -> Icon(
                         modifier = Modifier
                             .size(40.dp)
+                            .alpha(0.6f)
                             .weight(0.2f)
                             .clickable {
                                 musicServiceConnection.transportControls?.setRepeatMode(
                                     REPEAT_MODE_ONE
                                 )
                             },
-                        painter = painterResource(id = R.drawable.exo_icon_repeat_off),
+                        painter = painterResource(id = R.drawable.exo_icon_repeat_all),
                         contentDescription = null,
+                        tint = MaterialTheme.colors.surface
                     )
+
+                    //off
                     REPEAT_MODE_ONE -> Icon(
                         modifier = Modifier
                             .size(40.dp)
@@ -222,6 +302,8 @@ public fun PlayBarActionsMaximized(
                             },
                         painter = painterResource(id = R.drawable.exo_icon_repeat_one),
                         contentDescription = null,
+                        tint = MaterialTheme.colors.onSurface
+
                     )
                     REPEAT_MODE_ALL -> Icon(
                         modifier = Modifier
@@ -234,6 +316,8 @@ public fun PlayBarActionsMaximized(
                             },
                         painter = painterResource(id = R.drawable.exo_icon_repeat_all),
                         contentDescription = null,
+                        tint = MaterialTheme.colors.onSurface
+
                     )
                 }
             }

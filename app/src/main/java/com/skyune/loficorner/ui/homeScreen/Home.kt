@@ -168,7 +168,7 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 
                                         ),
                                 contentDescription = null,
-                                contentScale = ContentScale.FillHeight,
+                                contentScale = ContentScale.FillHeight
                                 )
 
                                 // White edge shadow (should move slightly slower than the card)
@@ -204,6 +204,8 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                                 )
 
 
+
+
 //                                Box (modifier = Modifier.offset(75.dp, -50.dp)) {
 //                                    VideoView(
 //                                        videoResourceId = R.raw.bluestars, modifier = Modifier
@@ -215,13 +217,15 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
 //                                    )
 //                                }
 
+
+
                                 // Image Card (with slight parallax for the image itself)
                                 Image(
                                     painter = painterResource(id = R.drawable.witchopaque),
                                     modifier = Modifier
                                         .offset(
-                                            x = (data!!.roll * 0.1).dp,
-                                            y = (-data!!.pitch * 0.1).dp
+                                            x = (data!!.roll * 0.11).dp,
+                                            y = (-data!!.pitch * 0.11).dp
                                         )
                                         .wrapContentSize()
                                         .aspectRatio(0.9f)
@@ -234,6 +238,25 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                                         verticalBias = 0f,
                                     )
                                 )
+
+//                                Image(
+//                                    painter = painterResource(id = R.drawable.witchborder),
+//                                    modifier = Modifier
+//                                        .offset(
+//                                            x = (data!!.roll * 0.1).dp,
+//                                            y = (-data!!.pitch * 0.1).dp
+//                                        )
+//                                        .wrapContentSize()
+//                                        .aspectRatio(0.9f)
+//                                        .scale(1.083f),
+//
+//                                    contentDescription = null,
+//                                    contentScale = ContentScale.FillHeight,
+//                                    alignment = BiasAlignment(
+//                                        horizontalBias = -(data!!.roll * 0.001).toFloat(),
+//                                        verticalBias = 0f,
+//                                    )
+//                                )
                                 
 //                                VideoView(videoResourceId = R.raw.cat, modifier = Modifier.offset(
 //                                            x = (data!!.roll * 0.3).dp,
