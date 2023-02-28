@@ -1,8 +1,10 @@
 package com.skyune.loficorner.ui.mainScreen
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.session.PlaybackState
 import android.net.Uri
+import android.os.CountDownTimer
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -11,10 +13,16 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -27,7 +35,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
@@ -54,7 +66,7 @@ import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.MainViewModel
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 
 
 @Composable
@@ -68,8 +80,10 @@ fun MainScreen(
     mainViewModel: MainViewModel = hiltViewModel()
 ) {
 
+
     val list by allWords.observeAsState(listOf())
     val navController = rememberNavController()
+    var showDialog by remember { mutableStateOf(false) }
     val bottomBarState = remember { derivedStateOf {    (mutableStateOf(true)) }}
 
     val shouldHavePlayBar by remember {
@@ -80,6 +94,9 @@ fun MainScreen(
                     || musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_BUFFERING
                     || musicServiceConnection.currentPlayingSong.value != null
         }
+    }
+    if (showDialog) {
+        Popup(onDismiss = { showDialog = false })
     }
 
     //for testing
@@ -125,7 +142,21 @@ fun MainScreen(
 
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "My App Title") },
+                actions = {
+                    IconButton(onClick = { showDialog = !showDialog  }) {
+                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                    }
+                    IconButton(onClick = { /* Handle action */ }) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                    }
+                }
+            )
+        },
         bottomBar = {
+            //remove it later (showbottombar)
             if(shouldHavePlayBar || showBottomBar) {
                 BottomBar(
                     navController = navController,
@@ -260,6 +291,236 @@ fun BottomBar(
     }
 }
 
+
+enum class PomodoroSession {
+    WORK,
+    SHORT_BREAK,
+    LONG_BREAK
+}
+
+@Composable
+fun Popup(onDismiss: () -> Unit) {
+    var isTimerRunning by remember { mutableStateOf(false) }
+    var timeLeft by remember { mutableStateOf(0L) }
+    var currentSession by remember { mutableStateOf(PomodoroSession.WORK) }
+    var timePaused by remember { mutableStateOf(0L) }
+
+    var pomodorosCompleted = 0
+    val WORK_DURATION_MINUTES = 10
+    val SHORT_BREAK_DURATION_MINUTES = 5
+    val LONG_BREAK_DURATION_MINUTES = 15
+    val POMODORO_SESSIONS_BEFORE_LONG_BREAK = 2
+
+
+    // should be 60_000L
+    val ONE_MINUTE_MILLIS = 1000L
+
+    var countDownTimer: CountDownTimer? = null
+
+    fun startTimer() {
+        val durationInMillis = when (currentSession) {
+            PomodoroSession.WORK -> WORK_DURATION_MINUTES * ONE_MINUTE_MILLIS
+            PomodoroSession.SHORT_BREAK -> SHORT_BREAK_DURATION_MINUTES * ONE_MINUTE_MILLIS
+            PomodoroSession.LONG_BREAK -> LONG_BREAK_DURATION_MINUTES * ONE_MINUTE_MILLIS
+        } - timePaused // subtract paused time from duration
+
+        countDownTimer = object : CountDownTimer(durationInMillis, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeft = millisUntilFinished
+            }
+
+            override fun onFinish() {
+                when (currentSession) {
+                    PomodoroSession.WORK -> {
+                        currentSession = PomodoroSession.SHORT_BREAK
+                        pomodorosCompleted++
+                        if (pomodorosCompleted >= POMODORO_SESSIONS_BEFORE_LONG_BREAK) {
+                            currentSession = PomodoroSession.LONG_BREAK
+                            pomodorosCompleted = 0
+                        }
+                        timeLeft = 0L
+                        startTimer()
+                    }
+                    PomodoroSession.SHORT_BREAK -> {
+                        timeLeft = 0L
+                        startTimer()
+                    }
+                    PomodoroSession.LONG_BREAK -> {
+                        currentSession = PomodoroSession.WORK
+                        timeLeft = 0L
+                        startTimer()
+                    }
+                }
+                // TODO: show a notification or play a sound to indicate the end of the timer
+            }
+        }.start()
+        isTimerRunning = true
+
+    }
+
+    fun pauseTimer() {
+        countDownTimer?.cancel()
+        isTimerRunning = false
+        timePaused += (when (currentSession) {
+            PomodoroSession.WORK -> WORK_DURATION_MINUTES * ONE_MINUTE_MILLIS
+            PomodoroSession.SHORT_BREAK -> SHORT_BREAK_DURATION_MINUTES * ONE_MINUTE_MILLIS
+            PomodoroSession.LONG_BREAK -> LONG_BREAK_DURATION_MINUTES * ONE_MINUTE_MILLIS
+        } - timeLeft)
+    }
+
+    fun resetTimer() {
+        countDownTimer?.cancel()
+        isTimerRunning = false
+        timeLeft = 0L
+        timePaused = 0L
+        currentSession = PomodoroSession.WORK
+    }
+
+
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(onClick = onDismiss),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(16.dp)
+                    .size(width = 280.dp, height = 400.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+                    Text(
+                        text = "Pomodoro Timer",
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    when (currentSession) {
+                        PomodoroSession.WORK -> {
+                            Text(
+                                text = "Work Session",
+                                fontSize = 18.sp,
+
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        PomodoroSession.SHORT_BREAK -> {
+                            Text(
+                                text = "Short Break",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                        PomodoroSession.LONG_BREAK -> {
+                            Text(
+                                text = "Long Break",
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = getTimeString(timeLeft),
+                        fontSize = 48.sp,
+
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = { if (isTimerRunning) pauseTimer() else startTimer() },
+                            modifier = Modifier.width(120.dp)
+                        ) {
+                            Text(if (isTimerRunning) "Pause" else "Start")
+                        }
+                        Button(
+                            onClick = { resetTimer() },
+                            modifier = Modifier.width(120.dp)
+                        ) {
+                            Text("Reset")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+@SuppressLint("DefaultLocale")
+fun getTimeString(timeMillis: Long): String {
+    val seconds = timeMillis / 1000 % 60
+    val minutes = timeMillis / (1000 * 60) % 60
+    return String.format("%02d:%02d", minutes, seconds)
+}
+/*
+@Composable
+fun Popup(onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        var timeLeft by remember { mutableStateOf(0L) }
+        var timerJob: Job? = null
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.6f))
+                .clickable(onClick = onDismiss),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(Color.White)
+                    .padding(16.dp)
+                    .size(width = 280.dp, height = 400.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column {
+                    Text(
+                        text = "Popup Title",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    Button(
+                        onClick = {
+                            timerJob?.cancel()
+                            timerJob = CoroutineScope(Dispatchers.Main).launch {
+                                timeLeft = 25 * 60 // 25 minutes
+                                while (timeLeft > 0) {
+                                    delay(1000)
+                                    timeLeft -= 1
+                                }
+                                // Timer finished, do something here
+                            }
+                        }
+                    ) {
+                        Text(text = "Start Pomodoro Timer")
+                    }
+                    Text(
+                        text = "Time left: ${timeLeft / 60}:${timeLeft % 60}",
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items((0..20).toList()) { index ->
+                            Text(text = "Item $index", fontSize = 16.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+ */
 
 @Composable
 private fun SongColumn(
