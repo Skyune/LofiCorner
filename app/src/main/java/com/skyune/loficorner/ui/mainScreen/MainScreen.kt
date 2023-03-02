@@ -1,10 +1,8 @@
 package com.skyune.loficorner.ui.mainScreen
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.media.session.PlaybackState
 import android.net.Uri
-import android.os.CountDownTimer
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -13,10 +11,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -35,15 +30,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -56,19 +46,14 @@ import coil.request.ImageRequest
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicService
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
-import com.skyune.loficorner.exoplayer.isPlaying
 import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
-import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
 import com.skyune.loficorner.ui.theme.Theme
-import com.skyune.loficorner.utils.playMusic
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.MainViewModel
-import com.skyune.loficorner.viewmodels.ProfileViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
-import kotlinx.coroutines.*
 
 
 @Composable
@@ -97,11 +82,15 @@ fun MainScreen(
                     || musicServiceConnection.currentPlayingSong.value != null
         }
     }
-    if (showDialog) {
-        //Popup(mainViewModel,onDismiss = { showDialog = false })
-    }
+//    if (showDialog) {
+//        //Popup(mainViewModel,onDismiss = { showDialog = false })
+//    }
 
-
+    val isTimerRunning: MutableState<Boolean> = remember{
+        derivedStateOf {
+            mutableStateOf(false)
+        }
+    }.value
 
     //for testing
     var showBottomBar = false
@@ -113,6 +102,8 @@ fun MainScreen(
             mutableStateOf(false)
         }
     }.value
+
+
 
     if(list.size>5 && !isPlayerReady.value) {
         playMusicFromId(
@@ -185,7 +176,7 @@ fun MainScreen(
                 bottomBarState.value,
                 isLoaded.value,
             myList,
-                allWords)
+                allWords, isTimerRunning)
 
     }
 

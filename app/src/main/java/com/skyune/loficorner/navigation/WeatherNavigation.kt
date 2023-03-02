@@ -1,8 +1,6 @@
 package com.skyune.loficorner.navigation
 
-import android.os.CountDownTimer
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
@@ -18,6 +16,8 @@ import com.skyune.loficorner.ui.profileScreen.ProfileScreen
 import com.skyune.loficorner.ui.settingsScreen.SettingsScreen
 import com.skyune.loficorner.ui.splash.WeatherSplashScreen
 import com.skyune.loficorner.ui.theme.Theme
+import com.skyune.loficorner.viewmodels.PomodoroSession
+import com.skyune.loficorner.viewmodels.SettingsViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
 @Composable
@@ -30,9 +30,23 @@ fun WeatherNavigation(
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
     myList: MutableList<Data>,
-    allWords: LiveData<List<Data>>
+    allWords: LiveData<List<Data>>,
+    isTimerRunning: MutableState<Boolean>
 ) {
+
+    var settingsViewModel :  SettingsViewModel = hiltViewModel()
     //val navController = rememberNavController()
+    var timeLeft by remember {
+    mutableStateOf(0L)
+    }
+    var currentSession by remember {
+        mutableStateOf(PomodoroSession.WORK)
+    }
+    var isTimerRunning by remember {
+        mutableStateOf(false)
+    }
+
+
     NavHost(navController = navController,
         startDestination = BottomNavScreen.Home.route ) {
         composable(WeatherScreens.SplashScreen.name){
@@ -64,8 +78,8 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Settings.route) {
-            SettingsScreen(settingsViewModel = hiltViewModel(),
-                onToggleTheme, onToggleDarkMode)
+            SettingsScreen(
+                settingsViewModel = settingsViewModel)
         }
 
     }
