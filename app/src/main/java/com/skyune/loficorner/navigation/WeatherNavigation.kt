@@ -63,7 +63,8 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Settings.route) {
-            SettingsScreen(onToggleTheme, onToggleDarkMode)
+            SettingsScreen(settingsViewModel = hiltViewModel(),
+                onToggleTheme, onToggleDarkMode)
         }
 
     }

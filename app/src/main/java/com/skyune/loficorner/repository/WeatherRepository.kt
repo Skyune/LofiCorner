@@ -1,12 +1,17 @@
 package com.skyune.loficorner.repository
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.network.WeatherApi
 import com.skyune.loficorner.data.NoteDatabaseDao
 import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.model.TimePassed
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import javax.inject.Inject
 
@@ -27,6 +32,7 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi?, privat
     }
 
     val allWords: Flow<List<Data>> = noteDatabaseDao.getAll()
+
 
 
     suspend fun count(): Int {
@@ -50,5 +56,21 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi?, privat
         return api?.getPlaylistData(id)
     }
 
+    suspend fun insertTime(timePassed: TimePassed) {
+        noteDatabaseDao.insert(timePassed)
+    }
+
+    fun getAllTimePassed(): LiveData<List<TimePassed>> {
+        return noteDatabaseDao.getAllTimePassed()
+    }
+
+    suspend fun getLatestTimePassed(): TimePassed? {
+        return withContext(Dispatchers.IO) {
+            noteDatabaseDao.getLatestTimePassed()
+        }
+    }
+    suspend fun update(timePassed: TimePassed) {
+        noteDatabaseDao.updateTimePassed(timePassed)
+    }
 
 }

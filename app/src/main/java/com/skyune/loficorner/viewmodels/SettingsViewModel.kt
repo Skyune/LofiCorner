@@ -1,9 +1,12 @@
 package com.skyune.loficorner.viewmodels
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.model.CurrentSong
+import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +33,9 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
 
     }
 
-
+    fun getAllTimePassed(): LiveData<List<TimePassed>> {
+        return repository.getAllTimePassed()
+    }
 
     private val _noteList = MutableStateFlow<List<CurrentSong>>(emptyList())
     var noteList = _noteList.asStateFlow()

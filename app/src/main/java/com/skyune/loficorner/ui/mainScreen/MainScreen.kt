@@ -43,6 +43,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -58,6 +59,7 @@ import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.exoplayer.isPlaying
 import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
 import com.skyune.loficorner.ui.theme.Theme
@@ -96,8 +98,10 @@ fun MainScreen(
         }
     }
     if (showDialog) {
-        Popup(onDismiss = { showDialog = false })
+        Popup(mainViewModel,onDismiss = { showDialog = false })
     }
+
+
 
     //for testing
     var showBottomBar = false
@@ -144,6 +148,8 @@ fun MainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                backgroundColor = Color.Transparent,
+                elevation = 0.dp,
                 title = { Text(text = "My App Title") },
                 actions = {
                     IconButton(onClick = { showDialog = !showDialog  }) {
@@ -299,11 +305,14 @@ enum class PomodoroSession {
 }
 
 @Composable
-fun Popup(onDismiss: () -> Unit) {
+fun Popup(mainViewModel:MainViewModel, onDismiss: () -> Unit) {
     var isTimerRunning by remember { mutableStateOf(false) }
     var timeLeft by remember { mutableStateOf(0L) }
     var currentSession by remember { mutableStateOf(PomodoroSession.WORK) }
     var timePaused by remember { mutableStateOf(0L) }
+    var startTime by remember { mutableStateOf(0L) }
+
+
 
     var pomodorosCompleted = 0
     val WORK_DURATION_MINUTES = 10
@@ -313,7 +322,7 @@ fun Popup(onDismiss: () -> Unit) {
 
 
     // should be 60_000L
-    val ONE_MINUTE_MILLIS = 1000L
+    val ONE_MINUTE_MILLIS = 60_000L
 
     var countDownTimer: CountDownTimer? = null
 
@@ -324,38 +333,67 @@ fun Popup(onDismiss: () -> Unit) {
             PomodoroSession.LONG_BREAK -> LONG_BREAK_DURATION_MINUTES * ONE_MINUTE_MILLIS
         } - timePaused // subtract paused time from duration
 
-        countDownTimer = object : CountDownTimer(durationInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                timeLeft = millisUntilFinished
+        val startTime = System.currentTimeMillis()
+
+        // Check if timer was paused before starting
+        val wasPaused = timePaused > 0L
+
+        var latestTimePassed: TimePassed? = null
+
+        mainViewModel.viewModelScope.launch {
+            latestTimePassed = mainViewModel.getLatestTimePassed()
+            if (latestTimePassed == null || !wasPaused) {
+                // Insert a new TimePassed entity with the current time if no previous time exists or timer was not paused
+                mainViewModel.insert(TimePassed(time = 0L, date = startTime))
+                latestTimePassed = mainViewModel.getLatestTimePassed()
             }
 
-            override fun onFinish() {
-                when (currentSession) {
-                    PomodoroSession.WORK -> {
-                        currentSession = PomodoroSession.SHORT_BREAK
-                        pomodorosCompleted++
-                        if (pomodorosCompleted >= POMODORO_SESSIONS_BEFORE_LONG_BREAK) {
-                            currentSession = PomodoroSession.LONG_BREAK
-                            pomodorosCompleted = 0
+            countDownTimer = object : CountDownTimer(durationInMillis, 1000) {
+                override fun onTick(millisUntilFinished: Long) {
+                    timeLeft = millisUntilFinished
+
+                    val timePassed = timeLeft
+
+                    // Update the most recent TimePassed entity with the elapsed time
+                    mainViewModel.viewModelScope.launch {
+                        val latestTimePassed = mainViewModel.getLatestTimePassed()
+                        latestTimePassed?.let {
+                            val updatedTimePassed = it.copy(time = timePassed)
+                            mainViewModel.update(updatedTimePassed)
                         }
-                        timeLeft = 0L
-                        startTimer()
-                    }
-                    PomodoroSession.SHORT_BREAK -> {
-                        timeLeft = 0L
-                        startTimer()
-                    }
-                    PomodoroSession.LONG_BREAK -> {
-                        currentSession = PomodoroSession.WORK
-                        timeLeft = 0L
-                        startTimer()
                     }
                 }
-                // TODO: show a notification or play a sound to indicate the end of the timer
-            }
-        }.start()
-        isTimerRunning = true
 
+                override fun onFinish() {
+                    when (currentSession) {
+                        PomodoroSession.WORK -> {
+                            currentSession = PomodoroSession.SHORT_BREAK
+                            pomodorosCompleted++
+                            if (pomodorosCompleted >= POMODORO_SESSIONS_BEFORE_LONG_BREAK) {
+                                currentSession = PomodoroSession.LONG_BREAK
+                                pomodorosCompleted = 0
+                            }
+                            timeLeft = 0L
+                            startTimer()
+                        }
+                        PomodoroSession.SHORT_BREAK -> {
+                            timeLeft = 0L
+                            startTimer()
+                        }
+                        PomodoroSession.LONG_BREAK -> {
+                            currentSession = PomodoroSession.WORK
+                            timeLeft = 0L
+                            startTimer()
+                        }
+                    }
+                    // TODO: show a notification or play a sound to indicate the end of the timer
+                }
+            }.start()
+
+            // Reset timePaused after starting
+            timePaused = 0L
+            isTimerRunning = true
+        }
     }
 
     fun pauseTimer() {

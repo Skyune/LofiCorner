@@ -7,9 +7,10 @@ import com.skyune.loficorner.data.ArtworkTypeConverter
 import com.skyune.loficorner.data.NoteDatabaseDao
 import com.skyune.loficorner.data.UserTypeConverter
 import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.model.TimePassed
 
 
-@Database(entities = [Data::class], version = 14, exportSchema = false)
+@Database(entities = [Data::class, TimePassed::class], version = 27, exportSchema = false)
 @TypeConverters(ArtworkTypeConverter::class, UserTypeConverter::class)
 abstract class NoteDatabase: RoomDatabase() {
     abstract fun noteDao(): NoteDatabaseDao
