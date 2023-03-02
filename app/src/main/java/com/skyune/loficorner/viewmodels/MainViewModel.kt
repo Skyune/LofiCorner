@@ -1,5 +1,6 @@
 package com.skyune.loficorner.viewmodels
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyune.loficorner.data.DataOrException
@@ -33,6 +34,14 @@ class MainViewModel @Inject constructor(private val repository: WeatherRepositor
     }
 
     suspend fun getLatestTimePassed(): TimePassed? = repository.getLatestTimePassed()
+
+    private val currentTaskName = MutableLiveData<String>()
+
+    suspend fun insertTimePassed(timePassed: TimePassed) {
+        val taskName = currentTaskName.value ?: return
+        val timePassedWithTaskName = timePassed.copy(taskName = taskName)
+        repository.insertTimePassed(timePassedWithTaskName)
+    }
 
     fun update(timePassed: TimePassed) = viewModelScope.launch {
         repository.update(timePassed)

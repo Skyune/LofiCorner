@@ -34,6 +34,11 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi?, privat
     val allWords: Flow<List<Data>> = noteDatabaseDao.getAll()
 
 
+    suspend fun insertTimePassed(timePassed: TimePassed) {
+        withContext(Dispatchers.IO) {
+            noteDatabaseDao.insert(timePassed)
+        }
+    }
 
     suspend fun count(): Int {
         return noteDatabaseDao.getCount()

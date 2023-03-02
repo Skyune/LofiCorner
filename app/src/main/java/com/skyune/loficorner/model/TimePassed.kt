@@ -10,6 +10,6 @@ import javax.annotation.Nullable
 data class TimePassed(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val time: Long,
-    val date: Long = System.currentTimeMillis()
-
+    val date: Long = System.currentTimeMillis(),
+    val taskName: String
 )
