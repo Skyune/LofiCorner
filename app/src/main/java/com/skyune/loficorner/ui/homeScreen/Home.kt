@@ -15,14 +15,9 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
@@ -30,7 +25,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -43,10 +37,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.google.android.exoplayer2.ExoPlayer
@@ -55,7 +51,8 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
-import com.skyune.loficorner.model.TimePassed
+import com.skyune.loficorner.model.CurrentRoom
+import com.skyune.loficorner.viewmodels.HomeViewModel
 
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -72,7 +69,11 @@ import java.util.*
 )
 
 @Composable
-fun HomeScreen(musicServiceConnection: MusicServiceConnection, timePassedList: List<TimePassed>) {
+fun HomeScreen(
+    musicServiceConnection: MusicServiceConnection,
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    currentRoom: CurrentRoom?
+) {
             Column(modifier = Modifier
                 .background(
                     brush = Brush.linearGradient(
@@ -96,12 +97,6 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection, timePassedList: L
                         }
                     }
 
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(timePassedList) { timePassed ->
-
-                        Text(text = "Time passed: ${timePassed.time},  ${timePassed.taskName}")
-                    }
-                }
 
                     if (shouldHavePlayBar) {
                         //ParallaxImage(image = R.drawable.witch, sensor = GravitySensorDefaulted(context = LocalContext.current))
@@ -127,55 +122,51 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection, timePassedList: L
                             }
                         }
 
+
+
+
+
                         if (data != null) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .offset(y = 40.dp)
+                                    .offset(y = 30.dp)
                             ) {
-                                // Blurred image as glow shadow for the card
-                                // Will move in opposite direction of Image Card to reveal itself when inclined
-                                Image(
-                                    painter = painterResource(id = R.drawable.witchopaque),
-                                    modifier = Modifier
-                                        .offset(
-                                            x = (-data!!.roll * 0.14).dp,
-                                            y = (data!!.pitch * 0.14).dp
-                                        )
-                                        .wrapContentSize()
-                                        .aspectRatio(0.9f)
-                                        .scale(1.08f)
 
-                                        .blur(
-                                            radius = 10.dp,
-                                            edgeTreatment = BlurredEdgeTreatment.Unbounded
+                                //TODO: when have time add this glow effect
+//                                currentRoomImage?.let { painterResource(it) }?.let {
+//                                    Image(
+//                                        painter = it,
+//                                        modifier = Modifier
+//                                            .offset(
+//                                                x = (-data!!.roll * 0.14).dp,
+//                                                y = (data!!.pitch * 0.04).dp
+//                                            )
+//                                            .wrapContentSize()
+//                                            .aspectRatio(0.9f)
+//                                            .scale(1f)
+//                                            .blur(
+//                                                radius = 10.dp,
+//                                                edgeTreatment = BlurredEdgeTreatment.Unbounded
+//
+//                                            ),
+//                                        contentDescription = null,
+//                                        contentScale = ContentScale.FillHeight
+//                                    )
+//                                }
 
-                                        ),
-                                contentDescription = null,
-                                contentScale = ContentScale.FillHeight
-                                )
-
-                                // White edge shadow (should move slightly slower than the card)
-//                                Box(
-//                                    modifier = Modifier
-//                                        .offset(
-//                                            x = (data!!.roll * 0.35).dp,
-//                                            y = (-data!!.pitch * 0.35).dp
-//                                        )
-//                                        .width(300.dp)
-//                                        .height(400.dp)
-//                                        .background(
-//                                            color = Color.White.copy(alpha = 0.0f),
-//                                            shape = RoundedCornerShape(16.dp)
-//                                        ),
-//                                )
 
                                 Image(
-                                    painter = painterResource(id = R.drawable.stars),
+                                    rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalContext.current)
+                                            .diskCachePolicy(CachePolicy.DISABLED)
+                                            .data(data = R.drawable.stars)
+                                            .build()
+                                    ),
                                     modifier = Modifier
                                         .offset(
                                             x = (data!!.roll * 0.25).dp,
-                                            y = (-data!!.pitch * 0.25).dp
+                                            y = (-data!!.pitch * 0.15).dp
                                         )
                                         .wrapContentSize().aspectRatio(0.9f).scale(0.9f),
 
@@ -187,65 +178,27 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection, timePassedList: L
                                     )
                                 )
 
-
-
-
-//                                Box (modifier = Modifier.offset(75.dp, -50.dp)) {
-//                                    VideoView(
-//                                        videoResourceId = R.raw.bluestars, modifier = Modifier
-//                                            .offset(
-//                                                x = (data!!.roll * 0.25).dp,
-//                                                y = (-data!!.pitch * 0.25).dp
-//                                            )
-//                                            .wrapContentSize().aspectRatio(0.9f).scale(0.4f)
-//                                    )
-//                                }
-
-
-
-                                // Image Card (with slight parallax for the image itself)
-                                Image(
-                                    painter = painterResource(id = R.drawable.witchopaque),
-                                    modifier = Modifier
-                                        .offset(
-                                            x = (data!!.roll * 0.11).dp,
-                                            y = (-data!!.pitch * 0.11).dp
+                                if (currentRoom != null) {
+                                    currentRoom.imageId.let { (it) }.let {
+                                        Image(
+                                            rememberAsyncImagePainter(
+                                                ImageRequest.Builder(LocalContext.current)
+                                                    .diskCachePolicy(CachePolicy.ENABLED)
+                                                    .data(data = it)
+                                                    .build()
+                                            ),
+                                            modifier = Modifier.offset(
+                                                x = (data!!.roll * 0.11).dp,
+                                                y = (-data!!.pitch * 0.1).dp
+                                            )
+                                                .wrapContentSize()
+                                                .aspectRatio(0.9f)
+                                                .scale(1f),
+                                            contentScale = ContentScale.FillBounds,
+                                            contentDescription = null,
                                         )
-                                        .wrapContentSize()
-                                        .aspectRatio(0.9f)
-                                        .scale(1.08f),
-
-                                    contentDescription = null,
-                                    contentScale = ContentScale.FillHeight,
-                                    alignment = BiasAlignment(
-                                        horizontalBias = -(data!!.roll * 0.001).toFloat(),
-                                        verticalBias = 0f,
-                                    )
-                                )
-
-//                                Image(
-//                                    painter = painterResource(id = R.drawable.witchborder),
-//                                    modifier = Modifier
-//                                        .offset(
-//                                            x = (data!!.roll * 0.1).dp,
-//                                            y = (-data!!.pitch * 0.1).dp
-//                                        )
-//                                        .wrapContentSize()
-//                                        .aspectRatio(0.9f)
-//                                        .scale(1.083f),
-//
-//                                    contentDescription = null,
-//                                    contentScale = ContentScale.FillHeight,
-//                                    alignment = BiasAlignment(
-//                                        horizontalBias = -(data!!.roll * 0.001).toFloat(),
-//                                        verticalBias = 0f,
-//                                    )
-//                                )
-                                
-//                                VideoView(videoResourceId = R.raw.cat, modifier = Modifier.offset(
-//                                            x = (data!!.roll * 0.3).dp,
-//                                            y = (-data!!.pitch * 0.3).dp
-//                                        ))
+                                    }
+                                }
                             }
                         }
                         class SensorDataManager (context: Context): SensorEventListener {

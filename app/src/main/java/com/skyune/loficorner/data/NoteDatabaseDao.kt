@@ -2,6 +2,7 @@ package com.skyune.loficorner.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.model.Weather
@@ -28,6 +29,13 @@ interface NoteDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(timePassed: TimePassed)
+
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRoom(room: CurrentRoom)
+
+    @Query("SELECT * FROM current_room")
+    fun getCurrentRoom(): LiveData<CurrentRoom>
 
     @Query("SELECT * FROM time_passed ORDER BY id ASC")
     fun getAllTimePassed(): LiveData<List<TimePassed>>

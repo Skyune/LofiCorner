@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.ui.*
@@ -17,6 +18,7 @@ import com.skyune.loficorner.ui.profileScreen.ProfileScreen
 import com.skyune.loficorner.ui.settingsScreen.SettingsScreen
 import com.skyune.loficorner.ui.splash.WeatherSplashScreen
 import com.skyune.loficorner.ui.theme.Theme
+import com.skyune.loficorner.viewmodels.HomeViewModel
 import com.skyune.loficorner.viewmodels.SettingsViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
@@ -32,11 +34,13 @@ fun WeatherNavigation(
     myList: MutableList<Data>,
     allWords: LiveData<List<Data>>,
     isTimerRunning: MutableState<Boolean>,
-    timePassedList: List<TimePassed>
+    timePassedList: List<TimePassed>,
+    currentRoom: CurrentRoom?
 ) {
 
     //not sure gdzie powinna byc deklaracja settingsviewmodel
     val settingsViewModel :  SettingsViewModel = hiltViewModel()
+    val homeViewModel :  HomeViewModel = hiltViewModel()
 
 
     NavHost(navController = navController,
@@ -58,7 +62,7 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Home.route) {
-            HomeScreen(musicServiceConnection = musicServiceConnection,timePassedList)
+            HomeScreen(musicServiceConnection = musicServiceConnection, homeViewModel, currentRoom)
         }
         composable(route = BottomNavScreen.Profile.route) {
             ProfileScreen(

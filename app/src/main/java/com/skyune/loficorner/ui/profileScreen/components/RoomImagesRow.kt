@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.skyune.loficorner.R
+import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import com.skyune.loficorner.widgets.RoomImage
@@ -47,8 +48,9 @@ fun RoomImagesRow(
                 ) {
                     RoomImage(
                         modifier = Modifier.weight(1f),
-                        ImageId = R.drawable.rockstar,
+                        ImageId = R.drawable.biologistborder,
                         onClick = { onToggleTheme(Theme.Botanist)
+                            profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.biologistborder))
                             profileViewModel.selectRoomIndex(0)
                             selectedButtonIndex.value = 0
                                   },
@@ -59,8 +61,9 @@ fun RoomImagesRow(
                     RoomImage(
                         modifier = Modifier.weight(1f),
 
-                        ImageId = R.drawable.jazz,
+                        ImageId = R.drawable.queenborder,
                         onClick = { onToggleTheme(Theme.Queen)
+                            profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.queenborder))
                             profileViewModel.selectRoomIndex(1)
                             selectedButtonIndex.value = 1
                                   },
@@ -69,8 +72,9 @@ fun RoomImagesRow(
                     )
                     RoomImage(
                         modifier = Modifier.weight(1f),
-                        ImageId = R.drawable.witch,
+                        ImageId = R.drawable.rockstarborder,
                         onClick = { onToggleTheme(Theme.Rockstar)
+                            profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.rockstarborder))
                             profileViewModel.selectRoomIndex(2)
                             selectedButtonIndex.value = 2
                                   },
@@ -89,6 +93,7 @@ fun RoomImagesRow(
                             modifier = Modifier.weight(1f),
                             ImageId = R.drawable.witch,
                             onClick = { onToggleTheme(Theme.Witch)
+                                profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.witch))
                                 profileViewModel.selectRoomIndex(3)
                                 selectedButtonIndex.value = 3
                                       },
@@ -98,8 +103,9 @@ fun RoomImagesRow(
                         RoomImage(
                             modifier = Modifier.weight(1f),
 
-                            ImageId = R.drawable.jazz,
+                            ImageId = R.drawable.jazzborder,
                             onClick = { onToggleTheme(Theme.Jazz)
+                                profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.jazzborder))
                                 profileViewModel.selectRoomIndex(4)
                                 selectedButtonIndex.value = 4
                                       },
@@ -108,8 +114,9 @@ fun RoomImagesRow(
                         )
                         RoomImage(
                             modifier = Modifier.weight(1f),
-                            ImageId = R.drawable.witch,
+                            ImageId = R.drawable.witchopaque,
                             onClick = { onToggleTheme(Theme.Witch)
+                                profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.witchopaque))
                                 profileViewModel.selectRoomIndex(5)
                                 selectedButtonIndex.value = 5
                                       },

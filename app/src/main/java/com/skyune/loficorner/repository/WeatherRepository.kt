@@ -11,6 +11,7 @@ import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.network.WeatherApi
 import com.skyune.loficorner.data.NoteDatabaseDao
+import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.TimePassed
 import kotlinx.coroutines.Dispatchers
@@ -69,6 +70,14 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi?, privat
 
     suspend fun insertTime(timePassed: TimePassed) {
         noteDatabaseDao.insert(timePassed)
+    }
+
+    suspend fun insertRoom(room: CurrentRoom) {
+        noteDatabaseDao.insertRoom(room)
+    }
+
+    fun getCurrentRoom(): LiveData<CurrentRoom> {
+        return noteDatabaseDao.getCurrentRoom()
     }
 
     fun getAllTimePassed(): LiveData<List<TimePassed>> {

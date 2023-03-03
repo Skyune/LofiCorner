@@ -2,6 +2,8 @@ package com.skyune.loficorner.viewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
+import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.CurrentSong
 import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.model.Weather
@@ -31,7 +34,7 @@ class MainViewModel @Inject constructor(private val repository: WeatherRepositor
 
         }
 
-    val currentPomodoroDuration: MutableState<Int> = appPreferences.TimeLeft.let { mutableStateOf(it) }
+    //val currentPomodoroDuration: MutableState<Int> = appPreferences.TimeLeft.let { mutableStateOf(it) }
 
 
     private val _currentSong = MutableStateFlow<List<CurrentSong>>(emptyList())
@@ -49,6 +52,10 @@ class MainViewModel @Inject constructor(private val repository: WeatherRepositor
         val taskName = currentTaskName.value ?: return
         val timePassedWithTaskName = timePassed.copy(taskName = taskName)
         repository.insertTimePassed(timePassedWithTaskName)
+    }
+
+    fun getCurrentRoom(): LiveData<CurrentRoom> {
+        return repository.getCurrentRoom()
     }
 
     fun update(timePassed: TimePassed) = viewModelScope.launch {

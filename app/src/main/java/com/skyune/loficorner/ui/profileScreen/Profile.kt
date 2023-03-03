@@ -376,42 +376,6 @@ private fun MusicSelectionButton(
     }
 }
 
-@Composable
-private fun PlayPlaylist(
-    profileViewModel: ProfileViewModel,
-    item: Data,
-    isPlayerReady: MutableState<Boolean>,
-    musicServiceConnection: MusicServiceConnection
-) {
-    val response: Call<Weather>? =
-        profileViewModel.getMovieById(item.id)
-    response!!.enqueue(object : Callback<Weather> {
-        override fun onFailure(call: Call<Weather>, t: Throwable) {
-            Log.d("onFailure", t.message.toString())
-        }
-
-        override fun onResponse(
-            call: Call<Weather>,
-            response: Response<Weather>
-        ) {
-            if (isPlayerReady.value) {
-                isPlayerReady.value = false
-            }
-
-            playMusicFromId(
-                musicServiceConnection,
-                response.body()!!.data,
-                item.id,
-                isPlayerReady.value
-
-            )
-            Log.d("TAG", "onResponse: ${                response.body()!!.data
-            }")
-            isPlayerReady.value = true
-        }
-    })
-}
-
 fun Modifier.simpleVerticalScrollbar(
     state: LazyListState,
     width: Dp = 4.dp
@@ -489,7 +453,6 @@ fun ClippedShadow(elevation: Dp, shape: Shape, modifier: Modifier = Modifier) {
 
 @Composable
 fun WeatherItem(item: Data, onItemClicked: () -> Unit, isSelected: Boolean) {
-
 Box(modifier = Modifier
     .wrapContentWidth()
     .wrapContentHeight()) {

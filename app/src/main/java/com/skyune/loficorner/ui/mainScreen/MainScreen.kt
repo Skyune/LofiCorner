@@ -12,6 +12,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement.Start
+
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -30,7 +34,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
@@ -53,6 +59,7 @@ import com.skyune.loficorner.ui.BottomNavScreen
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.MainViewModel
+import com.skyune.loficorner.viewmodels.getTimeString
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
 
@@ -121,7 +128,7 @@ fun MainScreen(
     }
         //PlayPlaylist()
     val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
-    var myList: MutableList<Data> = mutableListOf<Data>()
+    val myList: MutableList<Data> = mutableListOf<Data>()
     val songIcon by remember { derivedStateOf { musicServiceConnection.currentPlayingSong.value?.displayIconUri} }
     val title by remember {
         derivedStateOf {
@@ -135,22 +142,82 @@ fun MainScreen(
     }
 
     val timePassedList by mainViewModel.getAllTimePassed().observeAsState(listOf())
+    val currentRoom by mainViewModel.getCurrentRoom().observeAsState(null)
 
     Scaffold(
         topBar = {
             TopAppBar(
                 backgroundColor = Color.Transparent,
                 elevation = 0.dp,
+                modifier = Modifier.wrapContentSize(),
                 title = {},
                 actions = {
-                    IconButton(onClick = { showDialog = !showDialog  }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                Modifier
+                                    .weight(1.12f)
+                            ) {
+                                IconButton(
+                                    onClick = { showDialog = !showDialog }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Search,
+                                        contentDescription = "Search",
+                                        tint = MaterialTheme.colors.surface
+                                    )
+                                }
+                            }
+
+                            Box(
+                                Modifier
+                                    .weight(2f)
+                                    .padding(top = 20.dp)
+                            ) {
+
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    timePassedList.firstOrNull()?.let {
+                                        Text(
+                                            text = it.taskName,
+                                            fontSize = 19.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colors.surface
+                                        )
+                                    }
+                                    timePassedList.firstOrNull()?.let {
+                                        Text("${getTimeString(it.time)}"
+                                            ,color = MaterialTheme.colors.onSurface)
+                                    }
+                                }
+
+
+                            }
+
+                            Box(
+                                Modifier
+                                    .weight(0.5f)
+                            ) {
+                                IconButton(
+                                    onClick = { /* Handle action */ }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Settings,
+                                        contentDescription = "Settings",
+                                        tint = MaterialTheme.colors.surface
+                                    )
+                                }
+                            }
+                        }
                     }
-                    IconButton(onClick = { /* Handle action */ }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                    }
-                }
+
             )
+
+
         },
         bottomBar = {
             //remove it later (showbottombar)
@@ -178,7 +245,7 @@ fun MainScreen(
                 bottomBarState.value,
                 isLoaded.value,
             myList,
-                allWords, isTimerRunning,timePassedList)
+                allWords, isTimerRunning,timePassedList,currentRoom)
 
     }
 
@@ -390,8 +457,7 @@ private fun SongColumn(
 
         Column(Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp)) {
             Row(
-                modifier = Modifier
-                ,
+                modifier = Modifier,
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -428,11 +494,9 @@ private fun SongColumn(
                     }
                 ) {
                     Icon(
-
                         painter = painterResource(id = if (isPlaying) R.drawable.exo_icon_pause else R.drawable.exo_icon_play),
                         tint = Color.White,
-                        modifier = Modifier
-                        ,
+                        modifier = Modifier,
                         contentDescription = null
                     )
                 }

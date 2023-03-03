@@ -58,10 +58,6 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
     var isTimerRunning by mutableStateOf(false)
 
 
-    fun saveDuration(itemId: Int) {
-        appPreferences.TimeLeft = itemId // save to SharedPreferences
-        timeLeft = itemId.toLong()
-    }
 
 
     fun startTimer() {

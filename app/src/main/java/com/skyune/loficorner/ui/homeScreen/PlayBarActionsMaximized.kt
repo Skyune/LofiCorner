@@ -114,8 +114,8 @@ public fun PlayBarActionsMaximized(
             }
 
             val customSliderColors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colors.onSurface,
-                activeTrackColor = MaterialTheme.colors.onSurface,
+                thumbColor = MaterialTheme.colors.surface,
+                activeTrackColor = MaterialTheme.colors.surface,
                 inactiveTrackColor = MaterialTheme.colors.secondary
 
             )
@@ -124,7 +124,7 @@ public fun PlayBarActionsMaximized(
                 modifier = Modifier
                     .offset(x = offsetX(currentFraction, maxWidth).dp)
                     .width(widthSize(currentFraction, maxWidth).dp)
-                    .padding(bottom = 40.dp),
+                    .padding(bottom = 20.dp,top = 10.dp),
                 colors = customSliderColors,
                 value = sliderValue, onValueChange = {
                     sliderValueRaw = it
@@ -134,7 +134,7 @@ public fun PlayBarActionsMaximized(
 
             )
             Row(
-                Modifier.height(200.dp)
+                Modifier.height(165.dp)
             ) {
                 if (musicServiceConnection.shuffleMode == SHUFFLE_MODE_NONE) {
                     Icon(
@@ -195,8 +195,8 @@ public fun PlayBarActionsMaximized(
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
-                                            MaterialTheme.colors.surface,
-                                            MaterialTheme.colors.secondary
+                                            MaterialTheme.colors.onPrimary,
+                                            MaterialTheme.colors.onSecondary
                                         ),
                                         start = Offset(0f, 0f),
                                         end = Offset(40f, 140f)
@@ -217,7 +217,7 @@ public fun PlayBarActionsMaximized(
                                 Icon(
                                     painter = painterResource(id = R.drawable.exo_icon_play),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colors.onSurface
+                                    tint = Color.White
                                 )
                             }
                         }
@@ -236,8 +236,8 @@ public fun PlayBarActionsMaximized(
                                 .background(
                                     brush = Brush.linearGradient(
                                         colors = listOf(
-                                            MaterialTheme.colors.surface,
-                                            MaterialTheme.colors.secondary
+                                            MaterialTheme.colors.onPrimary,
+                                            MaterialTheme.colors.onSecondary
                                         ),
                                         start = Offset(0f, 0f),
                                         end = Offset(40f, 140f)
@@ -257,7 +257,7 @@ public fun PlayBarActionsMaximized(
                                 Icon(
                                     painter = painterResource(id = R.drawable.exo_icon_pause),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colors.onSurface
+                                    tint = Color.White
                                 )
                             }
                         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.repository.WeatherRepository
@@ -111,6 +112,12 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
     val selectedButtonIndexId: State<Int> = preferences.selectedButtonIndexId.let { mutableStateOf(it) }
 
 
+
+    fun insertRoom(room: CurrentRoom) =  viewModelScope.launch {
+        repository.insertRoom(room)
+    }
+
+
     fun selectButtonIndex(itemId: Int) {
         preferences.selectedButtonIndexId = itemId // save to SharedPreferences
         _selectedButtonIndex.value = itemId
@@ -119,7 +126,6 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
 
     var _selectedRoomIndex = mutableStateOf(0)
     val selectedRoomIndexId: State<Int> = preferences.selectedRoomId.let { mutableStateOf(it) }
-
     fun selectRoomIndex(itemId: Int) {
         preferences.selectedRoomId = itemId // save to SharedPreferences
         _selectedRoomIndex.value = itemId
