@@ -82,15 +82,14 @@ fun MainScreen(
                     || musicServiceConnection.currentPlayingSong.value != null
         }
     }
-//    if (showDialog) {
-//        //Popup(mainViewModel,onDismiss = { showDialog = false })
-//    }
+
 
     val isTimerRunning: MutableState<Boolean> = remember{
         derivedStateOf {
             mutableStateOf(false)
         }
     }.value
+
 
     //for testing
     var showBottomBar = false
@@ -135,13 +134,14 @@ fun MainScreen(
         }
     }
 
+    val timePassedList by mainViewModel.getAllTimePassed().observeAsState(listOf())
 
     Scaffold(
         topBar = {
             TopAppBar(
                 backgroundColor = Color.Transparent,
                 elevation = 0.dp,
-                title = { Text(text = "My App Title") },
+                title = {},
                 actions = {
                     IconButton(onClick = { showDialog = !showDialog  }) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
@@ -154,7 +154,9 @@ fun MainScreen(
         },
         bottomBar = {
             //remove it later (showbottombar)
-            if(shouldHavePlayBar || showBottomBar) {
+            //shouldHavePlayBar
+            //TODO: change it back to shouldhaveplaybar
+            if(true) {
                 BottomBar(
                     navController = navController,
                     bottomBarState,
@@ -176,7 +178,7 @@ fun MainScreen(
                 bottomBarState.value,
                 isLoaded.value,
             myList,
-                allWords, isTimerRunning)
+                allWords, isTimerRunning,timePassedList)
 
     }
 

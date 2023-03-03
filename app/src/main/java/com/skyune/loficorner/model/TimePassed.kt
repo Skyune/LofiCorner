@@ -8,8 +8,7 @@ import javax.annotation.Nullable
 
 @Entity(tableName = "time_passed")
 data class TimePassed(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: Int = 1,
     val time: Long,
-    val date: Long = System.currentTimeMillis(),
     val taskName: String
 )

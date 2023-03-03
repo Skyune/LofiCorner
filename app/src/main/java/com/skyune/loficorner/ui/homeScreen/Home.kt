@@ -1,8 +1,6 @@
 package com.skyune.loficorner.ui.homeScreen
 
-import android.app.Activity
 import android.content.Context
-import android.gesture.GestureLibraries.fromRawResource
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -11,23 +9,16 @@ import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
 
-import android.support.v4.media.session.MediaControllerCompat
 import android.util.Log
-import androidx.activity.compose.BackHandler
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -35,31 +26,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.room.Room
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
@@ -69,18 +52,11 @@ import coil.size.Size
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.rld.justlisten.android.ui.bottombars.sheets.BottomSheetScreen
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
-import com.skyune.loficorner.model.Data
-import com.skyune.loficorner.utils.playMusic
-import com.skyune.loficorner.utils.playMusicFromId
+import com.skyune.loficorner.model.TimePassed
 
-import com.skyune.loficorner.widgets.RoundIconButton
-import com.yeocak.parallaximage.*
-import com.yeocak.parallaximage.ParallaxImage
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -88,6 +64,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.*
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class,
@@ -95,7 +72,7 @@ import kotlinx.coroutines.launch
 )
 
 @Composable
-fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
+fun HomeScreen(musicServiceConnection: MusicServiceConnection, timePassedList: List<TimePassed>) {
             Column(modifier = Modifier
                 .background(
                     brush = Brush.linearGradient(
@@ -118,6 +95,13 @@ fun HomeScreen(musicServiceConnection: MusicServiceConnection) {
                                     || musicServiceConnection.currentPlayingSong.value != null
                         }
                     }
+
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    items(timePassedList) { timePassed ->
+
+                        Text(text = "Time passed: ${timePassed.time},  ${timePassed.taskName}")
+                    }
+                }
 
                     if (shouldHavePlayBar) {
                         //ParallaxImage(image = R.drawable.witch, sensor = GravitySensorDefaulted(context = LocalContext.current))

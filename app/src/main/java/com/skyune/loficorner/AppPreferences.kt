@@ -20,4 +20,8 @@ class AppPreferences(private val sharedPreferences: SharedPreferences) {
     var selectedRoomId: Int
         get() = sharedPreferences.getInt("selectedRoomId", 0)
         set(value) = sharedPreferences.edit().putInt("selectedRoomId", value).apply()
+
+    var TimeLeft: Int
+        get() = sharedPreferences.getInt("selectedRoomId", 0)
+        set(value) = sharedPreferences.edit().putInt("selectedRoomId", value).apply()
 }

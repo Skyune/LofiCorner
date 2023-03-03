@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.model.TimePassed
 import com.skyune.loficorner.ui.*
 import com.skyune.loficorner.ui.homeScreen.HomeScreen
 import com.skyune.loficorner.ui.mainScreen.MainScreen
@@ -16,7 +17,6 @@ import com.skyune.loficorner.ui.profileScreen.ProfileScreen
 import com.skyune.loficorner.ui.settingsScreen.SettingsScreen
 import com.skyune.loficorner.ui.splash.WeatherSplashScreen
 import com.skyune.loficorner.ui.theme.Theme
-import com.skyune.loficorner.viewmodels.PomodoroSession
 import com.skyune.loficorner.viewmodels.SettingsViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
@@ -31,20 +31,12 @@ fun WeatherNavigation(
     isLoaded: MutableState<Boolean>,
     myList: MutableList<Data>,
     allWords: LiveData<List<Data>>,
-    isTimerRunning: MutableState<Boolean>
+    isTimerRunning: MutableState<Boolean>,
+    timePassedList: List<TimePassed>
 ) {
 
-    var settingsViewModel :  SettingsViewModel = hiltViewModel()
-    //val navController = rememberNavController()
-    var timeLeft by remember {
-    mutableStateOf(0L)
-    }
-    var currentSession by remember {
-        mutableStateOf(PomodoroSession.WORK)
-    }
-    var isTimerRunning by remember {
-        mutableStateOf(false)
-    }
+    //not sure gdzie powinna byc deklaracja settingsviewmodel
+    val settingsViewModel :  SettingsViewModel = hiltViewModel()
 
 
     NavHost(navController = navController,
@@ -66,7 +58,7 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Home.route) {
-            HomeScreen(musicServiceConnection = musicServiceConnection)
+            HomeScreen(musicServiceConnection = musicServiceConnection,timePassedList)
         }
         composable(route = BottomNavScreen.Profile.route) {
             ProfileScreen(

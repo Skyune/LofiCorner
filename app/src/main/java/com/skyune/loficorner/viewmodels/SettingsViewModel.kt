@@ -2,6 +2,7 @@ package com.skyune.loficorner.viewmodels
 
 import android.annotation.SuppressLint
 import android.os.CountDownTimer
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.model.CurrentSong
 import com.skyune.loficorner.model.TimePassed
@@ -25,10 +27,19 @@ import javax.inject.Inject
 
 @OptIn(InternalCoroutinesApi::class)
 @HiltViewModel
-class SettingsViewModel @Inject constructor(private val repository: WeatherRepository)
+class SettingsViewModel @Inject constructor(private val repository: WeatherRepository, private val appPreferences: AppPreferences)
     : ViewModel() {
 
+    fun insert(timePassed: TimePassed) =  viewModelScope.launch {
+        repository.insertTime(timePassed)
+    }
 
+    suspend fun getLatestTimePassed(): TimePassed? = repository.getLatestTimePassed()
+
+
+    fun update(timePassed: TimePassed) = viewModelScope.launch {
+        repository.update(timePassed)
+    }
 
     private var countDownTimer: CountDownTimer? = null
     private var timePaused = 0L
@@ -41,9 +52,17 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
 
     private var pomodorosCompleted = 0
 
+
     var timeLeft by mutableStateOf(0L)
     var currentSession by mutableStateOf(PomodoroSession.WORK)
     var isTimerRunning by mutableStateOf(false)
+
+
+    fun saveDuration(itemId: Int) {
+        appPreferences.TimeLeft = itemId // save to SharedPreferences
+        timeLeft = itemId.toLong()
+    }
+
 
     fun startTimer() {
         if (countDownTimer == null) {
@@ -53,9 +72,29 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
             PomodoroSession.LONG_BREAK -> LONG_BREAK_DURATION_MINUTES * ONE_MINUTE_MILLIS
         } - timePaused // subtract paused time from duration
 
+
             countDownTimer = object : CountDownTimer(durationInMillis, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
                     timeLeft = millisUntilFinished
+                    val startTime = System.currentTimeMillis()
+
+                    val wasPaused = timePaused > 0L
+
+                    var latestTimePassed: TimePassed? = null
+                    viewModelScope.launch {
+                        latestTimePassed = getLatestTimePassed()
+                        if (latestTimePassed == null || !wasPaused) {
+                            // Insert a new TimePassed entity with the current time if no previous time exists or timer was not paused
+
+                            val currentName = when (currentSession) {
+                                PomodoroSession.WORK -> "Work Session"
+                                PomodoroSession.SHORT_BREAK -> "Short Break"
+                                PomodoroSession.LONG_BREAK -> "Long Break"
+                            }
+                            insert(TimePassed(time = timeLeft, taskName = currentName))
+                            latestTimePassed = getLatestTimePassed()
+                        }
+                }
                 }
 
 
@@ -68,6 +107,17 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
                             if (pomodorosCompleted >= POMODORO_SESSIONS_BEFORE_LONG_BREAK) {
                                 currentSession = PomodoroSession.LONG_BREAK
                                 pomodorosCompleted = 0
+                            }
+                            val timePassed = timeLeft
+
+
+                            // Update the most recent TimePassed entity with the elapsed time
+                            viewModelScope.launch {
+                                val latestTimePassed = getLatestTimePassed()
+                                latestTimePassed?.let {
+                                    val updatedTimePassed = it.copy(time = timePassed)
+                                    update(updatedTimePassed)
+                                }
                             }
                             timeLeft = 0L
                             startTimer()
@@ -126,6 +176,4 @@ fun getTimeString(timeMillis: Long): String {
     val minutes = timeMillis / (1000 * 60) % 60
     return String.format("%02d:%02d", minutes, seconds)
 }
-
-
 

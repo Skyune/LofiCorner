@@ -26,7 +26,7 @@ interface NoteDatabaseDao {
     @Query("SELECT * FROM time_passed ORDER BY id DESC LIMIT 1")
     suspend fun getLatestTimePassed(): TimePassed?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(timePassed: TimePassed)
 
     @Query("SELECT * FROM time_passed ORDER BY id ASC")

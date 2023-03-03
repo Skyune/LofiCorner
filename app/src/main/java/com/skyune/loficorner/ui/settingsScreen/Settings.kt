@@ -44,7 +44,8 @@ fun SettingsScreen(
             isTimerRunning = settingsViewModel.isTimerRunning,
             onPause = settingsViewModel::pauseTimer,
             onStart = settingsViewModel::startTimer,
-            onReset = settingsViewModel::resetTimer
+            onReset = settingsViewModel::resetTimer,
+
         )
     }
 }
@@ -56,7 +57,8 @@ fun TimerPopup(
     isTimerRunning: Boolean,
     onPause: () -> Unit,
     onStart: () -> Unit,
-    onReset: () -> Unit
+    onReset: () -> Unit,
+
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -85,11 +87,13 @@ fun TimerPopup(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
+
                 Text(
                     text = getTimeString(timeLeft),
                     fontSize = 48.sp,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 

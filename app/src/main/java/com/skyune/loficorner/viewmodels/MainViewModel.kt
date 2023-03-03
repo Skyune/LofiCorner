@@ -1,8 +1,13 @@
 package com.skyune.loficorner.viewmodels
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.model.CurrentSong
 import com.skyune.loficorner.model.TimePassed
@@ -18,13 +23,16 @@ import retrofit2.Call
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val repository: WeatherRepository)
+class MainViewModel @Inject constructor(private val repository: WeatherRepository, private val appPreferences: AppPreferences)
     : ViewModel(){
         suspend fun getWeatherData()
         : DataOrException<Weather, Boolean, Exception> {
             return repository.getWeather()
 
         }
+
+    val currentPomodoroDuration: MutableState<Int> = appPreferences.TimeLeft.let { mutableStateOf(it) }
+
 
     private val _currentSong = MutableStateFlow<List<CurrentSong>>(emptyList())
     val currentSongList = _currentSong.asStateFlow()
@@ -45,5 +53,9 @@ class MainViewModel @Inject constructor(private val repository: WeatherRepositor
 
     fun update(timePassed: TimePassed) = viewModelScope.launch {
         repository.update(timePassed)
+    }
+
+    fun getAllTimePassed(): LiveData<List<TimePassed>> {
+        return repository.getAllTimePassed()
     }
 }
