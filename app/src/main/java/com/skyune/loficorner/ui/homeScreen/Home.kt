@@ -34,6 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -68,13 +70,18 @@ import java.util.*
     ExperimentalAnimationGraphicsApi::class, InternalCoroutinesApi::class
 )
 
+
+
+
+
 @Composable
 fun HomeScreen(
     musicServiceConnection: MusicServiceConnection,
     homeViewModel: HomeViewModel = hiltViewModel(),
     currentRoom: CurrentRoom?
 ) {
-            Column(modifier = Modifier
+
+    Column(modifier = Modifier
                 .background(
                     brush = Brush.linearGradient(
                         0f to MaterialTheme.colors.background,
@@ -101,11 +108,29 @@ fun HomeScreen(
                     if (shouldHavePlayBar) {
                         //ParallaxImage(image = R.drawable.witch, sensor = GravitySensorDefaulted(context = LocalContext.current))
 
+                        currentRoom?.imageId?.let { (it) }?.let {
+                            Image(
+                                rememberAsyncImagePainter(
+                                    ImageRequest.Builder(LocalContext.current)
+                                        .diskCachePolicy(CachePolicy.ENABLED)
+                                        .data(data = it)
+                                        .build()
+                                ),
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .aspectRatio(0.9f)
+                                    .scale(1f),
+                                contentScale = ContentScale.FillBounds,
+                                contentDescription = null,
+                            )
+                        }
+
                         val context = LocalContext.current
                         val scope = rememberCoroutineScope()
 
                         var data by remember { mutableStateOf<SensorData?>(null) }
 
+                        /*
                         DisposableEffect(Unit) {
                             val dataManager = SensorDataManager(context)
                             dataManager.init()
@@ -122,10 +147,6 @@ fun HomeScreen(
                             }
                         }
 
-
-
-
-
                         if (data != null) {
                             Box(
                                 modifier = Modifier
@@ -134,28 +155,6 @@ fun HomeScreen(
                             ) {
 
                                 //TODO: when have time add this glow effect
-//                                currentRoomImage?.let { painterResource(it) }?.let {
-//                                    Image(
-//                                        painter = it,
-//                                        modifier = Modifier
-//                                            .offset(
-//                                                x = (-data!!.roll * 0.14).dp,
-//                                                y = (data!!.pitch * 0.04).dp
-//                                            )
-//                                            .wrapContentSize()
-//                                            .aspectRatio(0.9f)
-//                                            .scale(1f)
-//                                            .blur(
-//                                                radius = 10.dp,
-//                                                edgeTreatment = BlurredEdgeTreatment.Unbounded
-//
-//                                            ),
-//                                        contentDescription = null,
-//                                        contentScale = ContentScale.FillHeight
-//                                    )
-//                                }
-
-
                                 Image(
                                     rememberAsyncImagePainter(
                                         ImageRequest.Builder(LocalContext.current)
@@ -201,6 +200,9 @@ fun HomeScreen(
                                 }
                             }
                         }
+
+                        //sensor TODO only for witch
+
                         class SensorDataManager (context: Context): SensorEventListener {
 
                             private val sensorManager by lazy {
@@ -259,6 +261,8 @@ fun HomeScreen(
                             val roll: Double,
                             val pitch: Double
                         )
+
+                         */
 
                        // VideoView(R.raw.cat)
                         //room()

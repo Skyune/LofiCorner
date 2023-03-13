@@ -32,7 +32,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -358,66 +360,6 @@ fun BottomBar(
 }
 
 
-/*
-@Composable
-fun Popup(onDismiss: () -> Unit) {
-    Dialog(onDismissRequest = onDismiss) {
-        var timeLeft by remember { mutableStateOf(0L) }
-        var timerJob: Job? = null
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.6f))
-                .clickable(onClick = onDismiss),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .background(Color.White)
-                    .padding(16.dp)
-                    .size(width = 280.dp, height = 400.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column {
-                    Text(
-                        text = "Popup Title",
-                        fontSize = 20.sp,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    Button(
-                        onClick = {
-                            timerJob?.cancel()
-                            timerJob = CoroutineScope(Dispatchers.Main).launch {
-                                timeLeft = 25 * 60 // 25 minutes
-                                while (timeLeft > 0) {
-                                    delay(1000)
-                                    timeLeft -= 1
-                                }
-                                // Timer finished, do something here
-                            }
-                        }
-                    ) {
-                        Text(text = "Start Pomodoro Timer")
-                    }
-                    Text(
-                        text = "Time left: ${timeLeft / 60}:${timeLeft % 60}",
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items((0..20).toList()) { index ->
-                            Text(text = "Item $index", fontSize = 16.sp)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
- */
-
 @Composable
 private fun SongColumn(
     songIcon: Uri?,
@@ -436,10 +378,12 @@ private fun SongColumn(
     val isPlaying = musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PLAYING ||
             musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_BUFFERING
 
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier
+        modifier = Modifier.heightIn(max = screenHeight * 0.1f)
             .wrapContentHeight()
             .fillMaxWidth()
             .zIndex(1f)
@@ -455,6 +399,7 @@ private fun SongColumn(
             )
     ) {
 
+
         Column(Modifier.padding(0.dp, 0.dp, 0.dp, 16.dp)) {
             Row(
                 modifier = Modifier,
@@ -463,6 +408,7 @@ private fun SongColumn(
             ) {
                 val painter = rememberImagePainter(
                     imageRequest,
+
                     builder = {
                         crossfade(true)
                             .data(songIcon)
@@ -470,12 +416,12 @@ private fun SongColumn(
                 )
                 Image(
                     painter = painter,
-                    modifier = Modifier.size(50.dp)
-                    ,
-                    contentScale = ContentScale.FillBounds,
-                    contentDescription = null
+                    modifier = Modifier.fillMaxWidth().weight(0.2f),
+
+                    contentDescription = null,
+
                 )
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
                     Text(text = title,color = MaterialTheme.colors.onSurface)
                     Text(artist,color = MaterialTheme.colors.onSurface)
                 }
@@ -486,7 +432,7 @@ private fun SongColumn(
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
                     modifier = Modifier
                         .size(40.dp)
-                        .weight(0.2f)
+                        .weight(0.4f)
                     ,
                     onClick = {
                         if (isPlaying) musicServiceConnection.transportControls?.pause()
@@ -516,7 +462,10 @@ private fun SongColumn(
             }
 
     }
+
 }
+
+
 
 
 @Composable
