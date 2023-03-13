@@ -18,9 +18,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.rld.justlisten.android.ui.extensions.ModifiedSlider
 import com.rld.justlisten.android.ui.utils.offsetX
 import com.rld.justlisten.android.ui.utils.widthSize
@@ -76,8 +78,6 @@ public fun PlayBarActionsMaximized(
             musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat()
 
 
-
-
         Column(
             modifier
                 .fillMaxSize()
@@ -89,8 +89,11 @@ public fun PlayBarActionsMaximized(
             MarqueeText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = title,
+                fontWeight = FontWeight.Bold,
+                fontSize = 19.sp,
                 color = MaterialTheme.colors.surface,
                 style = MaterialTheme.typography.body1,
+
                 textAlign = TextAlign.Center, gradientEdgeColor = MaterialTheme.colors.primary)
             MarqueeText(
                 modifier = Modifier.align(Alignment.CenterHorizontally),

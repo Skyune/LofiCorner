@@ -114,7 +114,7 @@ fun HomeScreen(
                                     .wrapContentSize()
                                     .aspectRatio(0.9f)
                                     .scale(1f)
-                                    .weight(1.4f),
+                                    .weight(2.4f),
                                 contentScale = ContentScale.FillBounds,
                                 contentDescription = null,
                             )
@@ -258,10 +258,11 @@ fun HomeScreen(
                         )
 
                          */
+                        Spacer(modifier = Modifier.weight(0.32f).fillMaxSize())
 
                         Column(
                             Modifier
-                                .weight(1f)
+                                .weight(1.4f)
                                 .fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                             val title by remember {
                                 derivedStateOf {
@@ -289,7 +290,7 @@ fun HomeScreen(
                             }
                         }
                     }
-                Spacer(modifier = Modifier.weight(0.32f).fillMaxSize())
+                Spacer(modifier = Modifier.weight(0.52f).fillMaxSize())
             }
             
 
