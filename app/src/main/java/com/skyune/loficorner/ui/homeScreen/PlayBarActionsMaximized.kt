@@ -123,12 +123,12 @@ public fun PlayBarActionsMaximized(
                 inactiveTrackColor = MaterialTheme.colors.secondary
 
             )
+
             ModifiedSlider(
                 interactionSource = interactionSource,
                 modifier = Modifier
                     .offset(x = offsetX(currentFraction, maxWidth).dp)
-                    .width(widthSize(currentFraction, maxWidth).dp)
-                    .padding(bottom = 20.dp,top = 10.dp),
+                    .width(widthSize(currentFraction, maxWidth).dp),
                 colors = customSliderColors,
                 value = sliderValue, onValueChange = {
                     sliderValueRaw = it
@@ -137,6 +137,8 @@ public fun PlayBarActionsMaximized(
 
 
             )
+
+
             Row(
                 Modifier.wrapContentHeight()
             ) {
