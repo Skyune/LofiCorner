@@ -114,7 +114,7 @@ fun HomeScreen(
                                     .wrapContentSize()
                                     .aspectRatio(0.9f)
                                     .scale(1f)
-                                    .weight(10f),
+                                    .weight(6.7f),
                                 contentScale = ContentScale.FillBounds,
                                 contentDescription = null,
                             )
