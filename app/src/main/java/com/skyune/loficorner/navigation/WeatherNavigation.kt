@@ -1,6 +1,7 @@
 package com.skyune.loficorner.navigation
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
@@ -24,6 +25,7 @@ import com.yeocak.parallaximage.GravitySensorDefaulted
 
 @Composable
 fun WeatherNavigation(
+    modifier: Modifier,
     navController: NavHostController,
     onToggleTheme: (Theme) -> Unit,
     onToggleDarkMode: () -> Unit,
@@ -62,7 +64,7 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Home.route) {
-            HomeScreen(musicServiceConnection = musicServiceConnection, homeViewModel, currentRoom)
+            HomeScreen(modifier,musicServiceConnection = musicServiceConnection, homeViewModel, currentRoom)
         }
         composable(route = BottomNavScreen.Profile.route) {
             ProfileScreen(

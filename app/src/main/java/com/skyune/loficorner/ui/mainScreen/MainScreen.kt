@@ -239,6 +239,7 @@ fun MainScreen(
     ) {
 
             WeatherNavigation(
+                modifier = Modifier.padding(it),
                 navController = navController,
                 onToggleTheme,
                 onToggleDarkMode,

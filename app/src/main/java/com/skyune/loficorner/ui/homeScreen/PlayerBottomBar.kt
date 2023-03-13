@@ -7,13 +7,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.rld.justlisten.android.ui.extensions.noRippleClickable
-import com.skyune.loficorner.model.SongIconList
-import com.rld.justlisten.datalayer.models.UserModel
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicService.Companion.curSongDuration
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
@@ -51,6 +47,7 @@ fun PlayerBottomBar(
                     }
             )
             PlayBarActionsMaximized(
+                modifier = Modifier,
                 bottomPadding = {
                     if (isExtended) {
                         0.dp

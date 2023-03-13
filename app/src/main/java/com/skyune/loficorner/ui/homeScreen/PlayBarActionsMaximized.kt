@@ -1,6 +1,5 @@
 package com.skyune.loficorner.ui.homeScreen
 
-import android.graphics.drawable.AnimationDrawable
 import android.media.session.PlaybackState
 import android.support.v4.media.session.PlaybackStateCompat.*
 import androidx.compose.foundation.BorderStroke
@@ -33,6 +32,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 @InternalCoroutinesApi
 @Composable
 public fun PlayBarActionsMaximized(
+    modifier: Modifier = Modifier,
     bottomPadding: Dp,
     currentFraction: Float,
     musicServiceConnection: MusicServiceConnection,
@@ -79,10 +79,11 @@ public fun PlayBarActionsMaximized(
 
 
         Column(
-            Modifier
+            modifier
                 .fillMaxSize()
                 .background(Color.Transparent)
-                .padding(bottom = bottomPadding + 5.dp, top = 5.dp),
+                //.padding(bottom = bottomPadding + 5.dp, top = 5.dp),
+                    ,
             verticalArrangement = Arrangement.Bottom
         ) {
             MarqueeText(
@@ -134,7 +135,7 @@ public fun PlayBarActionsMaximized(
 
             )
             Row(
-                Modifier.height(165.dp)
+                Modifier.wrapContentHeight()
             ) {
                 if (musicServiceConnection.shuffleMode == SHUFFLE_MODE_NONE) {
                     Icon(

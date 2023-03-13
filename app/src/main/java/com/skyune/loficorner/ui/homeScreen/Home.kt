@@ -34,8 +34,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -59,11 +57,6 @@ import com.skyune.loficorner.viewmodels.HomeViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
-import java.util.*
 
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class,
@@ -76,22 +69,23 @@ import java.util.*
 
 @Composable
 fun HomeScreen(
+    modifier: Modifier,
     musicServiceConnection: MusicServiceConnection,
     homeViewModel: HomeViewModel = hiltViewModel(),
     currentRoom: CurrentRoom?
 ) {
 
     Column(modifier = Modifier
-                .background(
-                    brush = Brush.linearGradient(
-                        0f to MaterialTheme.colors.background,
-                        1f to MaterialTheme.colors.onBackground,
-                        start = Offset(250f, 300f),
-                        end = Offset(900f, 1900.5f)
-                    )
-                )
-                .fillMaxSize()
-                .padding(30.dp, 0.dp, 30.dp, 4.dp),
+        .background(
+            brush = Brush.linearGradient(
+                0f to MaterialTheme.colors.background,
+                1f to MaterialTheme.colors.onBackground,
+                start = Offset(250f, 300f),
+                end = Offset(900f, 1900.5f)
+            )
+        )
+        .fillMaxSize()
+        .padding(30.dp, 0.dp, 30.dp, 4.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
                      val shouldHavePlayBar by remember {
@@ -119,7 +113,8 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .wrapContentSize()
                                     .aspectRatio(0.9f)
-                                    .scale(1f),
+                                    .scale(1f)
+                                    .weight(1.4f),
                                 contentScale = ContentScale.FillBounds,
                                 contentDescription = null,
                             )
@@ -264,27 +259,39 @@ fun HomeScreen(
 
                          */
 
-                       // VideoView(R.raw.cat)
-                        //room()
-                        val title by remember { derivedStateOf {
-                            musicServiceConnection.currentPlayingSong.value?.description?.title.toString()  } }
-                        val artist by remember { derivedStateOf {
-                            musicServiceConnection.currentPlayingSong.value?.description?.subtitle.toString() } }
+                        Column(
+                            Modifier
+                                .weight(1f)
+                                .fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                            val title by remember {
+                                derivedStateOf {
+                                    musicServiceConnection.currentPlayingSong.value?.description?.title.toString()
+                                }
+                            }
+                            val artist by remember {
+                                derivedStateOf {
+                                    musicServiceConnection.currentPlayingSong.value?.description?.subtitle.toString()
+                                }
+                            }
 
-                        BoxWithConstraints() {
-                            val constraints = this@BoxWithConstraints
-                            PlayBarActionsMaximized(
-                                bottomPadding = 0.dp,
-                                currentFraction = 1f,
-                                musicServiceConnection = musicServiceConnection,
-                                title = title,
-                                artist = artist,
-                                onSkipNextPressed = { musicServiceConnection.transportControls?.skipToNext() },
-                                maxWidth = constraints.maxWidth.value
-                            )
+                            BoxWithConstraints() {
+                                val constraints = this@BoxWithConstraints
+                                PlayBarActionsMaximized(
+                                    modifier,
+                                    bottomPadding = 0.dp,
+                                    currentFraction = 1f,
+                                    musicServiceConnection = musicServiceConnection,
+                                    title = title,
+                                    artist = artist,
+                                    onSkipNextPressed = { musicServiceConnection.transportControls?.skipToNext() },
+                                    maxWidth = constraints.maxWidth.value
+                                )
+                            }
                         }
                     }
+                Spacer(modifier = Modifier.weight(0.32f).fillMaxSize())
             }
+            
 
 
     }
