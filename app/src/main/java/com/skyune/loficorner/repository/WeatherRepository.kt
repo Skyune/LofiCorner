@@ -84,6 +84,10 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi?, privat
         return noteDatabaseDao.getAllTimePassed()
     }
 
+    suspend fun deleteAllTimePassed() {
+        return noteDatabaseDao.deleteAllTimePassed()
+    }
+
     suspend fun getLatestTimePassed(): TimePassed? {
         return withContext(Dispatchers.IO) {
             noteDatabaseDao.getLatestTimePassed()

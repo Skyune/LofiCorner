@@ -79,9 +79,10 @@ public fun PlayBarActionsMaximized(
 
 
         Column(
-            modifier
+            Modifier
                 .fillMaxSize()
                 .background(Color.Transparent)
+                .padding(bottom = 40.dp)
                 //.padding(bottom = bottomPadding + 5.dp, top = 5.dp),
                     ,
             verticalArrangement = Arrangement.Bottom

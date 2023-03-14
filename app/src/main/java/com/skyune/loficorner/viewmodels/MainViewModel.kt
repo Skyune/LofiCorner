@@ -34,6 +34,9 @@ class MainViewModel @Inject constructor(private val repository: WeatherRepositor
 
         }
 
+    fun deleteAllTimePassed() = viewModelScope.launch {
+        repository.deleteAllTimePassed()
+    }
     //val currentPomodoroDuration: MutableState<Int> = appPreferences.TimeLeft.let { mutableStateOf(it) }
 
 

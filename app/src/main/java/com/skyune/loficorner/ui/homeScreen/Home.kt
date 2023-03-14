@@ -258,8 +258,9 @@ fun HomeScreen(
                         )
 
                          */
-                        Spacer(modifier = Modifier.weight(0.32f).fillMaxSize())
 
+
+                        Spacer(modifier = Modifier.weight(0.32f).fillMaxSize())
                         Column(
                             Modifier
                                 .weight(4f)

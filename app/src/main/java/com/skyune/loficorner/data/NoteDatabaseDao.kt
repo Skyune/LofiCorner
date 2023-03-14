@@ -48,4 +48,7 @@ interface NoteDatabaseDao {
 
     @Update
     suspend fun updateTimePassed(timePassed: TimePassed)
+
+    @Query("DELETE FROM time_passed")
+    suspend fun deleteAllTimePassed()
 }

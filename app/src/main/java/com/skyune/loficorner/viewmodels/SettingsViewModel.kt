@@ -34,6 +34,10 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
         repository.insertTime(timePassed)
     }
 
+    fun deleteAllTimePassed() = viewModelScope.launch {
+        repository.deleteAllTimePassed()
+    }
+
     suspend fun getLatestTimePassed(): TimePassed? = repository.getLatestTimePassed()
 
 
@@ -149,6 +153,7 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
     }
 
     fun resetTimer() {
+
         countDownTimer?.cancel() // cancel the existing CountDownTimer instance
         countDownTimer = null
         isTimerRunning = false
@@ -156,8 +161,10 @@ class SettingsViewModel @Inject constructor(private val repository: WeatherRepos
         timePaused = 0L
         currentSession = PomodoroSession.WORK
 
+        viewModelScope.launch {
+            deleteAllTimePassed()
+        }
     }
-
 }
 
 enum class PomodoroSession {

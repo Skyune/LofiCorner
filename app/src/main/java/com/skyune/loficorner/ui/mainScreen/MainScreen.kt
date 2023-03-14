@@ -1,6 +1,7 @@
 package com.skyune.loficorner.ui.mainScreen
 
 import android.content.Context
+import android.content.Intent
 import android.media.session.PlaybackState
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
@@ -22,6 +23,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -40,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavDestination
@@ -92,6 +95,7 @@ fun MainScreen(
         }
     }
 
+    mainViewModel.deleteAllTimePassed()
 
     val isTimerRunning: MutableState<Boolean> = remember{
         derivedStateOf {
@@ -177,7 +181,7 @@ fun MainScreen(
                             Box(
                                 Modifier
                                     .weight(2f)
-                                    .padding(top = 20.dp)
+                                    .padding(top = 0.dp)
                             ) {
 
                                 Column(
@@ -200,16 +204,33 @@ fun MainScreen(
 
                             }
 
+                            /*
+                            val sendIntent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_TEXT, "Check out this cool app!")
+                                        type = "text/plain"
+                                    }
+                                        startActivity(context,sendIntent,null)
+                                    }
+                             */
+                            val context = LocalContext.current
+
                             Box(
                                 Modifier
                                     .weight(0.5f)
                             ) {
                                 IconButton(
-                                    onClick = { /* Handle action */ }
+                                    onClick = {
+                                        val sharingIntent = Intent(Intent.ACTION_SEND)
+                                        sharingIntent.type = "text/plain"
+                                        sharingIntent.putExtra(Intent.EXTRA_TEXT, "Check out this cool website: https://www.example.com")
+                                        val chooserIntent = Intent.createChooser(sharingIntent, "Share via")
+                                        startActivity(context,chooserIntent,null)
+                                    }
                                 ) {
                                     Icon(
-                                        Icons.Filled.Settings,
-                                        contentDescription = "Settings",
+                                        Icons.Filled.Share,
+                                        contentDescription = "Share",
                                         tint = MaterialTheme.colors.surface
                                     )
                                 }
@@ -379,12 +400,11 @@ private fun SongColumn(
     val isPlaying = musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_PLAYING ||
             musicServiceConnection.playbackState.value?.state == PlaybackState.STATE_BUFFERING
 
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier.heightIn(max = screenHeight * 0.1f)
+        modifier = Modifier.height(70.dp)
             .wrapContentHeight()
             .fillMaxWidth()
             .zIndex(1f)
