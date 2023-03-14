@@ -228,7 +228,6 @@ fun ShowData(
                         .padding(10.dp, 0.dp, 10.dp, 5.dp)
                         .wrapContentSize())
                 }
-
                 items(list,key = {
                     it.id
                 },)  { item ->

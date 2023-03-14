@@ -80,6 +80,7 @@ fun MainScreen(
 ) {
 
 
+
     val list by allWords.observeAsState(listOf())
     val navController = rememberNavController()
     var showDialog by remember { mutableStateOf(false) }

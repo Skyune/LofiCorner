@@ -1,6 +1,8 @@
 package com.skyune.loficorner.ui.homeScreen
 
 import android.content.Context
+import android.graphics.Path
+import android.graphics.RectF
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -8,6 +10,7 @@ import android.hardware.SensorManager
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Build.VERSION.SDK_INT
+import android.util.LayoutDirection
 
 import android.util.Log
 import androidx.compose.animation.core.*
@@ -15,12 +18,17 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -34,9 +42,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.constraintlayout.solver.widgets.Rectangle
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -114,7 +122,7 @@ fun HomeScreen(
                                     .wrapContentSize()
                                     .aspectRatio(0.9f)
                                     .scale(1f)
-                                    .weight(6.7f),
+                                    .weight(8.7f),
                                 contentScale = ContentScale.FillBounds,
                                 contentDescription = null,
                             )
@@ -356,39 +364,29 @@ data class SensorData(
     val pitch: Double
 )
 
-
+@Preview
 @Composable
-fun VideoView(videoResourceId: Int, modifier: Modifier) {
-    val context = LocalContext.current
-
-    val rawPath = "android.resource://${context.packageName}/$videoResourceId"
-    val videoUri = Uri.parse(rawPath)
-
-    val exoPlayer = ExoPlayer.Builder(context)
-        .build()
-        .also { exoPlayer ->
-            val mediaItem = MediaItem.fromUri(videoUri)
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
-            exoPlayer.prepare()
-            exoPlayer.play()
+fun chatbox() {
+    Row(Modifier.height(IntrinsicSize.Max)) {
+        Column(
+            modifier = Modifier.background(
+                color = Color.Red,
+                shape = RoundedCornerShape(4.dp, 4.dp, 0.dp, 4.dp)
+            ).width(100.dp)
+        ) {
+            Text("Chat")
         }
-
-    DisposableEffect(
-        AndroidView(factory = {
-            StyledPlayerView(context).apply {
-                player = exoPlayer
-                useController = false
-            }
-
-        },   modifier = modifier
-
-        )
-    ) {
-        onDispose { exoPlayer.release() }
+        Column(
+            modifier = Modifier.background(
+                color = Color.Red,
+                shape = triangle(10)
+            )
+                .width(8.dp)
+                .fillMaxHeight()
+        ) {
+        }
     }
 }
-
 
 @Composable
 fun GifImage(
@@ -555,7 +553,6 @@ private fun GradientEdge(
 private enum class MarqueeLayers { MainText, SecondaryText, EdgesGradient }
 private data class TextLayoutInfo(val textWidth: Int, val containerWidth: Int)
 
-@Preview
 @Composable
 fun HomeScreenPreview() {
     //HomeScreen(musicServiceConnection)
