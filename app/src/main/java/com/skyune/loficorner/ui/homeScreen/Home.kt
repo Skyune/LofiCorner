@@ -17,6 +17,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -75,6 +76,8 @@ import kotlinx.coroutines.delay
 
 
 
+
+
 @Composable
 fun HomeScreen(
     modifier: Modifier,
@@ -106,26 +109,67 @@ fun HomeScreen(
                         }
                     }
 
+                    val visible = remember { mutableStateOf(false) }
 
                     if (shouldHavePlayBar) {
                         //ParallaxImage(image = R.drawable.witch, sensor = GravitySensorDefaulted(context = LocalContext.current))
 
                         currentRoom?.imageId?.let { (it) }?.let {
-                            Image(
-                                rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalContext.current)
-                                        .diskCachePolicy(CachePolicy.ENABLED)
-                                        .data(data = it)
-                                        .build()
-                                ),
-                                modifier = Modifier
-                                    .wrapContentSize()
-                                    .aspectRatio(0.9f)
-                                    .scale(1f)
-                                    .weight(8.7f),
-                                contentScale = ContentScale.FillBounds,
-                                contentDescription = null,
-                            )
+                            Box(modifier = Modifier
+                                .weight(8.7f)
+                                .clickable { visible.value = !visible.value }, Alignment.Center
+                            ) {
+//                                Column(Modifier.zIndex(1f),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//
+//                                    Spacer(
+//                                        modifier = Modifier
+//                                            .fillMaxSize()
+//                                            .weight(1.7f)
+//                                    )
+//                                    if (visible.value) {
+//                                        Box(Modifier.zIndex(2f)) {
+//                                            chatbox()
+//                                        }
+//                                    }
+//                                }
+                                Column(Modifier.zIndex(1f),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+
+                                    if (it == R.drawable.queenborder) {
+
+
+                                        Spacer(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .weight(1.7f)
+                                        )
+                                        Row( modifier = Modifier
+                                            .zIndex(1f)
+                                            .weight(1f)) {
+                                            Spacer(modifier = Modifier
+                                                .fillMaxWidth()
+                                                .weight(0.3f))
+
+                                            GifImage(Modifier.weight(2f))
+                                        }
+                                    }
+                                }
+                                    Image(
+                                        rememberAsyncImagePainter(
+                                            ImageRequest.Builder(LocalContext.current)
+                                                .diskCachePolicy(CachePolicy.ENABLED)
+                                                .data(data = it)
+                                                .build()
+                                        ),
+                                        modifier = Modifier
+                                            .wrapContentSize()
+                                            .aspectRatio(0.9f)
+                                            .scale(1f),
+                                        contentScale = ContentScale.FillBounds,
+                                        contentDescription = null,
+                                    )
+
+                            }
                         }
 
                         val context = LocalContext.current
@@ -268,7 +312,9 @@ fun HomeScreen(
                          */
 
 
-                        Spacer(modifier = Modifier.weight(0.32f).fillMaxSize())
+                        Spacer(modifier = Modifier
+                            .weight(0.32f)
+                            .fillMaxSize())
                         Column(
                             Modifier
                                 .weight(4f)
@@ -299,7 +345,9 @@ fun HomeScreen(
                             }
                         }
                     }
-                Spacer(modifier = Modifier.weight(1.52f).fillMaxSize())
+                Spacer(modifier = Modifier
+                    .weight(1.52f)
+                    .fillMaxSize())
             }
             
 
@@ -369,18 +417,21 @@ data class SensorData(
 fun chatbox() {
     Row(Modifier.height(IntrinsicSize.Max)) {
         Column(
-            modifier = Modifier.background(
-                color = Color.Red,
-                shape = RoundedCornerShape(4.dp, 4.dp, 0.dp, 4.dp)
-            ).width(100.dp)
+            modifier = Modifier
+                .background(
+                    color = Color.Red,
+                    shape = RoundedCornerShape(4.dp, 4.dp, 0.dp, 4.dp)
+                )
+                .width(100.dp)
         ) {
             Text("Chat")
         }
         Column(
-            modifier = Modifier.background(
-                color = Color.Red,
-                shape = triangle(10)
-            )
+            modifier = Modifier
+                .background(
+                    color = Color.Red,
+                    shape = triangle(10)
+                )
                 .width(8.dp)
                 .fillMaxHeight()
         ) {
@@ -404,7 +455,7 @@ fun GifImage(
         .build()
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.night).apply(block = {
+            ImageRequest.Builder(context).data(data = R.drawable.beautylying).apply(block = {
                 size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),

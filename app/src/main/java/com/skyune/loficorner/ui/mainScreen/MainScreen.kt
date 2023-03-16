@@ -205,15 +205,6 @@ fun MainScreen(
 
                             }
 
-                            /*
-                            val sendIntent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(Intent.EXTRA_TEXT, "Check out this cool app!")
-                                        type = "text/plain"
-                                    }
-                                        startActivity(context,sendIntent,null)
-                                    }
-                             */
                             val context = LocalContext.current
 
                             Box(
