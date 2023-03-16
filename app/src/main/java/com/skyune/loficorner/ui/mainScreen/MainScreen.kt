@@ -61,6 +61,7 @@ import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
+import com.skyune.loficorner.ui.homeScreen.chatbox
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.MainViewModel
@@ -396,7 +397,8 @@ private fun SongColumn(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier.height(70.dp)
+        modifier = Modifier
+            .height(70.dp)
             .wrapContentHeight()
             .fillMaxWidth()
             .zIndex(1f)
@@ -429,12 +431,16 @@ private fun SongColumn(
                 )
                 Image(
                     painter = painter,
-                    modifier = Modifier.fillMaxWidth().weight(0.2f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(0.2f),
 
                     contentDescription = null,
 
                 )
-                Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp)) {
                     Text(text = title,color = MaterialTheme.colors.onSurface)
                     Text(artist,color = MaterialTheme.colors.onSurface)
                 }

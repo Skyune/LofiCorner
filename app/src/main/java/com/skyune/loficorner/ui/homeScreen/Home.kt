@@ -109,15 +109,15 @@ fun HomeScreen(
                         }
                     }
 
-                    val visible = remember { mutableStateOf(false) }
+
+        val visible = remember { mutableStateOf(false) }
 
                     if (shouldHavePlayBar) {
                         //ParallaxImage(image = R.drawable.witch, sensor = GravitySensorDefaulted(context = LocalContext.current))
 
                         currentRoom?.imageId?.let { (it) }?.let {
                             Box(modifier = Modifier
-                                .weight(8.7f)
-                                .clickable { visible.value = !visible.value }, Alignment.Center
+                                .weight(8.7f), Alignment.Center
                             ) {
 //                                Column(Modifier.zIndex(1f),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 //
@@ -412,32 +412,46 @@ data class SensorData(
     val pitch: Double
 )
 
+
+
+
+
 @Preview
 @Composable
 fun chatbox() {
-    Row(Modifier.height(IntrinsicSize.Max)) {
-        Column(
-            modifier = Modifier
-                .background(
-                    color = Color.Red,
-                    shape = RoundedCornerShape(4.dp, 4.dp, 0.dp, 4.dp)
-                )
-                .width(100.dp)
-        ) {
-            Text("Chat")
+    Column(Modifier.wrapContentSize()) {
+        Column(Modifier) {
+                  Box(
+                Modifier
+                    .background(
+                        color = Color.Red,
+                        shape = RoundedCornerShape(4.dp, 4.dp, 0.dp, 4.dp)
+                    )
+                    .width(60.dp)
+            ) {
+                Text("ChatGPT")
+            }
         }
-        Column(
-            modifier = Modifier
-                .background(
-                    color = Color.Red,
-                    shape = triangle(10)
-                )
-                .width(8.dp)
-                .fillMaxHeight()
-        ) {
+
+            Column(
+                Modifier
+                    .background(
+                        color = Color.Red,
+                        shape = triangle(10)
+                    )
+                    .width(77.dp)
+            ) {
+
+            }
         }
     }
-}
+
+
+
+
+
+
+
 
 @Composable
 fun GifImage(
