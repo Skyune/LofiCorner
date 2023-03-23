@@ -13,7 +13,7 @@ interface NoteDatabaseDao {
     @Query("SELECT id,playlist_name,artwork,user FROM data")
     fun getAll(): Flow<List<Data>>
 
-    @Query("SELECT id,playlist_name,artwork,user FROM data")
+    @Query("SELECT id,playlist_name,artwork,user FROM data WHERE songType='Sleepy'")
     fun getAllSleepy(): Flow<List<Data>>
 
     @Query("SELECT id,playlist_name,artwork,user FROM data WHERE songType='Jazzy'")
@@ -22,7 +22,7 @@ interface NoteDatabaseDao {
     @Query("SELECT * FROM data WHERE id = :id")
     fun getById(id: String): Data
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(data: Data)
 
 

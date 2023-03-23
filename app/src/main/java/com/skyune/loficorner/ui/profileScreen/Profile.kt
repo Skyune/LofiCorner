@@ -134,8 +134,7 @@ fun ShowData(
         {
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded, songType = "Chill")
         }
-        if(list.size>5)
-        {
+
             val selectedItemId = remember { mutableStateOf(profileViewModel.selectedItemId.value) }
 
             LazyColumn(modifier = Modifier
@@ -275,11 +274,8 @@ fun ShowData(
                         })}
             }
         }
-        else
-        {
-            CircularProgressIndicator(modifier = Modifier.fillMaxSize())
-        }
- }}
+
+ }
 
 @Composable
 fun MusicSelectionButtons(

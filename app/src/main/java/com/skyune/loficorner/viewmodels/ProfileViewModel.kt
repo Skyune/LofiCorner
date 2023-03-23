@@ -192,7 +192,7 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
                             mood = firstItem.mood,
                             title = firstItem.title,
                             user = firstItem.user,
-                            songType = "Jazzy" // Set the songType field to "jazz"
+                            songType = songType// Set the songType field to "jazz"
                         )
                         insert(newItem) // Insert the new item into your data structure
                         Log.d("TAG", "onResponse: ${newItem}")
