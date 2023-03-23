@@ -37,8 +37,8 @@ class WeatherRepository @Inject constructor(private val api: WeatherApi?, privat
     }
 
     val allWords: Flow<List<Data>> = noteDatabaseDao.getAll()
-
-
+    val allSleepy: Flow<List<Data>> = noteDatabaseDao.getAllSleepy()
+    val allJazzy: Flow<List<Data>> = noteDatabaseDao.getAllJazzy()
 
 
     suspend fun insertTimePassed(timePassed: TimePassed) {

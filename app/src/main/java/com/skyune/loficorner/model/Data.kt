@@ -27,5 +27,6 @@ data class Data(
 //    val repost_count: Int,
 //    val tags: String,
     var title: String?,
-    val user: User?
+    val user: User?,
+    var songType: String?
 )

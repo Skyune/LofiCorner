@@ -13,16 +13,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement.Start
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,7 +29,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -85,6 +80,7 @@ fun MainScreen(
     val list by allWords.observeAsState(listOf())
     val navController = rememberNavController()
     var showDialog by remember { mutableStateOf(false) }
+    val topBarState = remember { derivedStateOf {    (mutableStateOf(true)) }.value}
     val bottomBarState = remember { derivedStateOf {    (mutableStateOf(true)) }}
 
     val shouldHavePlayBar by remember {
@@ -120,11 +116,10 @@ fun MainScreen(
 
 
     if(list.size>5 && !isPlayerReady.value) {
-        playMusicFromId(
-            musicServiceConnection,
-            list,
-            list[0].id,
-            isPlayerReady.value
+        mainViewModel.PlayPlaylist(
+            list.random(),
+            isPlayerReady,
+            musicServiceConnection
         )
         isPlayerReady.value = true
     }else
@@ -154,12 +149,13 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                backgroundColor = Color.Transparent,
-                elevation = 0.dp,
-                modifier = Modifier.wrapContentSize(),
-                title = {},
-                actions = {
+            if(topBarState.value) {
+                TopAppBar(
+                    backgroundColor = Color.Transparent,
+                    elevation = 0.dp,
+                    modifier = Modifier.wrapContentSize(),
+                    title = {},
+                    actions = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -198,8 +194,10 @@ fun MainScreen(
                                         )
                                     }
                                     timePassedList.firstOrNull()?.let {
-                                        Text("${getTimeString(it.time)}"
-                                            ,color = MaterialTheme.colors.onSurface)
+                                        Text(
+                                            "${getTimeString(it.time)}",
+                                            color = MaterialTheme.colors.onSurface
+                                        )
                                     }
                                 }
 
@@ -216,9 +214,13 @@ fun MainScreen(
                                     onClick = {
                                         val sharingIntent = Intent(Intent.ACTION_SEND)
                                         sharingIntent.type = "text/plain"
-                                        sharingIntent.putExtra(Intent.EXTRA_TEXT, "Check out this cool website: https://www.example.com")
-                                        val chooserIntent = Intent.createChooser(sharingIntent, "Share via")
-                                        startActivity(context,chooserIntent,null)
+                                        sharingIntent.putExtra(
+                                            Intent.EXTRA_TEXT,
+                                            "Check out this cool website: https://www.example.com"
+                                        )
+                                        val chooserIntent =
+                                            Intent.createChooser(sharingIntent, "Share via")
+                                        startActivity(context, chooserIntent, null)
                                     }
                                 ) {
                                     Icon(
@@ -231,9 +233,8 @@ fun MainScreen(
                         }
                     }
 
-            )
-
-
+                )
+            }
         },
         bottomBar = {
             //remove it later (showbottombar)
@@ -262,7 +263,7 @@ fun MainScreen(
                 bottomBarState.value,
                 isLoaded.value,
             myList,
-                allWords, isTimerRunning,timePassedList,currentRoom)
+                allWords, isTimerRunning,timePassedList,currentRoom,topBarState)
 
     }
 

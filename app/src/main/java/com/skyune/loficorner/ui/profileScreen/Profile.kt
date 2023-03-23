@@ -3,6 +3,7 @@
 package com.skyune.loficorner.ui.profileScreen
 
 import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -43,16 +44,10 @@ import coil.request.ImageRequest
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
-import com.skyune.loficorner.model.Weather
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.ui.theme.Theme
-import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import kotlinx.coroutines.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import kotlin.math.log
 
 
 @Composable
@@ -61,7 +56,8 @@ fun ProfileScreen(
     musicServiceConnection: MusicServiceConnection,
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
-    onToggleTheme: (Theme) -> Unit
+    onToggleTheme: (Theme) -> Unit,
+    topBarState: MutableState<Boolean>
 ) {
     Box(
         modifier = Modifier
@@ -70,7 +66,15 @@ fun ProfileScreen(
         contentAlignment = Alignment.Center
     ) {
         val list by profileViewModel.allWords.observeAsState(listOf())
-        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,list,onToggleTheme)
+        val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
+        val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
+
+
+        val selectedButtonIndex = remember { mutableStateOf(profileViewModel.selectedButtonIndexId.value) }
+
+
+
+        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,PlaylistPicker(list,Sleepylist,Jazzylist,selectedButtonIndex),onToggleTheme,selectedButtonIndex)
     }
 }
 
@@ -99,7 +103,8 @@ fun ShowData(
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
     list: List<Data>,
-    onToggleTheme: (Theme) -> Unit
+    onToggleTheme: (Theme) -> Unit,
+    selectedButtonIndex: MutableState<Int>
 ) {
     val listState = rememberLazyListState()
     val isPlayerReady: MutableState<Boolean> = remember{
@@ -127,14 +132,14 @@ fun ShowData(
         val showAll = remember { mutableStateOf(false) }
         if(profileViewModel.allWords.value?.isEmpty() == true)
         {
-            profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded)
+            profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded, songType = "Chill")
         }
         if(list.size>5)
         {
             val selectedItemId = remember { mutableStateOf(profileViewModel.selectedItemId.value) }
 
             LazyColumn(modifier = Modifier
-                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(12.dp), state = listState) {
+                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(6.dp), state = listState) {
                 item {
                     Column(
                         verticalArrangement = Arrangement.Top,
@@ -171,49 +176,72 @@ fun ShowData(
 
                     )}
 
-                item {
+                stickyHeader {
+                    val backgroundModifier = if (listState.firstVisibleItemIndex > 0) {
+                        Modifier.background(
+                            brush = Brush.linearGradient(
+                                0f to MaterialTheme.colors.background,
+                                1f to MaterialTheme.colors.onBackground,
+                                start = Offset(250f, 300f),
+                                end = Offset(900f, 1900.5f)
+                            )
+                        )
+                    } else {
+                        Modifier
+                    }
                     Column {
-                        Row(
-                                horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                            MusicSelectionButtons(profileViewModel)
+                        Row(Modifier.fillMaxWidth().then(backgroundModifier),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            MusicSelectionButtons(profileViewModel, selectedButtonIndex, isLoaded, listState.firstVisibleItemIndex > 0)
                         }
+                    }
+                }
 
-                        Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(0.dp,10.dp,0.dp,0.dp)) {
-                            Text(
-                                text = "Rooms",
-                                color = Color(MaterialTheme.colors.surface.value),
-                                textAlign = TextAlign.End,
-                                lineHeight = 26.sp,
-                                style = TextStyle(
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
+                            ) {
+                                Text(
+                                    text = "Rooms",
+                                    color = Color(MaterialTheme.colors.surface.value),
+                                    textAlign = TextAlign.End,
+                                    lineHeight = 26.sp,
+                                    style = TextStyle(
 
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold
                                     ),
-                                modifier = Modifier
-                                    .padding(10.dp, 0.dp, 0.dp, 0.dp)
-                                    .height(42.dp)
+                                    modifier = Modifier
+                                        .padding(10.dp, 0.dp, 0.dp, 0.dp)
+                                        .height(42.dp)
 
-                            )
+                                )
 
-                            Text(
-                                text = "Show All",
-                                color = Color(MaterialTheme.colors.onSurface.value),
-                                textAlign = TextAlign.End,
-                                lineHeight = 20.sp,
-                                style = TextStyle(
-                                    fontSize = 20.sp),
-                                modifier = Modifier
-                                    .padding(0.dp, 0.dp, 10.dp, 0.dp)
-                                    .weight(0.2f)
-                                    .height(42.dp)
-                                    .clickable {
-                                        showAll.value = !showAll.value
-                                    }
-                            )
+                                Text(
+                                    text = "Show All",
+                                    color = Color(MaterialTheme.colors.onSurface.value),
+                                    textAlign = TextAlign.End,
+                                    lineHeight = 20.sp,
+                                    style = TextStyle(
+                                        fontSize = 20.sp
+                                    ),
+                                    modifier = Modifier
+                                        .padding(0.dp, 0.dp, 10.dp, 0.dp)
+                                        .weight(0.2f)
+                                        .height(42.dp)
+                                        .clickable {
+                                            showAll.value = !showAll.value
+                                        }
+                                )
+                            }
+                            RoomImagesRow(showAll = showAll.value, onToggleTheme, profileViewModel)
                         }
-                        RoomImagesRow(showAll = showAll.value, onToggleTheme,profileViewModel)
-                    }
-                }
+
+
 
                 item {  Text(
                     text = "Featured playlists",
@@ -254,26 +282,47 @@ fun ShowData(
  }}
 
 @Composable
-fun MusicSelectionButtons(profileViewModel: ProfileViewModel) {
-    val selectedButtonIndex = remember { mutableStateOf(profileViewModel.selectedButtonIndexId.value) }
+fun MusicSelectionButtons(
+    profileViewModel: ProfileViewModel,
+    selectedButtonIndex: MutableState<Int>,
+    isLoaded: MutableState<Boolean>,
+    isOnTop: Boolean
+) {
 
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-        BouncingMusicSelectionButton(R.drawable.iconoir_coffee_cup__4_, "Chill", selectedButtonIndex.value == 0) { profileViewModel.selectButtonIndex(0)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        BouncingMusicSelectionButton(R.drawable.iconoir_coffee_cup__4_, "Chill", selectedButtonIndex.value == 0,isOnTop,Modifier.weight(1f)) {
+            profileViewModel.selectButtonIndex(0)
             selectedButtonIndex.value = 0
+            if(profileViewModel.allWords.value?.isEmpty() == true)
+            {
+                profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded, songType = "Chill")
+            }
         }
         BouncingMusicSelectionButton(
             R.drawable.fluent_sleep_20_filled__1_,
             "Sleepy",
-            selectedButtonIndex.value == 1
+            selectedButtonIndex.value == 1,
+            isOnTop,
+            Modifier.weight(1f)
         ) { profileViewModel.selectButtonIndex(1)
             selectedButtonIndex.value = 1
+            if(profileViewModel.allSleepy.value?.isEmpty() == true)
+            {
+                profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded, songType = "Sleepy")
+            }
         }
         BouncingMusicSelectionButton(
             R.drawable.fluent_emoji_high_contrast_saxophone__1_,
             "Jazzy",
-            selectedButtonIndex.value == 2
+            selectedButtonIndex.value == 2,
+            isOnTop,
+            Modifier.weight(1f)
         ) { profileViewModel.selectButtonIndex(2)
             selectedButtonIndex.value = 2
+            if(profileViewModel.allJazzy.value?.isEmpty() == true)
+            {
+                profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded, songType = "Jazzy")
+            }
         }
     }
 }
@@ -283,6 +332,8 @@ fun BouncingMusicSelectionButton(
     ImageId: Int,
     Title: String,
     isSelected: Boolean,
+    isOnTop: Boolean,
+    modifier: Modifier,
     onClick: () -> Unit
 ) {
 
@@ -298,13 +349,19 @@ fun BouncingMusicSelectionButton(
     )
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .clickable(onClick = onClick)
             .padding(0.dp, 0.dp, 0.dp, 10.dp)
-            .size(size = 130.dp)
+            .fillMaxSize()
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
             .scale(scale)
     ) {
-        MusicSelectionButton(ImageId,Title, isSelected, onClick)
+        MusicSelectionButton(ImageId,Title, isSelected, onClick,isOnTop)
     }
 }
 @Composable
@@ -312,16 +369,17 @@ private fun MusicSelectionButton(
     ImageId: Int,
     Title: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isOnTop: Boolean
 ) {
     Box(
         modifier = Modifier
-            .size(size = 130.dp)
+            .fillMaxSize()
             .padding(6.dp)
     ) {
         Box(
             modifier = Modifier
-                .matchParentSize()
+                .wrapContentSize()
                 .clip(shape = RoundedCornerShape(15.dp))
                 .clickable(onClick = onClick)
                 .background(
@@ -346,33 +404,55 @@ private fun MusicSelectionButton(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Card(
                     modifier = Modifier
-                        .fillMaxSize(1f)
-                        .aspectRatio(0.9f),
+                        .fillMaxSize(),
                     shape = CircleShape,
                     backgroundColor = Color.Transparent,
                     elevation = 0.dp
                 ) {}
             }
-            Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current)
-                            .diskCachePolicy(CachePolicy.DISABLED)
-                            .data(data = ImageId)
-                            .build()
-                    ),
-                    modifier = Modifier
-                        .size(60.dp)
-                        .composed {
-                            alpha(if (isSelected) 1f else 0.7f)
-                        },
-                    contentScale = ContentScale.FillBounds,
-                    contentDescription = null
-                )
-                Text(text = Title, Modifier.padding(4.dp), color = MaterialTheme.colors.error)
+            Column(Modifier.padding(top = 6.dp,bottom = 6.dp),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                if (!isOnTop) {
+                    Image(
+                        rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .diskCachePolicy(CachePolicy.DISABLED)
+                                .data(data = ImageId)
+                                .build()
+                        ),
+                        modifier = Modifier
+                            .size(60.dp)
+                            .composed {
+                                alpha(if (isSelected) 1f else 0.7f)
+                            },
+                        contentScale = ContentScale.FillBounds,
+                        contentDescription = null
+                    )
+                }
+                    Text(text = Title, Modifier.padding(4.dp), color = MaterialTheme.colors.error)
+
             }
         }
     }
+}
+
+fun PlaylistPicker(
+    list: List<Data>,
+    Sleepylist: List<Data>,
+    Jazzylist: List<Data>,
+    selectedButtonIndex: MutableState<Int>
+): List<Data> {
+    if (selectedButtonIndex.value==0) {
+        return list
+    }
+    else if (selectedButtonIndex.value == 1)
+    {
+        return Sleepylist
+    }
+    else if (selectedButtonIndex.value ==2)
+    {
+        return Jazzylist
+    }
+    return list
 }
 
 fun Modifier.simpleVerticalScrollbar(
@@ -394,7 +474,7 @@ fun Modifier.simpleVerticalScrollbar(
         drawWithContent {
         drawContent()
 
-        val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo.firstOrNull()?.index
+        val firstVisibleElementIndex = state.layoutInfo.visibleItemsInfo[1]?.index
         val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
 
         // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
@@ -454,7 +534,8 @@ fun ClippedShadow(elevation: Dp, shape: Shape, modifier: Modifier = Modifier) {
 fun WeatherItem(item: Data, onItemClicked: () -> Unit, isSelected: Boolean) {
 Box(modifier = Modifier
     .wrapContentWidth()
-    .wrapContentHeight()) {
+    .wrapContentHeight()
+    .padding(start = 6.dp,end = 6.dp)) {
     ClippedShadow(
         elevation = 10.dp,
         shape = RoundedCornerShape(15.dp),

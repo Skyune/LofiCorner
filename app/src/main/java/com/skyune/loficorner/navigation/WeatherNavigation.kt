@@ -37,7 +37,8 @@ fun WeatherNavigation(
     allWords: LiveData<List<Data>>,
     isTimerRunning: MutableState<Boolean>,
     timePassedList: List<TimePassed>,
-    currentRoom: CurrentRoom?
+    currentRoom: CurrentRoom?,
+    topBarState: MutableState<Boolean>
 ) {
 
     //not sure gdzie powinna byc deklaracja settingsviewmodel
@@ -72,7 +73,8 @@ fun WeatherNavigation(
                 musicServiceConnection,
                 bottomBarState,
                 isLoaded,
-                onToggleTheme
+                onToggleTheme,
+                topBarState
             )
         }
         composable(route = BottomNavScreen.Settings.route) {

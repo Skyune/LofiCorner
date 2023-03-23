@@ -119,24 +119,9 @@ fun HomeScreen(
                             Box(modifier = Modifier
                                 .weight(8.7f), Alignment.Center
                             ) {
-//                                Column(Modifier.zIndex(1f),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-//
-//                                    Spacer(
-//                                        modifier = Modifier
-//                                            .fillMaxSize()
-//                                            .weight(1.7f)
-//                                    )
-//                                    if (visible.value) {
-//                                        Box(Modifier.zIndex(2f)) {
-//                                            chatbox()
-//                                        }
-//                                    }
-//                                }
                                 Column(Modifier.zIndex(1f),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-
                                     if (it == R.drawable.queenborder) {
-
 
                                         Spacer(
                                             modifier = Modifier

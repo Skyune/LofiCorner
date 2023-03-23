@@ -57,6 +57,9 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
 
 
     val allWords : LiveData<List<Data>> = repository.allWords.asLiveData()
+    val allSleepy : LiveData<List<Data>> = repository.allSleepy.asLiveData()
+    val allJazzy : LiveData<List<Data>> = repository.allJazzy.asLiveData()
+
     var playlist: MutableList<Data> = mutableListOf<Data>()
 
 
@@ -162,13 +165,15 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
     }
 
     fun ShowPlaylistsSongs(
-        isLoaded: MutableState<Boolean>
+        isLoaded: MutableState<Boolean>,
+        songType: String
 
-        ) {
-                isLoaded.value = false
+    ) {
+
+        isLoaded.value = false
         for (i in playlistids.indices) {
-                    val response: Call<Weather>? =
-                        getPlaylistData(playlistids[i])
+            val response: Call<Weather>? =
+                getPlaylistData(playlistids[i])
             response?.enqueue(object : Callback<Weather> {
                 override fun onFailure(call: Call<Weather>, t: Throwable) {
                     Log.d("onFailure", t.message.toString())
@@ -176,18 +181,31 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
                 }
 
                 override fun onResponse(call: Call<Weather>, response: Response<Weather>) {
-                    Log.d("onResponse", response.body().toString())
                     if (response.isSuccessful) {
-                        playlist.add(response.body()!!.data[0])
-                        Log.d("TAG", "onResponse: ${playlist}")
-                        insert(response.body()!!.data[0])
-
+                        val firstItem = response.body()!!.data.first() // Get the first element of the list
+                        val newItem = Data(
+                            artwork = firstItem.artwork,
+                            description = firstItem.description,
+                            playlist_name = firstItem.playlist_name,
+                            duration = firstItem.duration,
+                            id = firstItem.id,
+                            mood = firstItem.mood,
+                            title = firstItem.title,
+                            user = firstItem.user,
+                            songType = "Jazzy" // Set the songType field to "jazz"
+                        )
+                        insert(newItem) // Insert the new item into your data structure
+                        Log.d("TAG", "onResponse: ${newItem}")
                     }
                 }
             })
-                    isLoaded.value = true
-                }
+            isLoaded.value = true
+        }
     }
+
+
+
+
 
     val playlistids = listOf("noPJL", "n62mn","ebd1O", "eAlov", "nQR49", "nqbzB", "ezWJp", "lzdql", "XB7R7", "5QaVY", "qE1q2","3AbWv", "AxRP0", "aAw5Q", "Q4wGW", "KK8v2", "RKjdZ","epYaM",
         "LKpEw", "Dv65v", "ebOpP", "ePMJ5", "Ax7ww")

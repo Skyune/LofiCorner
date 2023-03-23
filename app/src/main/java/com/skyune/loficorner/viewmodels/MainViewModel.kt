@@ -1,5 +1,6 @@
 package com.skyune.loficorner.viewmodels
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -11,11 +12,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
-import com.skyune.loficorner.model.CurrentRoom
-import com.skyune.loficorner.model.CurrentSong
-import com.skyune.loficorner.model.TimePassed
-import com.skyune.loficorner.model.Weather
+import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.model.*
 import com.skyune.loficorner.repository.WeatherRepository
+import com.skyune.loficorner.utils.playMusicFromId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +23,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,5 +69,40 @@ class MainViewModel @Inject constructor(private val repository: WeatherRepositor
 
     fun getAllTimePassed(): LiveData<List<TimePassed>> {
         return repository.getAllTimePassed()
+    }
+
+    fun getMovieById(id: String) : Call<Weather>? {
+        return repository?.getMovieById(id)
+
+    }
+
+    fun PlayPlaylist(
+        item: Data,
+        isPlayerReady: MutableState<Boolean>,
+        musicServiceConnection: MusicServiceConnection,
+    ) {
+        val response: Call<Weather>? =
+            getMovieById(item.id)
+        response?.enqueue(object : Callback<Weather> {
+            override fun onFailure(call: Call<Weather>, t: Throwable) {
+                Log.d("onFailure", t.message.toString())
+            }
+
+            override fun onResponse(
+                call: Call<Weather>,
+                response: Response<Weather>
+            ) {
+                if (isPlayerReady.value) {
+                    isPlayerReady.value = false
+                }
+                playMusicFromId(
+                    musicServiceConnection,
+                    response.body()!!.data,
+                    item.id,
+                    isPlayerReady.value
+                )
+                isPlayerReady.value = true
+            }
+        })
     }
 }

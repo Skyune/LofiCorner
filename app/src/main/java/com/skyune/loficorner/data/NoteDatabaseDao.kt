@@ -5,7 +5,6 @@ import androidx.room.*
 import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.TimePassed
-import com.skyune.loficorner.model.Weather
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,6 +12,12 @@ interface NoteDatabaseDao {
 
     @Query("SELECT id,playlist_name,artwork,user FROM data")
     fun getAll(): Flow<List<Data>>
+
+    @Query("SELECT id,playlist_name,artwork,user FROM data")
+    fun getAllSleepy(): Flow<List<Data>>
+
+    @Query("SELECT id,playlist_name,artwork,user FROM data WHERE songType='Jazzy'")
+    fun getAllJazzy(): Flow<List<Data>>
 
     @Query("SELECT * FROM data WHERE id = :id")
     fun getById(id: String): Data
