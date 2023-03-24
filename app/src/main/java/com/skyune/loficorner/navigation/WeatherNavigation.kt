@@ -1,6 +1,8 @@
 package com.skyune.loficorner.navigation
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
@@ -47,6 +49,11 @@ fun WeatherNavigation(
     val settingsViewModel :  SettingsViewModel = hiltViewModel()
     val homeViewModel :  HomeViewModel = hiltViewModel()
     val profileViewModel :  ProfileViewModel = hiltViewModel()
+    val listState = rememberLazyListState()
+    val list by profileViewModel.allWords.observeAsState(listOf())
+    val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
+    val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
+
 
     NavHost(navController = navController,
         startDestination = BottomNavScreen.Home.route ) {
@@ -77,7 +84,11 @@ fun WeatherNavigation(
                 isLoaded,
                 onToggleTheme,
                 topBarState,
-                title
+                title,
+                listState,
+                list,
+                Sleepylist,
+                Jazzylist
             )
         }
         composable(route = BottomNavScreen.Settings.route) {

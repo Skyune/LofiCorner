@@ -49,6 +49,7 @@ import androidx.constraintlayout.solver.widgets.Rectangle
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.decode.Decoder
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.CachePolicy
@@ -442,7 +443,8 @@ fun chatbox() {
 fun GifImage(
     modifier: Modifier = Modifier,
     gifId: Int,
-    colorFilter: ColorFilter? = null
+    colorFilter: ColorFilter? = null,
+    isPaused: Boolean = false
 ) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
@@ -454,14 +456,17 @@ fun GifImage(
             }
         }
         .build()
-    Image(
-        painter = rememberAsyncImagePainter(
+
+
+    Image(painter = rememberAsyncImagePainter(
             ImageRequest.Builder(context).data(data = gifId).apply(block = {
                 size(Size.ORIGINAL)
-            }).build(), imageLoader = imageLoader
+
+                }
+            ).build(), imageLoader = imageLoader
         ),
         contentDescription = null,
-        modifier = modifier ,
+        modifier = modifier,
         colorFilter = colorFilter
     )
 }

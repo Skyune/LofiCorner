@@ -16,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -137,6 +138,13 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
     fun selectRoomIndex(itemId: Int) {
         preferences.selectedRoomId = itemId // save to SharedPreferences
         _selectedRoomIndex.value = itemId
+    }
+
+    private val _scrollOffset = MutableStateFlow(0)
+    val scrollOffset: StateFlow<Int> = _scrollOffset.asStateFlow()
+
+    fun saveScrollOffset(offset: Int) {
+        _scrollOffset.value = offset
     }
 
     fun PlayPlaylist(

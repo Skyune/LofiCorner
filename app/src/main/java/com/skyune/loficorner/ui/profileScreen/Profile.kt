@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -18,7 +17,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -37,12 +35,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.exoplayer.isPlaying
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.ui.homeScreen.GifImage
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
@@ -59,7 +57,11 @@ fun ProfileScreen(
     isLoaded: MutableState<Boolean>,
     onToggleTheme: (Theme) -> Unit,
     topBarState: MutableState<Boolean>,
-    title: String
+    title: String,
+    listState: LazyListState,
+    list: List<Data>,
+    Sleepylist: List<Data>,
+    Jazzylist: List<Data>
 ) {
     Box(
         modifier = Modifier
@@ -67,16 +69,14 @@ fun ProfileScreen(
             .fillMaxHeight(),
         contentAlignment = Alignment.TopCenter
     ) {
-        val list by profileViewModel.allWords.observeAsState(listOf())
-        val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
-        val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
+
 
 
         val selectedButtonIndex = remember { mutableStateOf(profileViewModel.selectedButtonIndexId.value) }
 
 
 
-        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,PlaylistPicker(list,Sleepylist,Jazzylist,selectedButtonIndex),onToggleTheme,selectedButtonIndex,title)
+        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,PlaylistPicker(list,Sleepylist,Jazzylist,selectedButtonIndex),onToggleTheme,selectedButtonIndex,title,listState)
     }
 }
 
@@ -107,9 +107,9 @@ fun ShowData(
     list: List<Data>,
     onToggleTheme: (Theme) -> Unit,
     selectedButtonIndex: MutableState<Int>,
-    title: String
+    title: String,
+    listState: LazyListState
 ) {
-    val listState = rememberLazyListState()
     val isPlayerReady: MutableState<Boolean> = remember{
         derivedStateOf {
             mutableStateOf(false)
@@ -129,6 +129,7 @@ fun ShowData(
         }
     }.value
     bottomBarState.value=listState.isScrollingUp()// If we're scrolling up, show the bottom bar
+
 
     Box(
         modifier = Modifier
@@ -278,6 +279,7 @@ fun ShowData(
                 }
 
 
+
                 if(isLoading.value) {
                     items(list, key = {
                         it.id
@@ -285,7 +287,7 @@ fun ShowData(
                         WeatherItem(
                             item = item,
                             isLoading = profileViewModel.isLoading.value &&  selectedItemId.value == item.id,
-                            isSelected = profileViewModel.isSelected.value && profileViewModel.currentPlaylistSelected.value == item.id,
+                            isSelected = profileViewModel.isSelected.value && profileViewModel.currentPlaylistSelected.value == item.id && musicServiceConnection.playbackState.value?.isPlaying == true,
                             onItemClicked = {
                                 selectedItemId.value = item.id
                                 profileViewModel.selectItem(item.id)
@@ -697,14 +699,23 @@ Box(modifier = Modifier
 
 }
             Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                if (isSelected) {
+                val targetAlpha = if (isSelected) 1f else 0f
+                val duration = if (isSelected) 300 else 800
+
+                val alpha by animateFloatAsState(
+                    targetValue = targetAlpha,
+                    animationSpec = tween(durationMillis = duration)
+
+                )
+
+                if (alpha != 0f) {
                     GifImage(
-                        Modifier.size(30.dp),
+                        Modifier.size(30.dp).alpha(alpha),
                         R.drawable.audiowave,
                         colorFilter = ColorFilter.tint(MaterialTheme.colors.surface)
                     )
                 }
-                else {
+                if(!isSelected) {
                     if (isLoading)
                     {
                         CircularProgressIndicator()
