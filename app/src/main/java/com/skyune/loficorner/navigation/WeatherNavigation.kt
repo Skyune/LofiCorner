@@ -20,6 +20,7 @@ import com.skyune.loficorner.ui.settingsScreen.SettingsScreen
 import com.skyune.loficorner.ui.splash.WeatherSplashScreen
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.viewmodels.HomeViewModel
+import com.skyune.loficorner.viewmodels.ProfileViewModel
 import com.skyune.loficorner.viewmodels.SettingsViewModel
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
@@ -38,13 +39,14 @@ fun WeatherNavigation(
     isTimerRunning: MutableState<Boolean>,
     timePassedList: List<TimePassed>,
     currentRoom: CurrentRoom?,
-    topBarState: MutableState<Boolean>
+    topBarState: MutableState<Boolean>,
+    title: String
 ) {
 
     //not sure gdzie powinna byc deklaracja settingsviewmodel
     val settingsViewModel :  SettingsViewModel = hiltViewModel()
     val homeViewModel :  HomeViewModel = hiltViewModel()
-
+    val profileViewModel :  ProfileViewModel = hiltViewModel()
 
     NavHost(navController = navController,
         startDestination = BottomNavScreen.Home.route ) {
@@ -69,12 +71,13 @@ fun WeatherNavigation(
         }
         composable(route = BottomNavScreen.Profile.route) {
             ProfileScreen(
-                profileViewModel = hiltViewModel(),
+                profileViewModel = profileViewModel,
                 musicServiceConnection,
                 bottomBarState,
                 isLoaded,
                 onToggleTheme,
-                topBarState
+                topBarState,
+                title
             )
         }
         composable(route = BottomNavScreen.Settings.route) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.*
 import com.skyune.loficorner.AppPreferences
 import com.skyune.loficorner.data.DataOrException
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.exoplayer.library.extension.id
 import com.skyune.loficorner.model.CurrentRoom
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.model.Weather
@@ -13,6 +14,7 @@ import com.skyune.loficorner.repository.WeatherRepository
 import com.skyune.loficorner.utils.playMusicFromId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -55,6 +57,8 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
     }
 
 
+    var isSelected = mutableStateOf(false)
+    var isLoading = mutableStateOf(true)
 
     val allWords : LiveData<List<Data>> = repository.allWords.asLiveData()
     val allSleepy : LiveData<List<Data>> = repository.allSleepy.asLiveData()
@@ -114,6 +118,7 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
     var _selectedButtonIndex = mutableStateOf(0)
     val selectedButtonIndexId: State<Int> = preferences.selectedButtonIndexId.let { mutableStateOf(it) }
 
+    var currentPlaylistSelected = mutableStateOf("")
 
 
     fun insertRoom(room: CurrentRoom) =  viewModelScope.launch {
@@ -139,6 +144,7 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
         isPlayerReady: MutableState<Boolean>,
         musicServiceConnection: MusicServiceConnection,
     ) {
+
         val response: Call<Weather>? =
             getMovieById(item.id)
         response?.enqueue(object : Callback<Weather> {
@@ -153,14 +159,38 @@ class ProfileViewModel @Inject constructor(private val repository: WeatherReposi
                 if (isPlayerReady.value) {
                     isPlayerReady.value = false
                 }
+                val songList = response.body()?.data ?: emptyList()
+                viewModelScope.launch {
+                    isLoading.value = true
+                    delay(200)
+
+                    val isSongIdMatching = songList.any {
+                        Log.d("TAG", "it.id: ${it.title}")
+                        it.title == musicServiceConnection.currentPlayingSong.value?.description?.title.toString()
+                    }
+                    val matchingSong = songList.find {
+                        it.id == musicServiceConnection.currentPlayingSong.value?.id
+                    }
+                    if (matchingSong != null) {
+                        currentPlaylistSelected.value = item.id
+                    }
+                    isLoading.value = false
+                    isSelected.value = isSongIdMatching
+                }
+
+
+
+                Log.d("TAG", "item.id: ${ item.title}")
                 playMusicFromId(
                     musicServiceConnection,
                     response.body()!!.data,
                     item.id,
                     isPlayerReady.value
                 )
-                isPlayerReady.value = true
-            }
+
+                    isPlayerReady.value = true
+                }
+
         })
     }
 

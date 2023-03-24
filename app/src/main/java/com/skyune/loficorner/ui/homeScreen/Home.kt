@@ -135,7 +135,7 @@ fun HomeScreen(
                                                 .fillMaxWidth()
                                                 .weight(0.3f))
 
-                                            GifImage(Modifier.weight(2f))
+                                            GifImage(Modifier.weight(2f),R.drawable.beautylying)
                                         }
                                     }
                                 }
@@ -441,6 +441,8 @@ fun chatbox() {
 @Composable
 fun GifImage(
     modifier: Modifier = Modifier,
+    gifId: Int,
+    colorFilter: ColorFilter? = null
 ) {
     val context = LocalContext.current
     val imageLoader = ImageLoader.Builder(context)
@@ -454,12 +456,13 @@ fun GifImage(
         .build()
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(context).data(data = R.drawable.beautylying).apply(block = {
+            ImageRequest.Builder(context).data(data = gifId).apply(block = {
                 size(Size.ORIGINAL)
             }).build(), imageLoader = imageLoader
         ),
         contentDescription = null,
-        modifier = modifier
+        modifier = modifier ,
+        colorFilter = colorFilter
     )
 }
 

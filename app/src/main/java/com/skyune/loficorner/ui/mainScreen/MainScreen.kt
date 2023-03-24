@@ -29,9 +29,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,9 +54,7 @@ import com.skyune.loficorner.exoplayer.library.extension.*
 import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
-import com.skyune.loficorner.ui.homeScreen.chatbox
 import com.skyune.loficorner.ui.theme.Theme
-import com.skyune.loficorner.utils.playMusicFromId
 import com.skyune.loficorner.viewmodels.MainViewModel
 import com.skyune.loficorner.viewmodels.getTimeString
 import com.yeocak.parallaximage.GravitySensorDefaulted
@@ -115,20 +111,20 @@ fun MainScreen(
 
 
 
-    if(list.size>5 && !isPlayerReady.value) {
-        mainViewModel.PlayPlaylist(
-            list.random(),
-            isPlayerReady,
-            musicServiceConnection
-        )
-        isPlayerReady.value = true
-    }else
-    {
-        if(allWords.value?.isEmpty() == true)
-        {
-            showBottomBar = true
-        }
-    }
+//    if(list.size>5 && !isPlayerReady.value) {
+//        mainViewModel.PlayPlaylist(
+//            list.random(),
+//            isPlayerReady,
+//            musicServiceConnection
+//        )
+//        isPlayerReady.value = true
+//    }else
+//    {
+//        if(allWords.value?.isEmpty() == true)
+//        {
+//            showBottomBar = true
+//        }
+//    }
         //PlayPlaylist()
     val isLoaded = remember { derivedStateOf {  (mutableStateOf(false)) }}
     val myList: MutableList<Data> = mutableListOf<Data>()
@@ -263,7 +259,7 @@ fun MainScreen(
                 bottomBarState.value,
                 isLoaded.value,
             myList,
-                allWords, isTimerRunning,timePassedList,currentRoom,topBarState)
+                allWords, isTimerRunning,timePassedList,currentRoom,topBarState,title)
 
     }
 

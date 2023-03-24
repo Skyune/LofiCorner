@@ -44,6 +44,7 @@ import coil.request.ImageRequest
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.model.Data
+import com.skyune.loficorner.ui.homeScreen.GifImage
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.ui.theme.Theme
 import com.skyune.loficorner.viewmodels.ProfileViewModel
@@ -52,18 +53,19 @@ import kotlinx.coroutines.*
 
 @Composable
 fun ProfileScreen(
-    profileViewModel: ProfileViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel,
     musicServiceConnection: MusicServiceConnection,
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
     onToggleTheme: (Theme) -> Unit,
-    topBarState: MutableState<Boolean>
+    topBarState: MutableState<Boolean>,
+    title: String
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
         val list by profileViewModel.allWords.observeAsState(listOf())
         val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
@@ -74,7 +76,7 @@ fun ProfileScreen(
 
 
 
-        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,PlaylistPicker(list,Sleepylist,Jazzylist,selectedButtonIndex),onToggleTheme,selectedButtonIndex)
+        ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,PlaylistPicker(list,Sleepylist,Jazzylist,selectedButtonIndex),onToggleTheme,selectedButtonIndex,title)
     }
 }
 
@@ -104,10 +106,24 @@ fun ShowData(
     isLoaded: MutableState<Boolean>,
     list: List<Data>,
     onToggleTheme: (Theme) -> Unit,
-    selectedButtonIndex: MutableState<Int>
+    selectedButtonIndex: MutableState<Int>,
+    title: String
 ) {
     val listState = rememberLazyListState()
     val isPlayerReady: MutableState<Boolean> = remember{
+        derivedStateOf {
+            mutableStateOf(false)
+        }
+    }.value
+
+
+
+    var currentIndex by remember {
+        mutableStateOf(0)
+    }
+
+
+    val isLoading: MutableState<Boolean> = remember{
         derivedStateOf {
             mutableStateOf(false)
         }
@@ -126,7 +142,7 @@ fun ShowData(
                     end = Offset(900f, 1900.5f)
                 )
             ),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.TopCenter,
         ) {
 
         val showAll = remember { mutableStateOf(false) }
@@ -134,11 +150,12 @@ fun ShowData(
         {
             profileViewModel.ShowPlaylistsSongs(isLoaded = isLoaded, songType = "Chill")
         }
+        isLoading.value = list.size > 5
 
             val selectedItemId = remember { mutableStateOf(profileViewModel.selectedItemId.value) }
 
             LazyColumn(modifier = Modifier
-                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(6.dp), state = listState) {
+                .simpleVerticalScrollbar(listState), contentPadding = PaddingValues(6.dp), state = listState, verticalArrangement = Arrangement.Top) {
                 item {
                     Column(
                         verticalArrangement = Arrangement.Top,
@@ -170,6 +187,7 @@ fun ShowData(
                         fontWeight = FontWeight.SemiBold
                     ),
                     modifier = Modifier
+                        .align(Alignment.TopCenter)
                         .wrapContentSize()
                         .padding(10.dp, 0.dp, 0.dp, 6.dp)
 
@@ -189,7 +207,10 @@ fun ShowData(
                         Modifier
                     }
                     Column {
-                        Row(Modifier.fillMaxWidth().then(backgroundModifier),
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .then(backgroundModifier),
                             horizontalArrangement = Arrangement.SpaceEvenly,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -201,7 +222,7 @@ fun ShowData(
                         item {
                             Row(
                                 horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically,
+                                verticalAlignment = Alignment.Top,
                                 modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp)
                             ) {
                                 Text(
@@ -255,27 +276,53 @@ fun ShowData(
                         .padding(10.dp, 0.dp, 10.dp, 5.dp)
                         .wrapContentSize())
                 }
-                items(list,key = {
-                    it.id
-                },)  { item ->
-                    WeatherItem(
-                        item = item,
-                        isSelected = item.id == selectedItemId.value,
-                        onItemClicked = {
-                            selectedItemId.value = item.id
-                            profileViewModel.selectItem(item.id)
 
-                            Log.d("TAG", "ShowData: ${item}")
-                            profileViewModel.PlayPlaylist(
-                                item,
-                                isPlayerReady,
-                                musicServiceConnection
+
+                if(isLoading.value) {
+                    items(list, key = {
+                        it.id
+                    }) { item ->
+                        WeatherItem(
+                            item = item,
+                            isLoading = profileViewModel.isLoading.value &&  selectedItemId.value == item.id,
+                            isSelected = profileViewModel.isSelected.value && profileViewModel.currentPlaylistSelected.value == item.id,
+                            onItemClicked = {
+                                selectedItemId.value = item.id
+                                profileViewModel.selectItem(item.id)
+                                profileViewModel.isLoading.value = true
+                                Log.d("TAG", "ShowData: ${item}")
+                                profileViewModel.PlayPlaylist(
+                                    item,
+                                    isPlayerReady,
+                                    musicServiceConnection,
                                 )
-                        })}
+                            }
+                        )
+                    }
+                }
+                if (!isLoading.value) {
+                item {
+                    Column(Modifier.fillMaxHeight(),Arrangement.Center,Alignment.CenterHorizontally) {
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(top = 10.dp),
+                            Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                Modifier.fillParentMaxSize(0.1f),
+                                MaterialTheme.colors.surface
+                            )
+                        }
+                    }
+                }
             }
         }
-
+    }
  }
+
 
 @Composable
 fun MusicSelectionButtons(
@@ -347,7 +394,7 @@ fun BouncingMusicSelectionButton(
     Box(
         modifier = modifier
             .clickable(onClick = onClick)
-            .padding(0.dp, 0.dp, 0.dp, 10.dp)
+            .padding(0.dp, 0.dp, 0.dp, 0.dp)
             .fillMaxSize()
             .animateContentSize(
                 animationSpec = spring(
@@ -411,7 +458,7 @@ private fun MusicSelectionButton(
                     Image(
                         rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
-                                .diskCachePolicy(CachePolicy.DISABLED)
+                                .diskCachePolicy(CachePolicy.ENABLED)
                                 .data(data = ImageId)
                                 .build()
                         ),
@@ -425,7 +472,6 @@ private fun MusicSelectionButton(
                     )
                 }
                     Text(text = Title, Modifier.padding(4.dp), color = MaterialTheme.colors.error)
-
             }
         }
     }
@@ -527,11 +573,11 @@ fun ClippedShadow(elevation: Dp, shape: Shape, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun WeatherItem(item: Data, onItemClicked: () -> Unit, isSelected: Boolean) {
+fun WeatherItem(item: Data, onItemClicked: () -> Unit, isSelected: Boolean, isLoading: Boolean) {
 Box(modifier = Modifier
     .wrapContentWidth()
     .wrapContentHeight()
-    .padding(start = 6.dp,end = 6.dp)) {
+    .padding(start = 6.dp, end = 6.dp)) {
     ClippedShadow(
         elevation = 10.dp,
         shape = RoundedCornerShape(15.dp),
@@ -547,21 +593,12 @@ Box(modifier = Modifier
             .height(height = 100.dp)
             .clip(shape = RoundedCornerShape(15.dp))
             .background(
-                if (!isSelected) {
-                    Brush.linearGradient(
-                        0f to Color(MaterialTheme.colors.primary.value),
-                        1f to Color(MaterialTheme.colors.primaryVariant.value),
-                        start = Offset(0f, 0f),
-                        end = Offset(20f, 500f)
-                    )
-                } else {
-                    Brush.linearGradient(
-                        0f to Color(0xFFA920CF),
-                        1f to Color(MaterialTheme.colors.primaryVariant.value),
-                        start = Offset(0f, 0f),
-                        end = Offset(20f, 500f)
-                    )
-                }
+                Brush.linearGradient(
+                    0f to Color(MaterialTheme.colors.primary.value),
+                    1f to Color(MaterialTheme.colors.primaryVariant.value),
+                    start = Offset(0f, 0f),
+                    end = Offset(20f, 500f)
+                )
             )
             .border(
                 BorderStroke(
@@ -574,7 +611,7 @@ Box(modifier = Modifier
                 )
             )
         , contentAlignment = Alignment.CenterStart) {
-        Row() {
+        Row( verticalAlignment = Alignment.CenterVertically) {
             Image(
                     rememberAsyncImagePainter(
                         ImageRequest.Builder(LocalContext.current)
@@ -600,7 +637,7 @@ Box(modifier = Modifier
                       ),
                       modifier = Modifier
                           .width(width = 209.dp)
-                          .padding(10.dp)
+                          .padding(0.dp)
                   )
               }
               item.user?.name?.let {
@@ -657,7 +694,29 @@ Box(modifier = Modifier
                   }
               }
           }
-}}}}}
+
+}
+            Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                if (isSelected) {
+                    GifImage(
+                        Modifier.size(30.dp),
+                        R.drawable.audiowave,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.surface)
+                    )
+                }
+                else {
+                    if (isLoading)
+                    {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+        }
+
+    }
+
+}}
 
 @Composable
 fun ProfileScreenPreview() {
