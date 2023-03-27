@@ -17,6 +17,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
@@ -51,7 +53,7 @@ import kotlinx.coroutines.*
 
 @Composable
 fun ProfileScreen(
-    profileViewModel: ProfileViewModel,
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     musicServiceConnection: MusicServiceConnection,
     bottomBarState: MutableState<Boolean>,
     isLoaded: MutableState<Boolean>,
@@ -75,6 +77,9 @@ fun ProfileScreen(
         val selectedButtonIndex = remember { mutableStateOf(profileViewModel.selectedButtonIndexId.value) }
 
 
+        val list by profileViewModel.allWords.observeAsState(listOf())
+        val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
+        val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
 
         ShowData(profileViewModel, musicServiceConnection, bottomBarState, isLoaded,PlaylistPicker(list,Sleepylist,Jazzylist,selectedButtonIndex),onToggleTheme,selectedButtonIndex,title,listState)
     }
@@ -710,7 +715,9 @@ Box(modifier = Modifier
 
                 if (alpha != 0f) {
                     GifImage(
-                        Modifier.size(30.dp).alpha(alpha),
+                        Modifier
+                            .size(30.dp)
+                            .alpha(alpha),
                         R.drawable.audiowave,
                         colorFilter = ColorFilter.tint(MaterialTheme.colors.surface)
                     )

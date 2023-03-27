@@ -13,6 +13,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.skyune.loficorner.viewmodels.PomodoroSession
 import com.skyune.loficorner.viewmodels.SettingsViewModel
 import com.skyune.loficorner.viewmodels.getTimeString
@@ -38,7 +43,18 @@ fun SettingsScreen(
         end = Offset(900f, 1900.5f))),
         contentAlignment = Alignment.Center
     ) {
-        TimerPopup(
+
+
+        val chartEntryModel = entryModelOf(4f, 12f, 8f, 16f)
+
+        Chart(
+            chart = lineChart(),
+            model = chartEntryModel,
+            startAxis = startAxis(),
+            bottomAxis = bottomAxis(),
+        )
+
+        /*TimerPopup(
             currentSession = settingsViewModel.currentSession,
             timeLeft = settingsViewModel.timeLeft,
             isTimerRunning = settingsViewModel.isTimerRunning,
@@ -46,7 +62,7 @@ fun SettingsScreen(
             onStart = settingsViewModel::startTimer,
             onReset = settingsViewModel::resetTimer,
 
-        )
+        )*/
     }
 }
 

@@ -5,13 +5,16 @@ plugins {
     id 'dagger.hilt.android.plugin'
 }
 
+kapt {
+    correctErrorTypes = true
+}
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.skyune.loficorner"
-        minSdk 26
-        targetSdk 31
+        minSdk 21
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -27,20 +30,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = '1.8'
-        useIR = true
     }
     buildFeatures {
         compose true
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.5.21'
+        kotlinCompilerVersion '1.7.0'
     }
     packagingOptions {
         resources {
@@ -51,10 +54,25 @@ android {
 
 dependencies {
 
+    // Includes the core logic for charts and other elements.
+    implementation "com.patrykandpatrick.vico:core:1.6.4"
+
+    // For Jetpack Compose.
+    implementation "com.patrykandpatrick.vico:compose:1.6.4"
+
+    // For the view system.
+    implementation "com.patrykandpatrick.vico:views:1.6.4"
+
+    // For `compose`. Creates a `ChartStyle` based on an M2 Material Theme.
+    implementation "com.patrykandpatrick.vico:compose-m2:1.6.4"
+
+    // For `compose`. Creates a `ChartStyle` based on an M3 Material Theme.
+    implementation "com.patrykandpatrick.vico:compose-m3:1.6.4"
+    //
 
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
     //room
     implementation 'android.arch.persistence.room:runtime:1.1.1'
@@ -76,10 +94,8 @@ dependencies {
 
 
     //Dagger - Hilt
-    implementation 'com.google.dagger:hilt-android:2.39'
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+    implementation 'com.google.dagger:hilt-android:2.42'
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
-    implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
     kapt "androidx.hilt:hilt-compiler:1.0.0"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0-beta01"
     annotationProcessor "com.google.dagger:dagger-android-processor:2.11"
@@ -135,7 +151,7 @@ dependencies {
 
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
 
-    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.core:core-ktx:1.7.1'
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation "androidx.compose.ui:ui:$compose_version"

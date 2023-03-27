@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.session.PlaybackState
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,8 +57,7 @@ import com.skyune.loficorner.model.Data
 import com.skyune.loficorner.navigation.WeatherNavigation
 import com.skyune.loficorner.ui.BottomNavScreen
 import com.skyune.loficorner.ui.theme.Theme
-import com.skyune.loficorner.viewmodels.MainViewModel
-import com.skyune.loficorner.viewmodels.getTimeString
+import com.skyune.loficorner.viewmodels.*
 import com.yeocak.parallaximage.GravitySensorDefaulted
 
 
@@ -248,7 +249,6 @@ fun MainScreen(
             }
         }
     ) {
-
             WeatherNavigation(
                 modifier = Modifier.padding(it),
                 navController = navController,
@@ -281,8 +281,6 @@ fun BottomBar(
         BottomNavScreen.Profile,
         BottomNavScreen.Settings,
     )
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
 
     val context = LocalContext.current
     Column(
@@ -298,7 +296,7 @@ fun BottomBar(
         ) {
             Row() {
                 AnimatedVisibility(
-                    visible = bottomBarState.value.value && currentDestination?.route != "home" && musicServiceConnection.isConnected.value,
+                    visible = bottomBarState.value.value && navController.currentBackStackEntry?.destination?.route != "home" && musicServiceConnection.isConnected.value,
                     enter = slideInVertically(
                         initialOffsetY = { it }, animationSpec = tween(
                             durationMillis = 200,
@@ -312,7 +310,11 @@ fun BottomBar(
                         )
                     )
                 ) {
-                    SongColumn(songIcon, title, artist, musicServiceConnection, context)
+                    CompositionLocalProvider(LocalLifecycleOwner provides navController.currentBackStackEntry!!) {
+                        Log.d("TAG", "bottomBarState: ${bottomBarState.value.value}")
+                        Log.d("TAG", "route: ${navController.currentBackStackEntry?.destination?.route}")
+                        SongColumn(songIcon, title, artist, musicServiceConnection, context)
+                    }
                 }
             }
         }
@@ -337,6 +339,8 @@ fun BottomBar(
                     )
                 )
             ) {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
                 Box(
                     modifier = Modifier
                         .zIndex(22f)
@@ -466,15 +470,15 @@ private fun SongColumn(
 
 
 
-                LinearProgressIndicator(
-                    progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth(0.9f)
-                        .height(3f.dp)
-                        .graphicsLayer {
-                        }
-                )
+//                LinearProgressIndicator(
+//                    progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
+//                    Modifier
+//                        .align(Alignment.CenterHorizontally)
+//                        .fillMaxWidth(0.9f)
+//                        .height(3f.dp)
+//                        .graphicsLayer {
+//                        }
+//                )
             }
 
     }

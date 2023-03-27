@@ -1,5 +1,6 @@
 package com.skyune.loficorner.navigation
 
+import android.util.Log
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -46,13 +47,8 @@ fun WeatherNavigation(
 ) {
 
     //not sure gdzie powinna byc deklaracja settingsviewmodel
-    val settingsViewModel :  SettingsViewModel = hiltViewModel()
-    val homeViewModel :  HomeViewModel = hiltViewModel()
-    val profileViewModel :  ProfileViewModel = hiltViewModel()
+
     val listState = rememberLazyListState()
-    val list by profileViewModel.allWords.observeAsState(listOf())
-    val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
-    val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
 
 
     NavHost(navController = navController,
@@ -74,9 +70,14 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Home.route) {
+            val homeViewModel : HomeViewModel = hiltViewModel()
             HomeScreen(modifier,musicServiceConnection = musicServiceConnection, homeViewModel, currentRoom)
         }
         composable(route = BottomNavScreen.Profile.route) {
+            val profileViewModel : ProfileViewModel = hiltViewModel()
+            val list by profileViewModel.allWords.observeAsState(listOf())
+            val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
+            val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
             ProfileScreen(
                 profileViewModel = profileViewModel,
                 musicServiceConnection,
@@ -92,6 +93,8 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Settings.route) {
+            val settingsViewModel : SettingsViewModel = hiltViewModel()
+
             SettingsScreen(
                 settingsViewModel = settingsViewModel)
         }
