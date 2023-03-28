@@ -49,6 +49,13 @@ fun WeatherNavigation(
     //not sure gdzie powinna byc deklaracja settingsviewmodel
 
     val listState = rememberLazyListState()
+    val homeViewModel : HomeViewModel = hiltViewModel()
+    val settingsViewModel : SettingsViewModel = hiltViewModel()
+    val profileViewModel : ProfileViewModel = hiltViewModel()
+
+    val list by profileViewModel.allWords.observeAsState(listOf())
+    val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
+    val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
 
 
     NavHost(navController = navController,
@@ -70,14 +77,10 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Home.route) {
-            val homeViewModel : HomeViewModel = hiltViewModel()
             HomeScreen(modifier,musicServiceConnection = musicServiceConnection, homeViewModel, currentRoom)
         }
         composable(route = BottomNavScreen.Profile.route) {
-            val profileViewModel : ProfileViewModel = hiltViewModel()
-            val list by profileViewModel.allWords.observeAsState(listOf())
-            val Sleepylist by profileViewModel.allSleepy.observeAsState(listOf())
-            val Jazzylist by profileViewModel.allJazzy.observeAsState(listOf())
+
             ProfileScreen(
                 profileViewModel = profileViewModel,
                 musicServiceConnection,
@@ -93,7 +96,6 @@ fun WeatherNavigation(
             )
         }
         composable(route = BottomNavScreen.Settings.route) {
-            val settingsViewModel : SettingsViewModel = hiltViewModel()
 
             SettingsScreen(
                 settingsViewModel = settingsViewModel)

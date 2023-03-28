@@ -54,6 +54,8 @@ android {
 
 dependencies {
 
+    implementation "com.github.tehras:charts:0.2.4-alpha"
+
     // Includes the core logic for charts and other elements.
     implementation "com.patrykandpatrick.vico:core:1.6.4"
 
