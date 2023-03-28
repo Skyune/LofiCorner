@@ -16,7 +16,6 @@ class StraightLineConnector(private val color: Int, private val strokeWidth: Flo
             strokeWidth = this@StraightLineConnector.strokeWidth
             isAntiAlias = true
         }
-
         canvas.drawLine(left, top, right, bottom, paint)
     }
 }

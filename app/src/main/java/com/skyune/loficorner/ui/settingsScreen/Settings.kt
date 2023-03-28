@@ -1,6 +1,5 @@
 package com.skyune.loficorner.ui.settingsScreen
 
-import android.graphics.ColorSpace.Rgb
 import android.graphics.LinearGradient
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,32 +24,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.tehras.charts.piechart.PieChart
 import com.github.tehras.charts.piechart.PieChartData
-import com.github.tehras.charts.piechart.animation.simpleChartAnimation
 import com.github.tehras.charts.piechart.renderer.SimpleSliceDrawer
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.style.ChartStyle
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
-import com.patrykandpatrick.vico.compose.style.currentChartStyle
 import com.patrykandpatrick.vico.core.chart.line.LineChart
-import com.patrykandpatrick.vico.core.component.Component
 import com.patrykandpatrick.vico.core.component.shape.LineComponent
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShader
-import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.context.DrawContext
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.skyune.loficorner.ui.profileScreen.ClippedShadow
-import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.viewmodels.PomodoroSession
 import com.skyune.loficorner.viewmodels.SettingsViewModel
 import com.skyune.loficorner.viewmodels.getTimeString
 
 
 private val POPUP_WIDTH = 280.dp
-private  val POPUP_HEIGHT = 400.dp
-private  val POPUP_PADDING = 16.dp
+private val POPUP_HEIGHT = 400.dp
+private val POPUP_PADDING = 16.dp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -71,8 +63,7 @@ fun SettingsScreen(
                     start = Offset(250f, 300f),
                     end = Offset(900f, 1900.5f)
                 )
-            ),
-        contentAlignment = Alignment.Center
+            ), contentAlignment = Alignment.Center
     ) {
 
 
@@ -84,8 +75,7 @@ fun SettingsScreen(
         ) {
             item {
                 Column(
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.Start
+                    verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start
                 ) {
                     Text(
                         text = "Activity",
@@ -93,8 +83,7 @@ fun SettingsScreen(
                         textAlign = TextAlign.Start,
                         lineHeight = 26.sp,
                         style = TextStyle(
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 22.sp, fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier
                             .padding(10.dp, 4.dp, 0.dp, 4.dp)
@@ -142,35 +131,59 @@ fun SettingsScreen(
                             ), contentAlignment = Alignment.CenterStart
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column() {
+                            Column {
 
 
+                                val firstColor = MaterialTheme.colors.onPrimary
+                                val secondColor = MaterialTheme.colors.surface
+                                val circleColor = Color.White
 
-                                val firstColor = MaterialTheme.colors.surface
-                                val secondColor = MaterialTheme.colors.background
-                                val dynamicShader: (DrawContext, Float, Float, Float, Float) -> Shader = { context, x1, y1, x2, y2 ->
-                                    LinearGradient(
-                                        x1, y1, x1, y2,
-                                        intArrayOf(firstColor.toArgb(), secondColor.value.toInt()),
-                                        null,
-                                        android.graphics.Shader.TileMode.CLAMP
+                                val dynamicShader: (DrawContext, Float, Float, Float, Float) -> Shader =
+                                    { context, x1, y1, x2, y2 ->
+                                        LinearGradient(
+                                            x1, y1, x1, y2, intArrayOf(
+                                                secondColor.copy(alpha = 0.4f).toArgb(), 0), null, android.graphics.Shader.TileMode.CLAMP
+                                        )
+                                    }
+
+
+                                val chartEntryModel = entryModelOf(4f, 12f, 0f, 6f, 4f, 7f, 8f)
+                                ProvideChartStyle(remember {
+                                    ChartStyle(
+                                        axis = ChartStyle.Axis(
+                                            axisGuidelineColor = Color.Transparent,
+                                            axisLineColor = Color.Transparent,
+                                            axisLabelColor = Color.Magenta
+                                        ),
+                                        columnChart = ChartStyle.ColumnChart(
+                                            columns = listOf(
+                                                LineComponent(Color.Transparent.toArgb())
+                                            )
+                                        ),
+                                        ChartStyle.LineChart(
+                                            listOf(
+                                                LineChart.LineSpec(
+                                                    secondColor.toArgb(),
+                                                    lineBackgroundShader = DynamicShader(
+                                                        dynamicShader
+                                                    ),
+                                                    pointSizeDp = 10f,
+                                                    point = MyComponent(circleColor.toArgb(),secondColor.toArgb()),
+                                                    pointConnector = StraightConnector()
+                                                )
+                                            )
+                                        ),
+                                        ChartStyle.Marker(),
+                                        elevationOverlayColor = Color.DarkGray
                                     )
-                                }
-
-
-
-                                val chartEntryModel = entryModelOf(4f, 12f, 0f, 6f,4f,7f,8f)
-                                ProvideChartStyle(remember() { ChartStyle(axis = ChartStyle.Axis(axisGuidelineColor = Color.Red, axisLineColor = Color.Blue, axisLabelColor = Color.Magenta), columnChart = ChartStyle.ColumnChart(columns = listOf(
-                                    LineComponent(android.graphics.Color.GREEN)
-                                )),ChartStyle.LineChart(
-                                    listOf(LineChart.LineSpec(android.graphics.Color.BLACK, lineBackgroundShader = DynamicShader(dynamicShader), pointSizeDp = 10f, point = MyComponent(), pointConnector = StraightConnector()))
-                                ),ChartStyle.Marker(), elevationOverlayColor = Color.DarkGray) }) {
+                                }) {
 
 
                                     Chart(
                                         chart = lineChart(),
                                         model = chartEntryModel,
-                                        bottomAxis = bottomAxis())
+                                        bottomAxis = bottomAxis()
+                                    )
                                 }
 
                             }
@@ -191,8 +204,7 @@ fun SettingsScreen(
                         lineHeight = 26.sp,
                         style = TextStyle(
 
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 20.sp, fontWeight = FontWeight.Bold
                         ),
                         modifier = Modifier
                             .padding(10.dp, 0.dp, 0.dp, 0.dp)
@@ -216,7 +228,7 @@ fun SettingsScreen(
                 }
             }
 
-            item() {
+            item {
 
 
                 Box(
@@ -279,7 +291,6 @@ fun SettingsScreen(
         }
 
 
-
         /*TimerPopup(
             currentSession = settingsViewModel.currentSession,
             timeLeft = settingsViewModel.timeLeft,
@@ -293,8 +304,6 @@ fun SettingsScreen(
 }
 
 
-
-
 @Composable
 fun TimerPopup(
     currentSession: PomodoroSession,
@@ -304,10 +313,9 @@ fun TimerPopup(
     onStart: () -> Unit,
     onReset: () -> Unit,
 
-) {
+    ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
@@ -327,9 +335,7 @@ fun TimerPopup(
                         PomodoroSession.WORK -> "Work Session"
                         PomodoroSession.SHORT_BREAK -> "Short Break"
                         PomodoroSession.LONG_BREAK -> "Long Break"
-                    },
-                    fontSize = 48.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    }, fontSize = 48.sp, modifier = Modifier.padding(bottom = 16.dp)
                 )
 
 
@@ -353,8 +359,7 @@ fun TimerPopup(
                         Text(if (isTimerRunning) "Pause" else "Start")
                     }
                     Button(
-                        onClick = { onReset() },
-                        modifier = Modifier.width(120.dp)
+                        onClick = { onReset() }, modifier = Modifier.width(120.dp)
                     ) {
                         Text("Reset")
                     }

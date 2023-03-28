@@ -29,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -267,6 +266,7 @@ fun MainScreen(
 }
 
 
+
 @Composable
 fun BottomBar(
     navController: NavHostController,
@@ -281,6 +281,8 @@ fun BottomBar(
         BottomNavScreen.Profile,
         BottomNavScreen.Settings,
     )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
     val context = LocalContext.current
     Column(
@@ -296,7 +298,7 @@ fun BottomBar(
         ) {
             Row() {
                 AnimatedVisibility(
-                    visible = bottomBarState.value.value && navController.currentBackStackEntry?.destination?.route != "home" && musicServiceConnection.isConnected.value,
+                    visible = bottomBarState.value.value && currentDestination?.route != "home" && musicServiceConnection.isConnected.value,
                     enter = slideInVertically(
                         initialOffsetY = { it }, animationSpec = tween(
                             durationMillis = 200,
@@ -310,11 +312,7 @@ fun BottomBar(
                         )
                     )
                 ) {
-                    CompositionLocalProvider(LocalLifecycleOwner provides navController.currentBackStackEntry!!) {
-                        Log.d("TAG", "bottomBarState: ${bottomBarState.value.value}")
-                        Log.d("TAG", "route: ${navController.currentBackStackEntry?.destination?.route}")
-                        SongColumn(songIcon, title, artist, musicServiceConnection, context)
-                    }
+                    SongColumn(songIcon, title, artist, musicServiceConnection, context)
                 }
             }
         }
@@ -339,8 +337,6 @@ fun BottomBar(
                     )
                 )
             ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
                 Box(
                     modifier = Modifier
                         .zIndex(22f)
@@ -375,14 +371,13 @@ fun BottomBar(
     }
 }
 
-
 @Composable
 private fun SongColumn(
     songIcon: Uri?,
     title: String,
     artist: String,
     musicServiceConnection: MusicServiceConnection,
-    context: Context
+    context: Context,
 ) {
     val imageRequest = remember(songIcon) {
         ImageRequest.Builder(context)
@@ -470,16 +465,22 @@ private fun SongColumn(
 
 
 
-//                LinearProgressIndicator(
-//                    progress = musicServiceConnection.songDuration.value / MusicService.curSongDuration.toFloat(),
-//                    Modifier
-//                        .align(Alignment.CenterHorizontally)
-//                        .fillMaxWidth(0.9f)
-//                        .height(3f.dp)
-//                        .graphicsLayer {
-//                        }
-//                )
+            val songDuration = musicServiceConnection?.songDuration?.value ?: 0
+            val curSongDuration = MusicService.curSongDuration.toFloat()
+            val progress = if (songDuration > 0 && curSongDuration > 0) {
+                songDuration / curSongDuration
+            } else {
+                0f
             }
+
+            LinearProgressIndicator(
+                progress = progress,
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth(0.9f)
+                    .height(3f.dp)
+            )
+        }
 
     }
 
@@ -513,8 +514,11 @@ fun RowScope.AddItem(
         onClick = {
             bottomBarState.value = true
             navController.navigate(screen.route) {
-                popUpTo(navController.graph.findStartDestination().id)
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true // This line saves the state of the destination to the back stack
+                }
                 launchSingleTop = true
+                restoreState = true // This line restores the state of the destination from the back stack
             }
         }
     )
