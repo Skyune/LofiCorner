@@ -29,6 +29,7 @@ import com.rld.justlisten.android.ui.utils.widthSize
 import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicService
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
+import com.skyune.loficorner.ui.utils.MarqueeText
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi

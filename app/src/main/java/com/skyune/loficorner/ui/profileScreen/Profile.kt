@@ -44,9 +44,9 @@ import com.skyune.loficorner.R
 import com.skyune.loficorner.exoplayer.MusicServiceConnection
 import com.skyune.loficorner.exoplayer.isPlaying
 import com.skyune.loficorner.model.Data
-import com.skyune.loficorner.ui.homeScreen.GifImage
 import com.skyune.loficorner.ui.profileScreen.components.RoomImagesRow
 import com.skyune.loficorner.ui.theme.Theme
+import com.skyune.loficorner.ui.utils.GifImage
 import com.skyune.loficorner.viewmodels.ProfileViewModel
 import kotlinx.coroutines.*
 
@@ -103,6 +103,7 @@ private fun LazyListState.isScrollingUp(): Boolean {
     }.value
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShowData(
     profileViewModel: ProfileViewModel,

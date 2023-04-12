@@ -86,18 +86,21 @@ public val RockstarRoomTheme = lightColors(
 
 
 
-public val RainbowTheme = darkColors(
-    primary = JazzMainScreenPrimary,
-    primaryVariant = JazzMainScreenPrimaryVariant,
-    onPrimary = Color.Black,
-    secondary = JazzMainScreenSecondary,
-    onSecondary = Color.White,
-    error = RedErrorLight,
-    background = Color.Black,
-    onBackground = Color.White,
-    surface = Black1,
+@SuppressLint("ConflictingOnColor")
+public val CyberpunkRoomTheme = lightColors(
+    primary = Color(0xFF69DAEB),
+    primaryVariant = Color(0xFFE047B9),
+    onPrimary = Color(0xFF98B8E9), //Component1
+    secondary = Color(0xFFBB70C8), //BorderStroke1
+    secondaryVariant = Color(0xFF80BFFB), //BorderStroke2
+    onSecondary = Color(0xFFBB70C8), //Component2
+    error = Color.Black,
+    background = Color(0xFF69DAEB),
+    onBackground = Color(0xFFE047B9),
+    surface = Color(0xFF000000), //surfaceText
     onSurface = Color.White,
 )
+
 
 enum class Theme {
     Jazz,
@@ -105,7 +108,8 @@ enum class Theme {
     Witch,
     Queen,
     Botanist,
-    Rockstar
+    Rockstar,
+    Cyberpunk
 }
 
 @Composable
@@ -118,6 +122,7 @@ fun AppTheme(theme: Theme,
         Theme.Jazz -> JazzRoomTheme
         Theme.Botanist -> BotanistRoomTheme
         Theme.Rockstar -> RockstarRoomTheme
+        Theme.Cyberpunk -> CyberpunkRoomTheme
         else -> JazzRoomTheme
     }
 

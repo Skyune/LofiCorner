@@ -54,7 +54,7 @@ fun RoomImagesRow(
                             profileViewModel.selectRoomIndex(0)
                             selectedButtonIndex.value = 0
                                   },
-                        roomTitle = "The Rockstar",
+                        roomTitle = "Zoologist's Den",
                         isSelected = selectedButtonIndex.value == 0
 
                     )
@@ -67,7 +67,7 @@ fun RoomImagesRow(
                             profileViewModel.selectRoomIndex(1)
                             selectedButtonIndex.value = 1
                                   },
-                        roomTitle = "Jazz Enthusiast",
+                        roomTitle = "Queen's Quarters",
                         isSelected =  selectedButtonIndex.value == 1,
                     )
                     RoomImage(
@@ -78,7 +78,7 @@ fun RoomImagesRow(
                             profileViewModel.selectRoomIndex(2)
                             selectedButtonIndex.value = 2
                                   },
-                        roomTitle = "The Delinquent",
+                        roomTitle = "Guitarist's Lair",
                         isSelected =  selectedButtonIndex.value == 2,
                     )
                 }
@@ -91,13 +91,13 @@ fun RoomImagesRow(
                     ) {
                         RoomImage(
                             modifier = Modifier.weight(1f),
-                            ImageId = R.drawable.witch,
-                            onClick = { onToggleTheme(Theme.Witch)
-                                profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.witch))
+                            ImageId = R.drawable.cyberpunkborder,
+                            onClick = { onToggleTheme(Theme.Cyberpunk)
+                                profileViewModel.insertRoom(CurrentRoom(imageId = R.drawable.cyberpunkborder))
                                 profileViewModel.selectRoomIndex(3)
                                 selectedButtonIndex.value = 3
                                       },
-                            roomTitle = "The Witch's Bedroom",
+                            roomTitle = "Holographic Hideaway",
                             isSelected =  selectedButtonIndex.value == 3,
                         )
                         RoomImage(
@@ -109,7 +109,7 @@ fun RoomImagesRow(
                                 profileViewModel.selectRoomIndex(4)
                                 selectedButtonIndex.value = 4
                                       },
-                            roomTitle = "Jazz Enthusiast",
+                            roomTitle = "Blues Lounge",
                             isSelected =  selectedButtonIndex.value == 4,
                         )
                         RoomImage(
@@ -120,7 +120,7 @@ fun RoomImagesRow(
                                 profileViewModel.selectRoomIndex(5)
                                 selectedButtonIndex.value = 5
                                       },
-                            roomTitle = "The Delinquent",
+                            roomTitle = "Spellbound Sanctum",
                             isSelected =  selectedButtonIndex.value == 5,
                         )
                     }
